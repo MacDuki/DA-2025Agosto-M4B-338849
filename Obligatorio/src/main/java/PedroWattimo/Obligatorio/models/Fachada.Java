@@ -7,14 +7,16 @@ public class Fachada {
     private static Fachada instancia;
 
     // Sistemas como atributos privados. Nunca gets ni sets de estos atributos.
-    private final SistemaEstados sistemaEstados;
-    private final SistemaPropietarios sistemaPropietarios;
-    private final SistemaVehiculos sistemaVehiculos;
-    private final SistemaPuestos sistemaPuestos;
-    private final SistemaTransitos sistemaTransitos;
-    private final SistemaBonificaciones sistemaBonificaciones;
-    private final SistemaAuth sistemaAuth;
+    private SistemaEstados sistemaEstados;
+    private SistemaPropietarios sistemaPropietarios;
+    private SistemaVehiculos sistemaVehiculos;
+    private SistemaPuestos sistemaPuestos;
+    private SistemaTransitos sistemaTransitos;
+    private SistemaBonificaciones sistemaBonificaciones;
+    private SistemaAuth sistemaAuth;
+    private SistemaNotificaciones sistemaNotificaciones;
 
+    
   
     private Fachada() {
         // Instanciación de sub-sistemas
@@ -25,6 +27,7 @@ public class Fachada {
         this.sistemaTransitos = new SistemaTransitos();
         this.sistemaBonificaciones = new SistemaBonificaciones();
         this.sistemaAuth = new SistemaAuth();
+        this.sistemaNotificaciones = new SistemaNotificaciones();
     }
 
     // Acceso controlado a la instancia única
@@ -35,6 +38,8 @@ public class Fachada {
         return instancia;
     }
 
+
+    
     // --------------------------------------------------------------
     // Delegación de métodos a los sistemas internos
     // --------------------------------------------------------------
