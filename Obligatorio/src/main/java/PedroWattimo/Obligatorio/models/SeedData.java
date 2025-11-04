@@ -2,192 +2,166 @@ package PedroWattimo.Obligatorio.models;
 
 public class SeedData {
     public static void initialize() {
-        Fachada fachada = Fachada.getInstancia();
-
         // 1. Precargar Administradores
-        cargarAdministradores(fachada);
+        cargarAdministradores();
 
         // 2. Precargar Categorías de vehículos
-        cargarCategorias(fachada);
+        cargarCategorias();
 
         // 3. Precargar Propietarios (después de categorías para poder crear estados)
-        cargarPropietarios(fachada);
+        cargarPropietarios();
 
         // 4. Precargar Puestos
-        cargarPuestos(fachada);
+        cargarPuestos();
 
         // 5. Precargar Tarifas de cada puesto
-        cargarTarifas(fachada);
+        cargarTarifas();
 
         // 6. Precargar Vehículos
-        cargarVehiculos(fachada);
+        cargarVehiculos();
 
         System.out.println("✓ Datos precargados exitosamente");
     }
 
-    private static void cargarAdministradores(Fachada fachada) {
-        SistemaAdministradores sistemaAdmin = fachada.getSistemaAdministradores();
+    static void cargarAdministradores() {
+        Fachada f = Fachada.getInstancia();
+        SistemaAdministradores sa = f.getSistemaAdministradores();
 
-        // Administrador requerido
-        Administrador admin1 = new Administrador("12345678", "admin.123", "Usuario Administrador");
-        sistemaAdmin.getAdministradores().add(admin1);
+        // Crear administradores usando solo constructores
+        Administrador admin1 = new Administrador("99999999", "admin123", "Root Admin");
+        Administrador admin2 = new Administrador("88888888", "gestor123", "Gestor 1");
 
-        // Segundo administrador
-        Administrador admin2 = new Administrador("11111111", "admin456", "María Rodríguez");
-        sistemaAdmin.getAdministradores().add(admin2);
-
-        System.out.println("  - Administradores cargados: " + sistemaAdmin.getAdministradores().size());
+        // Registrar
+        sa.getAdministradores().add(admin1);
+        sa.getAdministradores().add(admin2);
     }
 
-    private static void cargarCategorias(Fachada fachada) {
-        SistemaCategorias sistemaCategorias = fachada.getSistemaCategorias();
+    static void cargarCategorias() {
+        Fachada f = Fachada.getInstancia();
+        SistemaCategorias sc = f.getSistemaCategorias();
 
-        // Categorías de vehículos
-        Categoria automovil = new Categoria("Automóvil");
-        Categoria camion = new Categoria("Camión");
-        Categoria motocicleta = new Categoria("Motocicleta");
+        // Categorías base
+        Categoria auto = new Categoria("Auto");
         Categoria camioneta = new Categoria("Camioneta");
+        Categoria camion = new Categoria("Camión");
 
-        sistemaCategorias.getCategorias().add(automovil);
-        sistemaCategorias.getCategorias().add(camion);
-        sistemaCategorias.getCategorias().add(motocicleta);
-        sistemaCategorias.getCategorias().add(camioneta);
-
-        System.out.println("  - Categorías cargadas: " + sistemaCategorias.getCategorias().size());
+        sc.getCategorias().add(auto);
+        sc.getCategorias().add(camioneta);
+        sc.getCategorias().add(camion);
     }
 
-    private static void cargarPropietarios(Fachada fachada) {
-        SistemaPropietarios sistemaProp = fachada.getSistemaPropietarios();
+    static void cargarPuestos() {
+        Fachada f = Fachada.getInstancia();
+        SistemaPuestos sp = f.getSistemaPuestos();
 
-        // Propietario requerido
-        Propietario prop1 = new Propietario("23456789", "Usuario Propietario", "prop.123");
-        prop1.setSaldoActual(2000);
-        prop1.setSaldoMinimoAlerta(500);
-        // Estado "Habilitado" es el estado por defecto
-        // prop1.setEstadoActual(estadoHabilitado); // Se configurará cuando exista
-        // SistemaEstados
-        sistemaProp.getPropietarios().add(prop1);
+        Puesto p1 = new Puesto("Peaje Ruta 1", "KM 34, Ruta Interbalnearia");
+        Puesto p2 = new Puesto("Peaje Ruta 3", "KM 96, San José");
+        Puesto p3 = new Puesto("Peaje Ruta 8", "KM 22, Pando");
 
-        // Segundo propietario
-        Propietario prop2 = new Propietario("33333333", "Juan Pérez", "prop456");
-        prop2.setSaldoActual(1500);
-        prop2.setSaldoMinimoAlerta(300);
-        sistemaProp.getPropietarios().add(prop2);
-
-        // Tercer propietario
-        Propietario prop3 = new Propietario("44444444", "Ana García", "prop789");
-        prop3.setSaldoActual(3000);
-        prop3.setSaldoMinimoAlerta(600);
-        sistemaProp.getPropietarios().add(prop3);
-
-        // Cuarto propietario (inhabilitado/suspendido) para pruebas de login 403
-        Propietario prop4 = new Propietario("55555555", "Carlos Inhabilitado", "disabled123");
-        prop4.setSaldoActual(1000);
-        prop4.setSaldoMinimoAlerta(200);
-        prop4.setEstadoActual(Estado.SUSPENDIDO);
-        sistemaProp.getPropietarios().add(prop4);
-
-        System.out.println("  - Propietarios cargados: " + sistemaProp.getPropietarios().size());
+        sp.getPuestos().add(p1);
+        sp.getPuestos().add(p2);
+        sp.getPuestos().add(p3);
     }
 
-    private static void cargarPuestos(Fachada fachada) {
-        SistemaPuestos sistemaPuestos = fachada.getSistemaPuestos();
+    static void cargarTarifas() {
+        Fachada f = Fachada.getInstancia();
+        SistemaPuestos sp = f.getSistemaPuestos();
+        SistemaCategorias sc = f.getSistemaCategorias();
 
-        // Puestos de peaje
-        Puesto puesto1 = new Puesto("Peaje Montevideo Este", "Ruta 1 Km 25");
-        Puesto puesto2 = new Puesto("Peaje Colonia", "Ruta 1 Km 120");
-        Puesto puesto3 = new Puesto("Peaje Canelones", "Ruta 8 Km 30");
-        Puesto puesto4 = new Puesto("Peaje Maldonado", "Ruta 9 Km 95");
-
-        sistemaPuestos.getPuestos().add(puesto1);
-        sistemaPuestos.getPuestos().add(puesto2);
-        sistemaPuestos.getPuestos().add(puesto3);
-        sistemaPuestos.getPuestos().add(puesto4);
-
-        System.out.println("  - Puestos cargados: " + sistemaPuestos.getPuestos().size());
-    }
-
-    private static void cargarTarifas(Fachada fachada) {
-        SistemaPuestos sistemaPuestos = fachada.getSistemaPuestos();
-        SistemaCategorias sistemaCategorias = fachada.getSistemaCategorias();
-
-        // Obtener categorías
-        Categoria automovil = sistemaCategorias.getCategorias().get(0); // Automóvil
-        Categoria camion = sistemaCategorias.getCategorias().get(1); // Camión
-        Categoria motocicleta = sistemaCategorias.getCategorias().get(2); // Motocicleta
-        Categoria camioneta = sistemaCategorias.getCategorias().get(3); // Camioneta
-
-        int tarifasTotales = 0;
-
-        // Asignar tarifas a cada puesto
-        for (Puesto puesto : sistemaPuestos.getPuestos()) {
-            // Tarifas varían según el puesto
-            double multiplicador = 1.0;
-            if (puesto.getNombre().contains("Colonia")) {
-                multiplicador = 1.2;
-            } else if (puesto.getNombre().contains("Maldonado")) {
-                multiplicador = 1.3;
+        // Helper: buscar categoría por nombre
+        java.util.function.Function<String, Categoria> cat = nombre -> {
+            for (Categoria c : sc.getCategorias()) {
+                if (c.getNombre().equalsIgnoreCase(nombre))
+                    return c;
             }
+            return null;
+        };
 
-            Tarifa tarifaAuto = new Tarifa(100 * multiplicador, automovil);
-            Tarifa tarifaCamion = new Tarifa(300 * multiplicador, camion);
-            Tarifa tarifaMoto = new Tarifa(50 * multiplicador, motocicleta);
-            Tarifa tarifaCamioneta = new Tarifa(150 * multiplicador, camioneta);
+        Categoria auto = cat.apply("Auto");
+        Categoria camioneta = cat.apply("Camioneta");
+        Categoria camion = cat.apply("Camión");
+        if (camion == null)
+            camion = cat.apply("Camion"); // tolerar sin tilde
 
-            puesto.getTablaTarifas().add(tarifaAuto);
-            puesto.getTablaTarifas().add(tarifaCamion);
-            puesto.getTablaTarifas().add(tarifaMoto);
-            puesto.getTablaTarifas().add(tarifaCamioneta);
+        // Definir montos por puesto y categoría (ejemplo simple)
+        for (Puesto puesto : sp.getPuestos()) {
+            if (auto != null)
+                puesto.getTablaTarifas().add(new Tarifa(120.0, auto));
+            if (camioneta != null)
+                puesto.getTablaTarifas().add(new Tarifa(180.0, camioneta));
+            if (camion != null)
+                puesto.getTablaTarifas().add(new Tarifa(300.0, camion));
+        }
+    }
 
-            tarifasTotales += 4;
+    static void cargarVehiculos() {
+        Fachada f = Fachada.getInstancia();
+        SistemaPropietarios sp = f.getSistemaPropietarios();
+        SistemaVehiculos sv = f.getSistemaVehiculos();
+        SistemaCategorias sc = f.getSistemaCategorias();
+
+        // Buscar categorías ya precargadas
+        Categoria catAuto = null;
+        Categoria catCamioneta = null;
+        Categoria catCamion = null;
+        for (Categoria c : sc.getCategorias()) {
+            if ("Auto".equalsIgnoreCase(c.getNombre()))
+                catAuto = c;
+            else if ("Camioneta".equalsIgnoreCase(c.getNombre()))
+                catCamioneta = c;
+            else if ("Camión".equalsIgnoreCase(c.getNombre()) || "Camion".equalsIgnoreCase(c.getNombre()))
+                catCamion = c;
         }
 
-        System.out.println("  - Tarifas cargadas: " + tarifasTotales);
+        // Obtener propietarios ya cargados
+        Propietario p1 = sp.buscarPorCedula("11111111");
+        Propietario p2 = sp.buscarPorCedula("22222222");
+        Propietario p3 = sp.buscarPorCedula("33333333");
+
+        // Crear vehículos mediante métodos de dominio (sin setters)
+        if (p1 != null) {
+            Vehiculo v1 = p1.registrarVehiculo("SBA1234", "Ford Fiesta", "Rojo", catAuto);
+            Vehiculo v2 = p1.registrarVehiculo("SBA5678", "Hyundai Tucson", "Blanco", catCamioneta);
+            sv.getVehiculos().add(v1);
+            sv.getVehiculos().add(v2);
+        }
+
+        if (p2 != null) {
+            Vehiculo v3 = p2.registrarVehiculo("ABC1234", "Toyota Hilux", "Negro", catCamioneta);
+            sv.getVehiculos().add(v3);
+        }
+
+        if (p3 != null) {
+            Vehiculo v4 = p3.registrarVehiculo("TRK9000", "Scania R500", "Azul", catCamion);
+            sv.getVehiculos().add(v4);
+        }
     }
 
-    private static void cargarVehiculos(Fachada fachada) {
-        SistemaVehiculos sistemaVehiculos = fachada.getSistemaVehiculos();
-        SistemaPropietarios sistemaProp = fachada.getSistemaPropietarios();
-        SistemaCategorias sistemaCategorias = fachada.getSistemaCategorias();
+    static void cargarPropietarios() {
+        Fachada f = Fachada.getInstancia();
+        SistemaPropietarios sp = f.getSistemaPropietarios();
 
-        // Obtener propietarios y categorías
-        Propietario prop1 = sistemaProp.getPropietarios().get(0);
-        Propietario prop2 = sistemaProp.getPropietarios().get(1);
-        Propietario prop3 = sistemaProp.getPropietarios().get(2);
+        // Propietario 1: habilitado, con saldo y mínimo de alerta
+        Propietario p1 = new Propietario("11111111", "Ana Pérez", "ana123")
+                .acreditarSaldo(1500)
+                .ajustarSaldoMinimoAlerta(200)
+                .cambiarEstado(Estado.HABILITADO);
 
-        Categoria automovil = sistemaCategorias.getCategorias().get(0);
-        Categoria camion = sistemaCategorias.getCategorias().get(1);
-        Categoria motocicleta = sistemaCategorias.getCategorias().get(2);
-        Categoria camioneta = sistemaCategorias.getCategorias().get(3);
+        // Propietario 2: penalizado
+        Propietario p2 = new Propietario("22222222", "Bruno López", "bruno123")
+                .acreditarSaldo(800)
+                .ajustarSaldoMinimoAlerta(100)
+                .cambiarEstado(Estado.PENALIZADO);
 
-        // Vehículos del propietario 1
-        Vehiculo v1 = new Vehiculo("ABC1234", "Toyota Corolla 2020", "Blanco", automovil, prop1);
-        Vehiculo v2 = new Vehiculo("DEF5678", "Honda CB500 2019", "Rojo", motocicleta, prop1);
+        // Propietario 3: suspendido, sin saldo
+        Propietario p3 = new Propietario("33333333", "Carla Gómez", "carla123")
+                .ajustarSaldoMinimoAlerta(50)
+                .cambiarEstado(Estado.SUSPENDIDO);
 
-        // Vehículos del propietario 2
-        Vehiculo v3 = new Vehiculo("GHI9012", "Ford Ranger 2021", "Negro", camioneta, prop2);
-        Vehiculo v4 = new Vehiculo("JKL3456", "Chevrolet Onix 2022", "Azul", automovil, prop2);
-
-        // Vehículos del propietario 3
-        Vehiculo v5 = new Vehiculo("MNO7890", "Mercedes Benz Actros 2018", "Blanco", camion, prop3);
-        Vehiculo v6 = new Vehiculo("PQR1234", "Volkswagen Amarok 2020", "Gris", camioneta, prop3);
-
-        // Agregar al sistema
-        sistemaVehiculos.getVehiculos().add(v1);
-        sistemaVehiculos.getVehiculos().add(v2);
-        sistemaVehiculos.getVehiculos().add(v3);
-        sistemaVehiculos.getVehiculos().add(v4);
-        sistemaVehiculos.getVehiculos().add(v5);
-        sistemaVehiculos.getVehiculos().add(v6);
-
-        // Agregar a los propietarios
-        prop1.getVehiculos().add(v1);
-        prop1.getVehiculos().add(v2);
-        prop2.getVehiculos().add(v3);
-        prop2.getVehiculos().add(v4);
-        prop3.getVehiculos().add(v5);
-        prop3.getVehiculos().add(v6);
-
-        System.out.println("  - Vehículos cargados: " + sistemaVehiculos.getVehiculos().size());
+        // Registrar en el sistema
+        sp.getPropietarios().add(p1);
+        sp.getPropietarios().add(p2);
+        sp.getPropietarios().add(p3);
     }
+
 }

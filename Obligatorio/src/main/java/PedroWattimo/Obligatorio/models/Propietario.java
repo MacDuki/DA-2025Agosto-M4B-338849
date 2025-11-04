@@ -17,21 +17,24 @@ public class Propietario {
     private List<AsignacionBonificacion> asignaciones;
     private List<Notificacion> notificaciones;
 
-    public Propietario() {
+    /**
+     * Constructor sencillo: define identidad y credenciales.
+     * Estado por defecto: HABILITADO. Saldos en 0.
+     */
+    public Propietario(String cedula, String nombreCompleto, String contraseña) {
+        // Inicialización de colecciones
         this.vehiculos = new ArrayList<>();
         this.transitos = new ArrayList<>();
         this.asignaciones = new ArrayList<>();
         this.notificaciones = new ArrayList<>();
-        // Por defecto, el propietario está habilitado para ingresar
-        this.estadoActual = Estado.HABILITADO;
-    }
 
-    public Propietario(String cedula, String nombreCompleto, String contraseña) {
-        this();
+        // Datos básicos
         this.cedula = cedula;
         this.nombreCompleto = nombreCompleto;
-        // Almacenar siempre el hash de la contraseña
         this.contraseña = hash(contraseña);
+        this.saldoActual = 0;
+        this.saldoMinimoAlerta = 0;
+        this.estadoActual = Estado.HABILITADO;
     }
 
     public String getCedula() {
@@ -74,29 +77,65 @@ public class Propietario {
         return notificaciones;
     }
 
-    public void setCedula(String cedula) {
-        this.cedula = cedula;
+    // --- Estilo sin setters: métodos de dominio explícitos ---
+    /** Cambia el estado actual del propietario. */
+    public Propietario cambiarEstado(Estado nuevoEstado) {
+        this.estadoActual = (nuevoEstado == null) ? Estado.HABILITADO : nuevoEstado;
+        return this;
     }
 
-    public void setNombreCompleto(String nombreCompleto) {
-        this.nombreCompleto = nombreCompleto;
+    /** Define el umbral de saldo mínimo para alertas (no negativo). */
+    public Propietario ajustarSaldoMinimoAlerta(int nuevoMinimo) {
+        this.saldoMinimoAlerta = Math.max(0, nuevoMinimo);
+        return this;
     }
 
-    public void setContraseña(String contraseña) {
-        // Almacenar siempre el hash de la contraseña
-        this.contraseña = hash(contraseña);
+    /** Acredita saldo positivo. Ignora montos nulos/negativos. */
+    public Propietario acreditarSaldo(int monto) {
+        if (monto > 0)
+            this.saldoActual += monto;
+        return this;
     }
 
-    public void setSaldoActual(int saldoActual) {
-        this.saldoActual = saldoActual;
+    /**
+     * Debita saldo si hay fondos suficientes. Retorna true si se realizó.
+     * No permite saldos negativos.
+     */
+    public boolean debitarSaldo(int monto) {
+        if (monto <= 0)
+            return false;
+        if (this.saldoActual - monto < 0)
+            return false;
+        this.saldoActual -= monto;
+        return true;
     }
 
-    public void setSaldoMinimoAlerta(int saldoMinimoAlerta) {
-        this.saldoMinimoAlerta = saldoMinimoAlerta;
+    /**
+     * Registra un vehículo nuevo asociado a este propietario.
+     */
+    public Vehiculo registrarVehiculo(String matricula, String modelo, String color, Categoria categoria) {
+        Vehiculo v = new Vehiculo(matricula, modelo, color, categoria, this);
+        if (this.vehiculos == null)
+            this.vehiculos = new ArrayList<>();
+        this.vehiculos.add(v);
+        return v;
     }
 
-    public void setEstadoActual(Estado estadoActual) {
-        this.estadoActual = estadoActual;
+    /**
+     * Agrega un vehículo ya construido y asegura la asociación con este
+     * propietario.
+     */
+    public Propietario agregarVehiculo(Vehiculo v) {
+        if (v == null)
+            return this;
+        // Si el vehículo no referencia este propietario, crear uno nuevo consistente
+        if (v.getPropietario() != this) {
+            v = new Vehiculo(v.getMatricula(), v.getModelo(), v.getColor(), v.getCategoria(), this);
+        }
+        if (this.vehiculos == null)
+            this.vehiculos = new ArrayList<>();
+        this.vehiculos.add(v);
+        return this;
     }
 
     // ---------------------------------------------

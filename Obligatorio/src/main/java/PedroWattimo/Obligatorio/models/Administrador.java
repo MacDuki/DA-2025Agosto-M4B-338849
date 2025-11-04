@@ -18,23 +18,11 @@ public class Administrador {
         return cedula;
     }
 
-    public void setCedula(String cedula) {
-        this.cedula = cedula;
-    }
-
     public String getContraseña() {
         return contraseña;
     }
 
-    public void setContraseña(String contraseña) {
-        this.contraseña = contraseña;
-    }
-
     public String getNombreCompleto() {
         return nombreCompleto;
-    }
-
-    public void setNombreCompleto(String nombreCompleto) {
-        this.nombreCompleto = nombreCompleto;
     }
 }
