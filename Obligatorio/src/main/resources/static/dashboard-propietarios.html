@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tablero de Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white"
+  >
+    <header class="border-b border-white/10 bg-slate-900/60 backdrop-blur">
+      <div
+        class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between"
+      >
+        <h1 class="text-xl font-semibold">Tablero de Control</h1>
+        <div class="flex items-center gap-3">
+          <span id="ownerName" class="text-slate-300"></span>
+          <button
+            id="logoutBtn"
+            class="px-3 py-2 rounded-md bg-red-600 hover:bg-red-500 text-sm"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-10">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white/5 rounded-2xl border border-white/10 p-6">
+          <h2 class="text-lg font-semibold mb-4">Datos del Propietario</h2>
+          <dl class="grid grid-cols-1 gap-3">
+            <div>
+              <dt class="text-slate-400 text-sm">Cédula</dt>
+              <dd id="ownerCedula" class="text-lg font-mono"></dd>
+            </div>
+            <div>
+              <dt class="text-slate-400 text-sm">Nombre</dt>
+              <dd id="ownerNombre" class="text-lg"></dd>
+            </div>
+            <div>
+              <dt class="text-slate-400 text-sm">Estado</dt>
+              <dd>
+                <span
+                  id="ownerEstado"
+                  class="inline-flex items-center px-2 py-1 rounded-md text-sm bg-emerald-900/50 border border-emerald-700 text-emerald-200"
+                ></span>
+              </dd>
+            </div>
+            <div>
+              <dt class="text-slate-400 text-sm">Saldo Actual</dt>
+              <dd id="ownerSaldo" class="text-lg font-mono"></dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="bg-white/5 rounded-2xl border border-white/10 p-6">
+          <h2 class="text-lg font-semibold mb-4">Acciones</h2>
+          <div class="space-x-3">
+            <a
+              href="/login-propietarios.html"
+              class="px-4 py-2 rounded-md bg-slate-700 hover:bg-slate-600"
+              >Ir a Login</a
+            >
+            <a
+              href="/"
+              class="px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-500"
+              >Inicio</a
+            >
+            <button
+              id="btnBorrarNotifs"
+              class="px-4 py-2 rounded-md bg-rose-700 hover:bg-rose-600"
+            >
+              Borrar notificaciones
+            </button>
+          </div>
+          <p id="accionMsg" class="mt-3 text-sm text-slate-300"></p>
+        </div>
+      </div>
+
+      <!-- Bonificaciones -->
+      <section class="mt-8 bg-white/5 rounded-2xl border border-white/10 p-6">
+        <h2 class="text-lg font-semibold mb-4">Bonificaciones asignadas</h2>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead class="text-slate-300">
+              <tr>
+                <th class="text-left p-2">Nombre</th>
+                <th class="text-left p-2">Puesto</th>
+                <th class="text-left p-2">Fecha asignada</th>
+              </tr>
+            </thead>
+            <tbody
+              id="tblBonificaciones"
+              class="divide-y divide-white/10"
+            ></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Vehículos -->
+      <section class="mt-8 bg-white/5 rounded-2xl border border-white/10 p-6">
+        <h2 class="text-lg font-semibold mb-4">Vehículos</h2>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead class="text-slate-300">
+              <tr>
+                <th class="text-left p-2">Matrícula</th>
+                <th class="text-left p-2">Modelo</th>
+                <th class="text-left p-2">Color</th>
+                <th class="text-right p-2">Tránsitos</th>
+                <th class="text-right p-2">Total gastado</th>
+              </tr>
+            </thead>
+            <tbody id="tblVehiculos" class="divide-y divide-white/10"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Tránsitos -->
+      <section class="mt-8 bg-white/5 rounded-2xl border border-white/10 p-6">
+        <h2 class="text-lg font-semibold mb-4">Tránsitos</h2>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead class="text-slate-300">
+              <tr>
+                <th class="text-left p-2">Puesto</th>
+                <th class="text-left p-2">Matrícula</th>
+                <th class="text-left p-2">Categoría</th>
+                <th class="text-right p-2">Tarifa</th>
+                <th class="text-left p-2">Bonificación</th>
+                <th class="text-right p-2">Monto bonif.</th>
+                <th class="text-right p-2">Pagado</th>
+                <th class="text-left p-2">FechaHora</th>
+              </tr>
+            </thead>
+            <tbody id="tblTransitos" class="divide-y divide-white/10"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Notificaciones -->
+      <section class="mt-8 bg-white/5 rounded-2xl border border-white/10 p-6">
+        <h2 class="text-lg font-semibold mb-4">Notificaciones</h2>
+        <ul id="listaNotifs" class="space-y-2"></ul>
+      </section>
+    </main>
+
+    <script type="module">
+      import {
+        getDashboard,
+        getDashboardVersion,
+        borrarNotificaciones,
+      } from "/js/vistaWeb.js";
+
+      function loadOwner() {
+        // 1) Intentar desde sessionStorage (flujo normal tras login)
+        const raw = sessionStorage.getItem("owner");
+        if (raw) {
+          try {
+            const dto = JSON.parse(raw);
+            setOwnerHeader(dto);
+            return dto;
+          } catch {
+            sessionStorage.removeItem("owner");
+          }
+        }
+
+        // 2) Fallback: permitir abrir el dashboard directo con ?cedula=NNNNNNNN
+        const params = new URLSearchParams(window.location.search);
+        const cedulaFromUrl = params.get("cedula");
+        if (cedulaFromUrl && /^\d{7,9}$/.test(cedulaFromUrl)) {
+          // Guardamos un owner mínimo para que el resto del flujo funcione
+          const ownerMin = {
+            cedula: cedulaFromUrl,
+            nombreCompleto: "",
+            estado: "",
+          };
+          sessionStorage.setItem("owner", JSON.stringify(ownerMin));
+          setOwnerHeader(ownerMin);
+          return ownerMin;
+        }
+
+        // 3) Sin información suficiente, redirigir a login
+        window.location.href = "/login-propietarios.html";
+      }
+
+      function setOwnerHeader(dto) {
+        document.getElementById("ownerName").textContent =
+          dto.nombreCompleto || "";
+        document.getElementById("ownerCedula").textContent = dto.cedula || "";
+        document.getElementById("ownerNombre").textContent =
+          dto.nombreCompleto || "";
+        const estadoEl = document.getElementById("ownerEstado");
+        estadoEl.textContent = dto.estado || "Habilitado";
+        if ((dto.estado || "").toLowerCase().includes("suspend")) {
+          estadoEl.className =
+            "inline-flex items-center px-2 py-1 rounded-md text-sm bg-red-900/50 border border-red-700 text-red-200";
+        } else if ((dto.estado || "").toLowerCase().includes("penal")) {
+          estadoEl.className =
+            "inline-flex items-center px-2 py-1 rounded-md text-sm bg-amber-900/50 border border-amber-700 text-amber-200";
+        }
+      }
+
+      function fmtMoney(n) {
+        return new Intl.NumberFormat("es-UY", {
+          style: "currency",
+          currency: "UYU",
+          maximumFractionDigits: 0,
+        }).format(n || 0);
+      }
+
+      function fmtDate(s) {
+        if (!s) return "";
+        // Accept LocalDateTime serialized by Jackson as ISO; show readable
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) return d.toLocaleString("es-UY");
+        return s;
+      }
+
+      function renderDashboard(dto, owner) {
+        // propietario
+        document.getElementById("ownerSaldo").textContent = fmtMoney(
+          dto?.propietario?.saldoActual || 0
+        );
+
+        // Actualizar encabezado con datos frescos del dashboard (si están presentes)
+        const nombreFresh = dto?.propietario?.nombreCompleto;
+        const estadoFresh = dto?.propietario?.estado;
+        const ownerDisplay = {
+          cedula: owner?.cedula || "",
+          nombreCompleto: nombreFresh ?? owner?.nombreCompleto ?? "",
+          estado: estadoFresh ?? owner?.estado ?? "",
+        };
+        setOwnerHeader(ownerDisplay);
+
+        // bonificaciones
+        const tbB = document.getElementById("tblBonificaciones");
+        tbB.innerHTML = "";
+        (dto.bonificaciones || []).forEach((b) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td class="p-2">${b.nombre ?? ""}</td>
+                          <td class="p-2">${b.puesto ?? ""}</td>
+                          <td class="p-2">${fmtDate(b.fechaAsignada)}</td>`;
+          tbB.appendChild(tr);
+        });
+
+        // vehiculos
+        const tbV = document.getElementById("tblVehiculos");
+        tbV.innerHTML = "";
+        (dto.vehiculos || []).forEach((v) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td class="p-2 font-mono">${v.matricula ?? ""}</td>
+                          <td class="p-2">${v.modelo ?? ""}</td>
+                          <td class="p-2">${v.color ?? ""}</td>
+                          <td class="p-2 text-right">${
+                            v.cantidadTransitos ?? 0
+                          }</td>
+                          <td class="p-2 text-right">${fmtMoney(
+                            v.montoTotalGastado ?? 0
+                          )}</td>`;
+          tbV.appendChild(tr);
+        });
+
+        // transitos
+        const tbT = document.getElementById("tblTransitos");
+        tbT.innerHTML = "";
+        (dto.transitos || []).forEach((t) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td class="p-2">${t.puesto ?? ""}</td>
+                          <td class="p-2 font-mono">${t.matricula ?? ""}</td>
+                          <td class="p-2">${t.categoria ?? ""}</td>
+                          <td class="p-2 text-right">${fmtMoney(
+                            t.montoTarifa ?? 0
+                          )}</td>
+                          <td class="p-2">${t.nombreBonificacion ?? ""}</td>
+                          <td class="p-2 text-right">${fmtMoney(
+                            t.montoBonificacion ?? 0
+                          )}</td>
+                          <td class="p-2 text-right">${fmtMoney(
+                            t.montoPagado ?? 0
+                          )}</td>
+                          <td class="p-2">${fmtDate(t.fechaHora)}</td>`;
+          tbT.appendChild(tr);
+        });
+
+        // notificaciones
+        const ulN = document.getElementById("listaNotifs");
+        ulN.innerHTML = "";
+        (dto.notificaciones || []).forEach((n) => {
+          const li = document.createElement("li");
+          li.className =
+            "p-3 rounded-lg bg-slate-800/60 border border-white/10";
+          li.innerHTML = `<div class="text-sm text-slate-300">${fmtDate(
+            n.fechaHora
+          )}</div>
+                          <div>${n.mensaje ?? ""}</div>`;
+          ulN.appendChild(li);
+        });
+
+        // persist state
+        if (owner?.cedula) {
+          sessionStorage.setItem(
+            `dash:${owner.cedula}:data`,
+            JSON.stringify(dto)
+          );
+          sessionStorage.setItem(
+            `dash:${owner.cedula}:version`,
+            String(dto.version ?? 0)
+          );
+          // Persistir también el header enriquecido para siguientes cargas
+          sessionStorage.setItem("owner", JSON.stringify(ownerDisplay));
+        }
+      }
+
+      async function loadDashboard(owner, { useCacheFirst = true } = {}) {
+        const ced = owner.cedula;
+        if (useCacheFirst) {
+          const cached = sessionStorage.getItem(`dash:${ced}:data`);
+          if (cached) {
+            try {
+              renderDashboard(JSON.parse(cached), owner);
+            } catch {}
+          }
+        }
+        try {
+          const dto = await getDashboard(ced);
+          renderDashboard(dto, owner);
+        } catch (e) {
+          document.getElementById("accionMsg").textContent =
+            "No se pudo cargar el tablero";
+        }
+      }
+
+      async function startPolling(owner) {
+        const ced = owner.cedula;
+        async function tick() {
+          try {
+            const vObj = await getDashboardVersion(ced);
+            const remoteV = Number(vObj?.version ?? 0);
+            const localV = Number(
+              sessionStorage.getItem(`dash:${ced}:version`) || 0
+            );
+            if (remoteV !== localV) {
+              const dto = await getDashboard(ced);
+              renderDashboard(dto, owner);
+            }
+          } catch {}
+          setTimeout(tick, 5000); // 5s
+        }
+        tick();
+      }
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        sessionStorage.removeItem("owner");
+        window.location.href = "/login-propietarios.html";
+      });
+
+      const owner = loadOwner();
+      if (owner) {
+        loadDashboard(owner, { useCacheFirst: true });
+        startPolling(owner);
+        document
+          .getElementById("btnBorrarNotifs")
+          .addEventListener("click", async () => {
+            const msgEl = document.getElementById("accionMsg");
+            msgEl.textContent = "Procesando...";
+            try {
+              const res = await borrarNotificaciones(owner.cedula);
+              msgEl.textContent = res.mensaje || `Borradas: ${res.borradas}`;
+              // Forzar refresh inmediato (version ya se incrementa en server)
+              const dto = await getDashboard(owner.cedula);
+              renderDashboard(dto, owner);
+            } catch (e) {
+              msgEl.textContent = e.message || "Error al borrar notificaciones";
+            }
+          });
+      }
+    </script>
+  </body>
+</html>

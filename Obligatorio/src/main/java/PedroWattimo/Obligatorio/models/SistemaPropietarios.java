@@ -12,4 +12,26 @@ public class SistemaPropietarios {
     public List<Propietario> getPropietarios() {
         return propietarios;
     }
+
+    /** Busca un propietario por su cédula (texto exacto). */
+    public Propietario buscarPorCedula(String cedula) {
+        if (cedula == null)
+            return null;
+        for (Propietario p : propietarios) {
+            if (cedula.equals(p.getCedula())) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Repositorio compuesto para el CU: retorna el propietario con sus colecciones
+     * ya precargadas
+     * (vehículos, tránsitos, bonificaciones, notificaciones). En memoria ya están
+     * embebidas.
+     */
+    public Propietario findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(int cedula) {
+        return buscarPorCedula(String.valueOf(cedula));
+    }
 }

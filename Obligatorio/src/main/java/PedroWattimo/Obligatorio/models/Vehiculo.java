@@ -36,6 +36,29 @@ public class Vehiculo {
         return transitos;
     }
 
+    public String getMatricula() {
+        return matricula;
+    }
+
+    public String getModelo() {
+        return modelo;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    // Expert helpers
+    public int cantidadTransitos() {
+        return transitos == null ? 0 : transitos.size();
+    }
+
+    public double totalGastadoPorMi() {
+        if (transitos == null)
+            return 0.0;
+        return transitos.stream().mapToDouble(Transito::totalPagado).sum();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)

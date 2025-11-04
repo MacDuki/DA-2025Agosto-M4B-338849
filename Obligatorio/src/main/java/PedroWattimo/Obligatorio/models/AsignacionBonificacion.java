@@ -28,4 +28,20 @@ public class AsignacionBonificacion {
         return bonificacion;
     }
 
+    public LocalDateTime getFechaHora() {
+        return fechaHora;
+    }
+
+    public Propietario getPropietario() {
+        return propietario;
+    }
+
+    public Puesto getPuesto() {
+        return puesto;
+    }
+
+    public Bonificacion getBonificacion() {
+        return bonificacion;
+    }
+
 }

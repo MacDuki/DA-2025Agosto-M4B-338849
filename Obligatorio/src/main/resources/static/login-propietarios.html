@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ingresar - Propietarios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6"
+  >
+    <div
+      class="w-full max-w-md bg-white/5 backdrop-blur shadow-xl rounded-2xl p-8 border border-white/10 text-white"
+    >
+      <div class="mb-6 text-center">
+        <h1 class="text-3xl font-bold">Ingresar</h1>
+        <p class="text-slate-300">Propietarios</p>
+      </div>
+
+      <form id="loginForm" class="space-y-5">
+        <div>
+          <label class="block text-sm mb-1" for="cedula">Cédula</label>
+          <input
+            id="cedula"
+            type="text"
+            inputmode="numeric"
+            placeholder="Ej: 23456789"
+            class="w-full px-4 py-3 rounded-lg bg-slate-800/70 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm mb-1" for="password">Contraseña</label>
+          <input
+            id="password"
+            type="password"
+            placeholder="Tu contraseña"
+            class="w-full px-4 py-3 rounded-lg bg-slate-800/70 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <p
+          id="errorMsg"
+          class="hidden text-sm text-red-400 bg-red-900/30 border border-red-700 rounded-md px-3 py-2"
+        ></p>
+
+        <button
+          type="submit"
+          class="w-full py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 font-semibold transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        >
+          Ingresar
+        </button>
+      </form>
+
+      <div class="mt-6 text-center">
+        <a href="/" class="text-slate-300 hover:text-white text-sm"
+          >Volver al inicio</a
+        >
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("loginForm");
+      const errorMsg = document.getElementById("errorMsg");
+
+      function showError(message) {
+        errorMsg.textContent = message || "Ocurrió un error";
+        errorMsg.classList.remove("hidden");
+      }
+      function clearError() {
+        errorMsg.classList.add("hidden");
+        errorMsg.textContent = "";
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearError();
+
+        const cedulaStr = document.getElementById("cedula").value.trim();
+        const password = document.getElementById("password").value;
+
+        if (!cedulaStr || isNaN(Number(cedulaStr))) {
+          showError("Ingresá una cédula válida (solo números).");
+          return;
+        }
+        if (!password) {
+          showError("La contraseña no puede ser vacía.");
+          return;
+        }
+
+        const payload = { cedula: Number(cedulaStr), password };
+
+        try {
+          const res = await fetch("/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!res.ok) {
+            const text = await res.text();
+            if (res.status === 401 || res.status === 403) {
+              showError(
+                text ||
+                  (res.status === 401
+                    ? "Acceso denegado"
+                    : "Usuario deshabilitado")
+              );
+            } else {
+              showError("Error inesperado. Código " + res.status);
+            }
+            return;
+          }
+
+          const dto = await res.json();
+          sessionStorage.setItem("owner", JSON.stringify(dto));
+          window.location.href = "/dashboard-propietarios.html";
+        } catch (err) {
+          showError("Error de conexión con el servidor.");
+        }
+      });
+    </script>
+  </body>
+</html>
