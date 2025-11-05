@@ -23,6 +23,8 @@ public class GlobalExceptionHandler {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mensaje);
         } else if (mensaje.contains("No hay notificaciones")) {
             return ResponseEntity.ok(mensaje);
+        } else if (mensaje.contains("No hay sesión activa")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
         }
 
         // Por defecto, error 400 Bad Request

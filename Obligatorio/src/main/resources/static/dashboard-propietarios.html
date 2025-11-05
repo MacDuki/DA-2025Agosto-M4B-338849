@@ -322,8 +322,32 @@
         const msgEl = document.getElementById("accionMsg");
         msgEl.textContent =
           resultado.mensaje || `Borradas: ${resultado.borradas}`;
-        // Forzar refresh del dashboard
-        submit("/propietarios/dashboard", "cedula=" + currentOwner.cedula);
+        // Forzar refresh del dashboard (sin enviar cédula, se obtiene de la sesión)
+        submit("/propietarios/dashboard", "");
+      }
+
+      // Función mostrar_ para logout exitoso
+      function mostrar_logoutExitoso(resultado) {
+        console.log("Sesión cerrada:", resultado.mensaje);
+      }
+
+      // Manejo de errores personalizado
+      function procesarErrorSubmit(status, text) {
+        if (status === 401) {
+          // Sin sesión activa o sesión expirada
+          alert(
+            text ||
+              "Tu sesión ha expirado. Por favor, inicia sesión nuevamente."
+          );
+          sessionStorage.removeItem("owner");
+          window.location.href = "/login-propietarios.html";
+        } else if (status === 403) {
+          alert("Acceso denegado: " + text);
+        } else if (status === 0) {
+          alert("Error de conexión con el servidor.");
+        } else {
+          alert("Error inesperado (código " + status + "): " + text);
+        }
       }
 
       function loadDashboard(owner, { useCacheFirst = true } = {}) {
@@ -336,15 +360,14 @@
             } catch {}
           }
         }
-        // Cargar datos frescos del servidor
-        submit("/propietarios/dashboard", "cedula=" + ced);
+        // Cargar datos frescos del servidor (sin enviar cédula, se obtiene de la sesión)
+        submit("/propietarios/dashboard", "");
       }
 
       function startPolling(owner) {
-        const ced = owner.cedula;
         function tick() {
-          // Consultar versión para ver si hay cambios
-          submit("/propietarios/dashboard/version", "cedula=" + ced);
+          // Consultar versión para ver si hay cambios (sin enviar cédula, se obtiene de la sesión)
+          submit("/propietarios/dashboard/version", "");
           setTimeout(tick, 5000); // 5s
         }
         tick();
@@ -352,7 +375,11 @@
 
       document.getElementById("logoutBtn").addEventListener("click", () => {
         sessionStorage.removeItem("owner");
-        window.location.href = "/login-propietarios.html";
+        // Llamar al endpoint de logout para limpiar la sesión del servidor
+        submit("/auth/logout", "");
+        setTimeout(() => {
+          window.location.href = "/login-propietarios.html";
+        }, 500);
       });
 
       // Inicialización
@@ -366,10 +393,8 @@
           .addEventListener("click", () => {
             const msgEl = document.getElementById("accionMsg");
             msgEl.textContent = "Procesando...";
-            submit(
-              "/propietarios/notificaciones/borrar",
-              "cedula=" + currentOwner.cedula
-            );
+            // No enviar cédula, se obtiene de la sesión del servidor
+            submit("/propietarios/notificaciones/borrar", "");
           });
       }
     </script>
