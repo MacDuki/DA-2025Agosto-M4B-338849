@@ -13,8 +13,7 @@ import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
 import PedroWattimo.Obligatorio.dtos.TransitoDto;
 import PedroWattimo.Obligatorio.dtos.VehiculoResumenDto;
-import PedroWattimo.Obligatorio.models.exceptions.PropietarioNoExisteException;
-import PedroWattimo.Obligatorio.models.exceptions.UsuarioDeshabilitadoException;
+import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 public class Fachada {
 
@@ -92,13 +91,13 @@ public class Fachada {
      * Orquesta la autenticación a través de SistemaAuth y verifica estado del
      * usuario.
      */
-    public PropietarioDTO loginPropietario(int cedula, String password) {
+    public PropietarioDTO loginPropietario(int cedula, String password) throws OblException {
 
         String cedulaStr = String.valueOf(cedula);
         Propietario propietario = this.sistemaAuth.autenticarPropietario(this.sistemaPropietarios, cedulaStr, password);
 
         if (!propietario.puedeIngresar()) {
-            throw new UsuarioDeshabilitadoException();
+            throw new OblException("Usuario deshabilitado, no puede ingresar al sistema");
         }
 
         return new PropietarioDTO(
@@ -111,10 +110,10 @@ public class Fachada {
     // --------------------------------------------------------------
     // CU: Dashboard del propietario
     // --------------------------------------------------------------
-    public PropietarioDashboardDto dashboardDePropietario(int cedula) {
+    public PropietarioDashboardDto dashboardDePropietario(int cedula) throws OblException {
         Propietario p = this.sistemaPropietarios.findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(cedula);
         if (p == null)
-            throw new PropietarioNoExisteException();
+            throw new OblException("El propietario no existe");
 
         PropietarioDashboardDto dto = new PropietarioDashboardDto();
         dto.setPropietario(new PropietarioResumenDto(p.getNombreCompleto(),
@@ -171,20 +170,20 @@ public class Fachada {
         return dto;
     }
 
-    public int borrarNotificacionesDePropietario(int cedula) {
+    public int borrarNotificacionesDePropietario(int cedula) throws OblException {
         Propietario p = this.sistemaPropietarios.findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(cedula);
         if (p == null)
-            throw new PropietarioNoExisteException();
+            throw new OblException("El propietario no existe");
         int borradas = p.borrarNotificaciones();
         // Persist in-memory already done; aumentar versión
         dashboardVersion.merge(p.getCedula(), 1L, Long::sum);
         return borradas;
     }
 
-    public long versionDashboardDePropietario(int cedula) {
+    public long versionDashboardDePropietario(int cedula) throws OblException {
         Propietario p = this.sistemaPropietarios.findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(cedula);
         if (p == null)
-            throw new PropietarioNoExisteException();
+            throw new OblException("El propietario no existe");
         return dashboardVersion.getOrDefault(p.getCedula(), 0L);
     }
 

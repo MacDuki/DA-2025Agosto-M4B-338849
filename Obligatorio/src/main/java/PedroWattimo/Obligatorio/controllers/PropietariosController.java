@@ -13,20 +13,21 @@ import org.springframework.web.bind.annotation.RestController;
 import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
 import PedroWattimo.Obligatorio.dtos.RespuestaVista;
 import PedroWattimo.Obligatorio.models.Fachada;
+import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 @RestController
 @RequestMapping("/propietarios")
 public class PropietariosController {
 
     @PostMapping("/dashboard")
-    public ResponseEntity<List<RespuestaVista>> dashboard(@RequestParam int cedula) {
+    public ResponseEntity<List<RespuestaVista>> dashboard(@RequestParam int cedula) throws OblException {
         PropietarioDashboardDto dto = Fachada.getInstancia().dashboardDePropietario(cedula);
         RespuestaVista respuesta = new RespuestaVista("dashboard", dto);
         return ResponseEntity.ok(List.of(respuesta));
     }
 
     @PostMapping("/dashboard/version")
-    public ResponseEntity<List<RespuestaVista>> version(@RequestParam int cedula) {
+    public ResponseEntity<List<RespuestaVista>> version(@RequestParam int cedula) throws OblException {
         long version = Fachada.getInstancia().versionDashboardDePropietario(cedula);
         Map<String, Object> versionData = new HashMap<>();
         versionData.put("version", version);
@@ -35,7 +36,7 @@ public class PropietariosController {
     }
 
     @PostMapping("/notificaciones/borrar")
-    public ResponseEntity<List<RespuestaVista>> borrarNotificaciones(@RequestParam int cedula) {
+    public ResponseEntity<List<RespuestaVista>> borrarNotificaciones(@RequestParam int cedula) throws OblException {
         int borradas = Fachada.getInstancia().borrarNotificacionesDePropietario(cedula);
         Map<String, Object> resultado = new HashMap<>();
         resultado.put("borradas", borradas);

@@ -5,33 +5,27 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import PedroWattimo.Obligatorio.models.exceptions.CredencialesInvalidasException;
-import PedroWattimo.Obligatorio.models.exceptions.PropietarioNoExisteException;
-import PedroWattimo.Obligatorio.models.exceptions.SinNotificacionesException;
-import PedroWattimo.Obligatorio.models.exceptions.UsuarioDeshabilitadoException;
+import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(CredencialesInvalidasException.class)
-    public ResponseEntity<String> handleCredenciales(CredencialesInvalidasException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
-    }
+    @ExceptionHandler(OblException.class)
+    public ResponseEntity<String> handleOblException(OblException ex) {
+        String mensaje = ex.getMessage();
 
-    @ExceptionHandler(UsuarioDeshabilitadoException.class)
-    public ResponseEntity<String> handleDeshabilitado(UsuarioDeshabilitadoException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-    }
+        // Determinar el código HTTP según el mensaje
+        if (mensaje.contains("Acceso denegado")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mensaje);
+        } else if (mensaje.contains("Usuario deshabilitado")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mensaje);
+        } else if (mensaje.contains("no existe")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mensaje);
+        } else if (mensaje.contains("No hay notificaciones")) {
+            return ResponseEntity.ok(mensaje);
+        }
 
-    @ExceptionHandler(PropietarioNoExisteException.class)
-    public ResponseEntity<String> handlePropNoExiste(PropietarioNoExisteException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(SinNotificacionesException.class)
-    public ResponseEntity<String> handleSinNotificaciones(SinNotificacionesException ex) {
-        // Por diseño del CU, este caso puede devolverse como 200 con mensaje; dejamos
-        // 200
-        return ResponseEntity.ok(ex.getMessage());
+        // Por defecto, error 400 Bad Request
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mensaje);
     }
 }

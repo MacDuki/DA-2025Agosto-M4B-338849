@@ -3,7 +3,7 @@ package PedroWattimo.Obligatorio.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.models.exceptions.CredencialesInvalidasException;
+import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 public class SistemaAuth {
     private List<Administrador> administradores = new ArrayList<>();
@@ -25,21 +25,21 @@ public class SistemaAuth {
     /**
      * Autentica un propietario validando existencia y contraseña.
      * - Valida nulos/vacíos en credenciales
-     * - Si no existe o la contraseña no coincide, lanza
-     * CredencialesInvalidasException
+     * - Si no existe o la contraseña no coincide, lanza OblException
      */
-    public Propietario autenticarPropietario(SistemaPropietarios sistemaPropietarios, String cedula, String password) {
+    public Propietario autenticarPropietario(SistemaPropietarios sistemaPropietarios, String cedula, String password)
+            throws OblException {
         if (cedula == null || cedula.isBlank() || password == null || password.isBlank()) {
-            throw new CredencialesInvalidasException();
+            throw new OblException("Acceso denegado");
         }
 
         Propietario dueño = sistemaPropietarios.buscarPorCedula(cedula);
         if (dueño == null) {
-            throw new CredencialesInvalidasException();
+            throw new OblException("Acceso denegado");
         }
 
         if (!dueño.passwordCorrecta(password)) {
-            throw new CredencialesInvalidasException();
+            throw new OblException("Acceso denegado");
         }
 
         return dueño;
