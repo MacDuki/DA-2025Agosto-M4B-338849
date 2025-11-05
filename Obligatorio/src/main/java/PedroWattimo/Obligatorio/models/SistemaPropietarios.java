@@ -9,7 +9,14 @@ public class SistemaPropietarios {
     protected SistemaPropietarios() {
     }
 
+    // Encapsulamiento: retornar copia inmutable para prevenir modificaciones
+    // externas
     public List<Propietario> getPropietarios() {
+        return List.copyOf(propietarios);
+    }
+
+    // Método interno para acceso directo (package-private para uso de SeedData)
+    List<Propietario> obtenerPropietariosInternos() {
         return propietarios;
     }
 

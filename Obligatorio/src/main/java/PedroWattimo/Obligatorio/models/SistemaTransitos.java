@@ -10,7 +10,14 @@ public class SistemaTransitos {
     protected SistemaTransitos() {
     }
 
+    // Encapsulamiento: retornar copia inmutable para prevenir modificaciones
+    // externas
     public List<Transito> getTransitos() {
+        return List.copyOf(transitos);
+    }
+
+    // Método interno para acceso directo (package-private para uso de SeedData)
+    List<Transito> obtenerTransitosInternos() {
         return transitos;
     }
 

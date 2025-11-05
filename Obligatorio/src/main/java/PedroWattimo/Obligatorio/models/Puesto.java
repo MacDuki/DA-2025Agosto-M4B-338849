@@ -30,16 +30,24 @@ public class Puesto {
         return direccion;
     }
 
+    // Encapsulamiento: retornar copias inmutables para prevenir modificaciones
+    // externas
     public List<Tarifa> getTablaTarifas() {
-        return tablaTarifas;
+        return tablaTarifas == null ? List.of() : List.copyOf(tablaTarifas);
     }
 
     public List<Transito> getTransitos() {
-        return transitos;
+        return transitos == null ? List.of() : List.copyOf(transitos);
     }
 
     public List<AsignacionBonificacion> getAsignaciones() {
-        return asignaciones;
+        return asignaciones == null ? List.of() : List.copyOf(asignaciones);
+    }
+
+    // Patrón Experto: el Puesto conoce sus propias tarifas
+    // Método interno para agregar tarifas (uso package-private para SeedData)
+    List<Tarifa> obtenerTablaTarifasInterna() {
+        return tablaTarifas;
     }
 
 }

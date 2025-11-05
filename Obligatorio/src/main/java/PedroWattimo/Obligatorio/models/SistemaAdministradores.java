@@ -9,7 +9,14 @@ public class SistemaAdministradores {
     protected SistemaAdministradores() {
     }
 
+    // Encapsulamiento: retornar copia inmutable para prevenir modificaciones
+    // externas
     public List<Administrador> getAdministradores() {
+        return List.copyOf(administradores);
+    }
+
+    // Método interno para acceso directo (package-private para uso de SeedData)
+    List<Administrador> obtenerAdministradoresInternos() {
         return administradores;
     }
 }

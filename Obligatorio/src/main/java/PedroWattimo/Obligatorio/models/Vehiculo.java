@@ -32,8 +32,10 @@ public class Vehiculo {
         return propietario;
     }
 
+    // Encapsulamiento: retornar copias inmutables para prevenir modificaciones
+    // externas
     public List<Transito> getTransitos() {
-        return transitos;
+        return transitos == null ? List.of() : List.copyOf(transitos);
     }
 
     public String getMatricula() {
@@ -48,7 +50,6 @@ public class Vehiculo {
         return color;
     }
 
-    // Expert helpers
     public int cantidadTransitos() {
         return transitos == null ? 0 : transitos.size();
     }

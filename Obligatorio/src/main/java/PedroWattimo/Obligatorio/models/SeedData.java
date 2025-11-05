@@ -25,52 +25,43 @@ public class SeedData {
 
     static void cargarAdministradores() {
         Fachada f = Fachada.getInstancia();
-        SistemaAdministradores sa = f.getSistemaAdministradores();
 
-        // Crear administradores usando solo constructores
         Administrador admin1 = new Administrador("99999999", "admin123", "Root Admin");
         Administrador admin2 = new Administrador("88888888", "gestor123", "Gestor 1");
 
-        // Registrar
-        sa.getAdministradores().add(admin1);
-        sa.getAdministradores().add(admin2);
+        f.obtenerAdministradoresInternos().add(admin1);
+        f.obtenerAdministradoresInternos().add(admin2);
     }
 
     static void cargarCategorias() {
         Fachada f = Fachada.getInstancia();
-        SistemaCategorias sc = f.getSistemaCategorias();
 
-        // Categorías base
         Categoria auto = new Categoria("Auto");
         Categoria camioneta = new Categoria("Camioneta");
         Categoria camion = new Categoria("Camión");
 
-        sc.getCategorias().add(auto);
-        sc.getCategorias().add(camioneta);
-        sc.getCategorias().add(camion);
+        f.obtenerCategoriasInternos().add(auto);
+        f.obtenerCategoriasInternos().add(camioneta);
+        f.obtenerCategoriasInternos().add(camion);
     }
 
     static void cargarPuestos() {
         Fachada f = Fachada.getInstancia();
-        SistemaPuestos sp = f.getSistemaPuestos();
 
         Puesto p1 = new Puesto("Peaje Ruta 1", "KM 34, Ruta Interbalnearia");
         Puesto p2 = new Puesto("Peaje Ruta 3", "KM 96, San José");
         Puesto p3 = new Puesto("Peaje Ruta 8", "KM 22, Pando");
 
-        sp.getPuestos().add(p1);
-        sp.getPuestos().add(p2);
-        sp.getPuestos().add(p3);
+        f.obtenerPuestosInternos().add(p1);
+        f.obtenerPuestosInternos().add(p2);
+        f.obtenerPuestosInternos().add(p3);
     }
 
     static void cargarTarifas() {
         Fachada f = Fachada.getInstancia();
-        SistemaPuestos sp = f.getSistemaPuestos();
-        SistemaCategorias sc = f.getSistemaCategorias();
 
-        // Helper: buscar categoría por nombre
         java.util.function.Function<String, Categoria> cat = nombre -> {
-            for (Categoria c : sc.getCategorias()) {
+            for (Categoria c : f.obtenerCategorias()) {
                 if (c.getNombre().equalsIgnoreCase(nombre))
                     return c;
             }
@@ -83,28 +74,23 @@ public class SeedData {
         if (camion == null)
             camion = cat.apply("Camion"); // tolerar sin tilde
 
-        // Definir montos por puesto y categoría (ejemplo simple)
-        for (Puesto puesto : sp.getPuestos()) {
+        for (Puesto puesto : f.obtenerPuestos()) {
             if (auto != null)
-                puesto.getTablaTarifas().add(new Tarifa(120.0, auto));
+                puesto.obtenerTablaTarifasInterna().add(new Tarifa(120.0, auto));
             if (camioneta != null)
-                puesto.getTablaTarifas().add(new Tarifa(180.0, camioneta));
+                puesto.obtenerTablaTarifasInterna().add(new Tarifa(180.0, camioneta));
             if (camion != null)
-                puesto.getTablaTarifas().add(new Tarifa(300.0, camion));
+                puesto.obtenerTablaTarifasInterna().add(new Tarifa(300.0, camion));
         }
     }
 
     static void cargarVehiculos() {
         Fachada f = Fachada.getInstancia();
-        SistemaPropietarios sp = f.getSistemaPropietarios();
-        SistemaVehiculos sv = f.getSistemaVehiculos();
-        SistemaCategorias sc = f.getSistemaCategorias();
 
-        // Buscar categorías ya precargadas
         Categoria catAuto = null;
         Categoria catCamioneta = null;
         Categoria catCamion = null;
-        for (Categoria c : sc.getCategorias()) {
+        for (Categoria c : f.obtenerCategorias()) {
             if ("Auto".equalsIgnoreCase(c.getNombre()))
                 catAuto = c;
             else if ("Camioneta".equalsIgnoreCase(c.getNombre()))
@@ -113,33 +99,30 @@ public class SeedData {
                 catCamion = c;
         }
 
-        // Obtener propietarios ya cargados
-        Propietario p1 = sp.buscarPorCedula("11111111");
-        Propietario p2 = sp.buscarPorCedula("22222222");
-        Propietario p3 = sp.buscarPorCedula("33333333");
+        Propietario p1 = f.buscarPropietarioPorCedula("11111111");
+        Propietario p2 = f.buscarPropietarioPorCedula("22222222");
+        Propietario p3 = f.buscarPropietarioPorCedula("33333333");
 
-        // Crear vehículos mediante métodos de dominio (sin setters)
         if (p1 != null) {
             Vehiculo v1 = p1.registrarVehiculo("SBA1234", "Ford Fiesta", "Rojo", catAuto);
             Vehiculo v2 = p1.registrarVehiculo("SBA5678", "Hyundai Tucson", "Blanco", catCamioneta);
-            sv.getVehiculos().add(v1);
-            sv.getVehiculos().add(v2);
+            f.obtenerVehiculosInternos().add(v1);
+            f.obtenerVehiculosInternos().add(v2);
         }
 
         if (p2 != null) {
             Vehiculo v3 = p2.registrarVehiculo("ABC1234", "Toyota Hilux", "Negro", catCamioneta);
-            sv.getVehiculos().add(v3);
+            f.obtenerVehiculosInternos().add(v3);
         }
 
         if (p3 != null) {
             Vehiculo v4 = p3.registrarVehiculo("TRK9000", "Scania R500", "Azul", catCamion);
-            sv.getVehiculos().add(v4);
+            f.obtenerVehiculosInternos().add(v4);
         }
     }
 
     static void cargarPropietarios() {
         Fachada f = Fachada.getInstancia();
-        SistemaPropietarios sp = f.getSistemaPropietarios();
 
         // Propietario 1: habilitado, con saldo y mínimo de alerta
         Propietario p1 = new Propietario("11111111", "Ana Pérez", "ana123")
@@ -158,10 +141,10 @@ public class SeedData {
                 .ajustarSaldoMinimoAlerta(50)
                 .cambiarEstado(Estado.SUSPENDIDO);
 
-        // Registrar en el sistema
-        sp.getPropietarios().add(p1);
-        sp.getPropietarios().add(p2);
-        sp.getPropietarios().add(p3);
+        // Registrar en el sistema usando método interno
+        f.obtenerPropietariosInternos().add(p1);
+        f.obtenerPropietariosInternos().add(p2);
+        f.obtenerPropietariosInternos().add(p3);
     }
 
 }

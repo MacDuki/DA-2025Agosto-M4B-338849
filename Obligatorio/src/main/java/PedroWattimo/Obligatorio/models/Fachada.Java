@@ -13,8 +13,6 @@ import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
 import PedroWattimo.Obligatorio.dtos.TransitoDto;
 import PedroWattimo.Obligatorio.dtos.VehiculoResumenDto;
-import PedroWattimo.Obligatorio.models.events.DashboardActualizadoEvent;
-import PedroWattimo.Obligatorio.models.events.EventBus;
 import PedroWattimo.Obligatorio.models.exceptions.PropietarioNoExisteException;
 import PedroWattimo.Obligatorio.models.exceptions.UsuarioDeshabilitadoException;
 
@@ -34,7 +32,6 @@ public class Fachada {
     private SistemaAdministradores sistemaAdministradores;
     private SistemaCategorias sistemaCategorias;
 
-    // Versión de dashboard por propietario (para ping/etag)
     private final Map<String, Long> dashboardVersion = new ConcurrentHashMap<>();
 
     private Fachada() {
@@ -51,7 +48,6 @@ public class Fachada {
         this.sistemaCategorias = new SistemaCategorias();
     }
 
-    // Acceso controlado a la instancia única
     public static Fachada getInstancia() {
         if (instancia == null) {
             instancia = new Fachada();
@@ -59,29 +55,36 @@ public class Fachada {
         return instancia;
     }
 
-    // --------------------------------------------------------------
-    // Delegación de métodos a los sistemas internos
-    // --------------------------------------------------------------
-
-    // Métodos para acceso protegido a los sistemas (usados por SeedData)
-    protected SistemaAdministradores getSistemaAdministradores() {
-        return sistemaAdministradores;
+    List<Administrador> obtenerAdministradoresInternos() {
+        return sistemaAdministradores.obtenerAdministradoresInternos();
     }
 
-    protected SistemaPropietarios getSistemaPropietarios() {
-        return sistemaPropietarios;
+    List<Categoria> obtenerCategoriasInternos() {
+        return sistemaCategorias.obtenerCategoriasInternas();
     }
 
-    protected SistemaPuestos getSistemaPuestos() {
-        return sistemaPuestos;
+    List<Puesto> obtenerPuestosInternos() {
+        return sistemaPuestos.obtenerPuestosInternos();
     }
 
-    protected SistemaCategorias getSistemaCategorias() {
-        return sistemaCategorias;
+    List<Propietario> obtenerPropietariosInternos() {
+        return sistemaPropietarios.obtenerPropietariosInternos();
     }
 
-    protected SistemaVehiculos getSistemaVehiculos() {
-        return sistemaVehiculos;
+    List<Vehiculo> obtenerVehiculosInternos() {
+        return sistemaVehiculos.obtenerVehiculosInternos();
+    }
+
+    List<Categoria> obtenerCategorias() {
+        return sistemaCategorias.getCategorias();
+    }
+
+    List<Puesto> obtenerPuestos() {
+        return sistemaPuestos.getPuestos();
+    }
+
+    Propietario buscarPropietarioPorCedula(String cedula) {
+        return sistemaPropietarios.buscarPorCedula(cedula);
     }
 
     // --------------------------------------------------------------
@@ -94,16 +97,14 @@ public class Fachada {
      * usuario.
      */
     public PropietarioDTO loginPropietario(int cedula, String password) {
-        // Autenticar credenciales
+
         String cedulaStr = String.valueOf(cedula);
         Propietario propietario = this.sistemaAuth.autenticarPropietario(this.sistemaPropietarios, cedulaStr, password);
 
-        // Verificar estado
         if (!propietario.puedeIngresar()) {
             throw new UsuarioDeshabilitadoException();
         }
 
-        // Mapear a DTO básico para el tablero
         return new PropietarioDTO(
                 propietario.getCedula(),
                 propietario.getNombreCompleto(),
@@ -179,9 +180,8 @@ public class Fachada {
         if (p == null)
             throw new PropietarioNoExisteException();
         int borradas = p.borrarNotificaciones();
-        // Persist in-memory already done; publicar evento y aumentar versión
+        // Persist in-memory already done; aumentar versión
         dashboardVersion.merge(p.getCedula(), 1L, Long::sum);
-        EventBus.getInstancia().publish(new DashboardActualizadoEvent(p.getCedula()));
         return borradas;
     }
 

@@ -61,20 +61,22 @@ public class Propietario {
         return estadoActual;
     }
 
+    // Encapsulamiento: retornar copias inmutables para prevenir modificaciones
+    // externas
     public List<Vehiculo> getVehiculos() {
-        return vehiculos;
+        return vehiculos == null ? List.of() : List.copyOf(vehiculos);
     }
 
     public List<Transito> getTransitos() {
-        return transitos;
+        return transitos == null ? List.of() : List.copyOf(transitos);
     }
 
     public List<AsignacionBonificacion> getAsignaciones() {
-        return asignaciones;
+        return asignaciones == null ? List.of() : List.copyOf(asignaciones);
     }
 
     public List<Notificacion> getNotificaciones() {
-        return notificaciones;
+        return notificaciones == null ? List.of() : List.copyOf(notificaciones);
     }
 
     // --- Estilo sin setters: métodos de dominio explícitos ---
@@ -167,11 +169,11 @@ public class Propietario {
     // Expert: Tablero del propietario
     // -----------------------------
     public List<AsignacionBonificacion> bonificacionesAsignadas() {
-        return this.asignaciones;
+        return this.asignaciones == null ? List.of() : List.copyOf(this.asignaciones);
     }
 
     public List<Vehiculo> vehiculos() {
-        return this.vehiculos;
+        return this.vehiculos == null ? List.of() : List.copyOf(this.vehiculos);
     }
 
     public List<Notificacion> notificacionesOrdenadasDesc() {
@@ -208,16 +210,20 @@ public class Propietario {
         return this.estadoActual != null ? this.estadoActual.nombre() : Estado.HABILITADO.nombre();
     }
 
+    /**
+     * Patrón Experto: delega en el vehículo el cálculo de su total gastado.
+     * El Propietario no debe conocer la estructura interna del Vehiculo.
+     */
     public double totalGastadoPor(Vehiculo v) {
-        if (v == null || v.getTransitos() == null)
-            return 0.0;
-        return v.getTransitos().stream().mapToDouble(Transito::totalPagado).sum();
+        return v == null ? 0.0 : v.totalGastadoPorMi();
     }
 
+    /**
+     * Patrón Experto: delega en el vehículo el cálculo de sus tránsitos.
+     * El Propietario no debe conocer la estructura interna del Vehiculo.
+     */
     public int cantidadTransitosDe(Vehiculo v) {
-        if (v == null || v.getTransitos() == null)
-            return 0;
-        return v.getTransitos().size();
+        return v == null ? 0 : v.cantidadTransitos();
     }
 
     // Helpers
