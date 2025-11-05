@@ -29,8 +29,6 @@ public class Fachada {
     private SistemaBonificaciones sistemaBonificaciones;
     private SistemaAuth sistemaAuth;
     private SistemaNotificaciones sistemaNotificaciones;
-    private SistemaAdministradores sistemaAdministradores;
-    private SistemaCategorias sistemaCategorias;
 
     private final Map<String, Long> dashboardVersion = new ConcurrentHashMap<>();
 
@@ -44,8 +42,6 @@ public class Fachada {
         this.sistemaBonificaciones = new SistemaBonificaciones();
         this.sistemaAuth = new SistemaAuth();
         this.sistemaNotificaciones = new SistemaNotificaciones();
-        this.sistemaAdministradores = new SistemaAdministradores();
-        this.sistemaCategorias = new SistemaCategorias();
     }
 
     public static Fachada getInstancia() {
@@ -56,11 +52,11 @@ public class Fachada {
     }
 
     List<Administrador> obtenerAdministradoresInternos() {
-        return sistemaAdministradores.obtenerAdministradoresInternos();
+        return sistemaAuth.obtenerAdministradoresInternos();
     }
 
     List<Categoria> obtenerCategoriasInternos() {
-        return sistemaCategorias.obtenerCategoriasInternas();
+        return sistemaPuestos.obtenerCategoriasInternas();
     }
 
     List<Puesto> obtenerPuestosInternos() {
@@ -76,7 +72,7 @@ public class Fachada {
     }
 
     List<Categoria> obtenerCategorias() {
-        return sistemaCategorias.getCategorias();
+        return sistemaPuestos.getCategorias();
     }
 
     List<Puesto> obtenerPuestos() {

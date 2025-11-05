@@ -5,6 +5,7 @@ import java.util.List;
 
 public class SistemaPuestos {
     private List<Puesto> puestos = new ArrayList<>();
+    private List<Categoria> categorias = new ArrayList<>();
 
     protected SistemaPuestos() {
     }
@@ -18,6 +19,17 @@ public class SistemaPuestos {
     // Método interno para acceso directo (package-private para uso de SeedData)
     List<Puesto> obtenerPuestosInternos() {
         return puestos;
+    }
+
+    // Encapsulamiento: retornar copia inmutable para prevenir modificaciones
+    // externas
+    public List<Categoria> getCategorias() {
+        return List.copyOf(categorias);
+    }
+
+    // Método interno para acceso directo (package-private para uso de SeedData)
+    List<Categoria> obtenerCategoriasInternas() {
+        return categorias;
     }
 
     /**

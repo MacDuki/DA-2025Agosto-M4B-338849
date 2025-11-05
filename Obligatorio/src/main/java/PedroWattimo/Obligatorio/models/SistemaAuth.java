@@ -1,8 +1,26 @@
 package PedroWattimo.Obligatorio.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import PedroWattimo.Obligatorio.models.exceptions.CredencialesInvalidasException;
 
 public class SistemaAuth {
+    private List<Administrador> administradores = new ArrayList<>();
+
+    protected SistemaAuth() {
+    }
+
+    // Encapsulamiento: retornar copia inmutable para prevenir modificaciones
+    // externas
+    public List<Administrador> getAdministradores() {
+        return List.copyOf(administradores);
+    }
+
+    // Método interno para acceso directo (package-private para uso de SeedData)
+    List<Administrador> obtenerAdministradoresInternos() {
+        return administradores;
+    }
 
     /**
      * Autentica un propietario validando existencia y contraseña.
