@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import PedroWattimo.Obligatorio.Respuesta;
 import PedroWattimo.Obligatorio.dtos.PropietarioDTO;
 import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
-import PedroWattimo.Obligatorio.dtos.RespuestaVista;
 import PedroWattimo.Obligatorio.models.Fachada;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import jakarta.servlet.http.HttpSession;
@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpSession;
 public class PropietariosController {
 
     @PostMapping("/dashboard")
-    public ResponseEntity<List<RespuestaVista>> dashboard(HttpSession session) throws OblException {
+    public ResponseEntity<List<Respuesta>> dashboard(HttpSession session) throws OblException {
         PropietarioDTO propietario = (PropietarioDTO) session.getAttribute("propietario");
 
         if (propietario == null) {
@@ -30,12 +30,12 @@ public class PropietariosController {
 
         int cedula = Integer.parseInt(propietario.getCedula());
         PropietarioDashboardDto dto = Fachada.getInstancia().dashboardDePropietario(cedula);
-        RespuestaVista respuesta = new RespuestaVista("dashboard", dto);
+        Respuesta respuesta = new Respuesta("dashboard", dto);
         return ResponseEntity.ok(List.of(respuesta));
     }
 
     @PostMapping("/dashboard/version")
-    public ResponseEntity<List<RespuestaVista>> version(HttpSession session) throws OblException {
+    public ResponseEntity<List<Respuesta>> version(HttpSession session) throws OblException {
         PropietarioDTO propietario = (PropietarioDTO) session.getAttribute("propietario");
 
         if (propietario == null) {
@@ -46,12 +46,12 @@ public class PropietariosController {
         long version = Fachada.getInstancia().versionDashboardDePropietario(cedula);
         Map<String, Object> versionData = new HashMap<>();
         versionData.put("version", version);
-        RespuestaVista respuesta = new RespuestaVista("version", versionData);
+        Respuesta respuesta = new Respuesta("version", versionData);
         return ResponseEntity.ok(List.of(respuesta));
     }
 
     @PostMapping("/notificaciones/borrar")
-    public ResponseEntity<List<RespuestaVista>> borrarNotificaciones(HttpSession session) throws OblException {
+    public ResponseEntity<List<Respuesta>> borrarNotificaciones(HttpSession session) throws OblException {
         PropietarioDTO propietario = (PropietarioDTO) session.getAttribute("propietario");
 
         if (propietario == null) {
@@ -67,7 +67,7 @@ public class PropietariosController {
         } else {
             resultado.put("mensaje", "Se borraron " + borradas + " notificaciones");
         }
-        RespuestaVista respuesta = new RespuestaVista("notificacionesBorradas", resultado);
+        Respuesta respuesta = new Respuesta("notificacionesBorradas", resultado);
         return ResponseEntity.ok(List.of(respuesta));
     }
 }
