@@ -1,44 +1,50 @@
 package PedroWattimo.Obligatorio.controllers;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
+import PedroWattimo.Obligatorio.dtos.RespuestaVista;
 import PedroWattimo.Obligatorio.models.Fachada;
 
 @RestController
 @RequestMapping("/propietarios")
 public class PropietariosController {
 
-    @GetMapping("/{cedula}/dashboard")
-    public ResponseEntity<PropietarioDashboardDto> dashboard(@PathVariable int cedula) {
+    @PostMapping("/dashboard")
+    public ResponseEntity<List<RespuestaVista>> dashboard(@RequestParam int cedula) {
         PropietarioDashboardDto dto = Fachada.getInstancia().dashboardDePropietario(cedula);
-        return ResponseEntity.ok(dto);
+        RespuestaVista respuesta = new RespuestaVista("dashboard", dto);
+        return ResponseEntity.ok(List.of(respuesta));
     }
 
-    @GetMapping("/{cedula}/dashboard/version")
-    public ResponseEntity<Map<String, Object>> version(@PathVariable int cedula) {
+    @PostMapping("/dashboard/version")
+    public ResponseEntity<List<RespuestaVista>> version(@RequestParam int cedula) {
         long version = Fachada.getInstancia().versionDashboardDePropietario(cedula);
-        Map<String, Object> body = new HashMap<>();
-        body.put("version", version);
-        return ResponseEntity.ok(body);
+        Map<String, Object> versionData = new HashMap<>();
+        versionData.put("version", version);
+        RespuestaVista respuesta = new RespuestaVista("version", versionData);
+        return ResponseEntity.ok(List.of(respuesta));
     }
 
-    @DeleteMapping("/{cedula}/notificaciones")
-    public ResponseEntity<Map<String, Object>> borrarNotificaciones(@PathVariable int cedula) {
+    @PostMapping("/notificaciones/borrar")
+    public ResponseEntity<List<RespuestaVista>> borrarNotificaciones(@RequestParam int cedula) {
         int borradas = Fachada.getInstancia().borrarNotificacionesDePropietario(cedula);
-        Map<String, Object> body = new HashMap<>();
-        body.put("borradas", borradas);
+        Map<String, Object> resultado = new HashMap<>();
+        resultado.put("borradas", borradas);
         if (borradas == 0) {
-            body.put("mensaje", "No hay notificaciones para borrar");
+            resultado.put("mensaje", "No hay notificaciones para borrar");
+        } else {
+            resultado.put("mensaje", "Se borraron " + borradas + " notificaciones");
         }
-        return ResponseEntity.ok(body);
+        RespuestaVista respuesta = new RespuestaVista("notificacionesBorradas", resultado);
+        return ResponseEntity.ok(List.of(respuesta));
     }
 }

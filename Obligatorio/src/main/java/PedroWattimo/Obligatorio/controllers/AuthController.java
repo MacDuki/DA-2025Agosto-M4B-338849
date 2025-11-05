@@ -1,13 +1,15 @@
 package PedroWattimo.Obligatorio.controllers;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import PedroWattimo.Obligatorio.dtos.LoginRequest;
 import PedroWattimo.Obligatorio.dtos.PropietarioDTO;
+import PedroWattimo.Obligatorio.dtos.RespuestaVista;
 import PedroWattimo.Obligatorio.models.Fachada;
 
 @RestController
@@ -15,8 +17,11 @@ import PedroWattimo.Obligatorio.models.Fachada;
 public class AuthController {
 
     @PostMapping("/login")
-    public ResponseEntity<PropietarioDTO> login(@RequestBody LoginRequest request) {
-        PropietarioDTO dto = Fachada.getInstancia().loginPropietario(request.getCedula(), request.getPassword());
-        return ResponseEntity.ok(dto);
+    public ResponseEntity<List<RespuestaVista>> login(
+            @RequestParam int cedula,
+            @RequestParam String password) {
+        PropietarioDTO dto = Fachada.getInstancia().loginPropietario(cedula, password);
+        RespuestaVista respuesta = new RespuestaVista("loginExitoso", dto);
+        return ResponseEntity.ok(List.of(respuesta));
     }
 }

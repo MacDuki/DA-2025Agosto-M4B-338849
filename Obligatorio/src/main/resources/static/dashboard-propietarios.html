@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Tablero de Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/utilesVista.js"></script>
+    <script src="/js/vistaWeb.js"></script>
+    <style>
+      /* Estilos para las tablas generadas por utilesVista.js */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      table thead th {
+        text-align: left;
+        padding: 0.5rem;
+        color: rgb(203 213 225); /* slate-300 */
+      }
+      table tbody tr {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      table tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+      table tbody td {
+        padding: 0.5rem;
+      }
+    </style>
   </head>
   <body
     class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white"
@@ -82,62 +107,19 @@
       <!-- Bonificaciones -->
       <section class="mt-8 bg-white/5 rounded-2xl border border-white/10 p-6">
         <h2 class="text-lg font-semibold mb-4">Bonificaciones asignadas</h2>
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-sm">
-            <thead class="text-slate-300">
-              <tr>
-                <th class="text-left p-2">Nombre</th>
-                <th class="text-left p-2">Puesto</th>
-                <th class="text-left p-2">Fecha asignada</th>
-              </tr>
-            </thead>
-            <tbody
-              id="tblBonificaciones"
-              class="divide-y divide-white/10"
-            ></tbody>
-          </table>
-        </div>
+        <div id="contenedorBonificaciones" class="overflow-x-auto"></div>
       </section>
 
       <!-- Vehículos -->
       <section class="mt-8 bg-white/5 rounded-2xl border border-white/10 p-6">
         <h2 class="text-lg font-semibold mb-4">Vehículos</h2>
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-sm">
-            <thead class="text-slate-300">
-              <tr>
-                <th class="text-left p-2">Matrícula</th>
-                <th class="text-left p-2">Modelo</th>
-                <th class="text-left p-2">Color</th>
-                <th class="text-right p-2">Tránsitos</th>
-                <th class="text-right p-2">Total gastado</th>
-              </tr>
-            </thead>
-            <tbody id="tblVehiculos" class="divide-y divide-white/10"></tbody>
-          </table>
-        </div>
+        <div id="contenedorVehiculos" class="overflow-x-auto"></div>
       </section>
 
       <!-- Tránsitos -->
       <section class="mt-8 bg-white/5 rounded-2xl border border-white/10 p-6">
         <h2 class="text-lg font-semibold mb-4">Tránsitos</h2>
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-sm">
-            <thead class="text-slate-300">
-              <tr>
-                <th class="text-left p-2">Puesto</th>
-                <th class="text-left p-2">Matrícula</th>
-                <th class="text-left p-2">Categoría</th>
-                <th class="text-right p-2">Tarifa</th>
-                <th class="text-left p-2">Bonificación</th>
-                <th class="text-right p-2">Monto bonif.</th>
-                <th class="text-right p-2">Pagado</th>
-                <th class="text-left p-2">FechaHora</th>
-              </tr>
-            </thead>
-            <tbody id="tblTransitos" class="divide-y divide-white/10"></tbody>
-          </table>
-        </div>
+        <div id="contenedorTransitos" class="overflow-x-auto"></div>
       </section>
 
       <!-- Notificaciones -->
@@ -147,12 +129,8 @@
       </section>
     </main>
 
-    <script type="module">
-      import {
-        getDashboard,
-        getDashboardVersion,
-        borrarNotificaciones,
-      } from "/js/vistaWeb.js";
+    <script>
+      let currentOwner = null;
 
       function loadOwner() {
         // 1) Intentar desde sessionStorage (flujo normal tras login)
@@ -235,69 +213,77 @@
         };
         setOwnerHeader(ownerDisplay);
 
-        // bonificaciones
-        const tbB = document.getElementById("tblBonificaciones");
-        tbB.innerHTML = "";
-        (dto.bonificaciones || []).forEach((b) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td class="p-2">${b.nombre ?? ""}</td>
-                          <td class="p-2">${b.puesto ?? ""}</td>
-                          <td class="p-2">${fmtDate(b.fechaAsignada)}</td>`;
-          tbB.appendChild(tr);
-        });
+        // Bonificaciones - usar utilesVista.js
+        const bonificacionesData = (dto.bonificaciones || []).map((b) => ({
+          nombre: b.nombre ?? "",
+          puesto: b.puesto ?? "",
+          fechaAsignada: fmtDate(b.fechaAsignada),
+        }));
 
-        // vehiculos
-        const tbV = document.getElementById("tblVehiculos");
-        tbV.innerHTML = "";
-        (dto.vehiculos || []).forEach((v) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td class="p-2 font-mono">${v.matricula ?? ""}</td>
-                          <td class="p-2">${v.modelo ?? ""}</td>
-                          <td class="p-2">${v.color ?? ""}</td>
-                          <td class="p-2 text-right">${
-                            v.cantidadTransitos ?? 0
-                          }</td>
-                          <td class="p-2 text-right">${fmtMoney(
-                            v.montoTotalGastado ?? 0
-                          )}</td>`;
-          tbV.appendChild(tr);
-        });
+        if (bonificacionesData.length > 0) {
+          const htmlBonif = crearTablaDesdeJson(bonificacionesData);
+          document.getElementById("contenedorBonificaciones").innerHTML =
+            htmlBonif;
+        } else {
+          document.getElementById("contenedorBonificaciones").innerHTML =
+            '<p class="text-slate-400">No hay bonificaciones asignadas</p>';
+        }
 
-        // transitos
-        const tbT = document.getElementById("tblTransitos");
-        tbT.innerHTML = "";
-        (dto.transitos || []).forEach((t) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td class="p-2">${t.puesto ?? ""}</td>
-                          <td class="p-2 font-mono">${t.matricula ?? ""}</td>
-                          <td class="p-2">${t.categoria ?? ""}</td>
-                          <td class="p-2 text-right">${fmtMoney(
-                            t.montoTarifa ?? 0
-                          )}</td>
-                          <td class="p-2">${t.nombreBonificacion ?? ""}</td>
-                          <td class="p-2 text-right">${fmtMoney(
-                            t.montoBonificacion ?? 0
-                          )}</td>
-                          <td class="p-2 text-right">${fmtMoney(
-                            t.montoPagado ?? 0
-                          )}</td>
-                          <td class="p-2">${fmtDate(t.fechaHora)}</td>`;
-          tbT.appendChild(tr);
-        });
+        // Vehículos - usar utilesVista.js
+        const vehiculosData = (dto.vehiculos || []).map((v) => ({
+          matricula: v.matricula ?? "",
+          modelo: v.modelo ?? "",
+          color: v.color ?? "",
+          cantidadTransitos: v.cantidadTransitos ?? 0,
+          montoTotalGastado: fmtMoney(v.montoTotalGastado ?? 0),
+        }));
 
-        // notificaciones
+        if (vehiculosData.length > 0) {
+          const htmlVeh = crearTablaDesdeJson(vehiculosData);
+          document.getElementById("contenedorVehiculos").innerHTML = htmlVeh;
+        } else {
+          document.getElementById("contenedorVehiculos").innerHTML =
+            '<p class="text-slate-400">No hay vehículos registrados</p>';
+        }
+
+        // Tránsitos - usar utilesVista.js
+        const transitosData = (dto.transitos || []).map((t) => ({
+          puesto: t.puesto ?? "",
+          matricula: t.matricula ?? "",
+          categoria: t.categoria ?? "",
+          montoTarifa: fmtMoney(t.montoTarifa ?? 0),
+          nombreBonificacion: t.nombreBonificacion ?? "",
+          montoBonificacion: fmtMoney(t.montoBonificacion ?? 0),
+          montoPagado: fmtMoney(t.montoPagado ?? 0),
+          fechaHora: fmtDate(t.fechaHora),
+        }));
+
+        if (transitosData.length > 0) {
+          const htmlTrans = crearTablaDesdeJson(transitosData);
+          document.getElementById("contenedorTransitos").innerHTML = htmlTrans;
+        } else {
+          document.getElementById("contenedorTransitos").innerHTML =
+            '<p class="text-slate-400">No hay tránsitos registrados</p>';
+        }
+
+        // Notificaciones
         const ulN = document.getElementById("listaNotifs");
         ulN.innerHTML = "";
-        (dto.notificaciones || []).forEach((n) => {
-          const li = document.createElement("li");
-          li.className =
-            "p-3 rounded-lg bg-slate-800/60 border border-white/10";
-          li.innerHTML = `<div class="text-sm text-slate-300">${fmtDate(
-            n.fechaHora
-          )}</div>
-                          <div>${n.mensaje ?? ""}</div>`;
-          ulN.appendChild(li);
-        });
+        if (dto.notificaciones && dto.notificaciones.length > 0) {
+          dto.notificaciones.forEach((n) => {
+            const li = document.createElement("li");
+            li.className =
+              "p-3 rounded-lg bg-slate-800/60 border border-white/10";
+            li.innerHTML = `<div class="text-sm text-slate-300">${fmtDate(
+              n.fechaHora
+            )}</div>
+                            <div>${n.mensaje ?? ""}</div>`;
+            ulN.appendChild(li);
+          });
+        } else {
+          ulN.innerHTML =
+            '<li class="text-slate-400">No hay notificaciones</li>';
+        }
 
         // persist state
         if (owner?.cedula) {
@@ -314,7 +300,33 @@
         }
       }
 
-      async function loadDashboard(owner, { useCacheFirst = true } = {}) {
+      // Función mostrar_ para recibir el dashboard desde el servidor
+      function mostrar_dashboard(dto) {
+        renderDashboard(dto, currentOwner);
+      }
+
+      // Función mostrar_ para recibir la versión desde el servidor
+      function mostrar_version(versionData) {
+        const remoteV = Number(versionData?.version ?? 0);
+        const localV = Number(
+          sessionStorage.getItem(`dash:${currentOwner.cedula}:version`) || 0
+        );
+        if (remoteV !== localV) {
+          // La versión cambió, recargar dashboard
+          submit("/propietarios/dashboard", "cedula=" + currentOwner.cedula);
+        }
+      }
+
+      // Función mostrar_ para cuando se borran notificaciones
+      function mostrar_notificacionesBorradas(resultado) {
+        const msgEl = document.getElementById("accionMsg");
+        msgEl.textContent =
+          resultado.mensaje || `Borradas: ${resultado.borradas}`;
+        // Forzar refresh del dashboard
+        submit("/propietarios/dashboard", "cedula=" + currentOwner.cedula);
+      }
+
+      function loadDashboard(owner, { useCacheFirst = true } = {}) {
         const ced = owner.cedula;
         if (useCacheFirst) {
           const cached = sessionStorage.getItem(`dash:${ced}:data`);
@@ -324,29 +336,15 @@
             } catch {}
           }
         }
-        try {
-          const dto = await getDashboard(ced);
-          renderDashboard(dto, owner);
-        } catch (e) {
-          document.getElementById("accionMsg").textContent =
-            "No se pudo cargar el tablero";
-        }
+        // Cargar datos frescos del servidor
+        submit("/propietarios/dashboard", "cedula=" + ced);
       }
 
-      async function startPolling(owner) {
+      function startPolling(owner) {
         const ced = owner.cedula;
-        async function tick() {
-          try {
-            const vObj = await getDashboardVersion(ced);
-            const remoteV = Number(vObj?.version ?? 0);
-            const localV = Number(
-              sessionStorage.getItem(`dash:${ced}:version`) || 0
-            );
-            if (remoteV !== localV) {
-              const dto = await getDashboard(ced);
-              renderDashboard(dto, owner);
-            }
-          } catch {}
+        function tick() {
+          // Consultar versión para ver si hay cambios
+          submit("/propietarios/dashboard/version", "cedula=" + ced);
           setTimeout(tick, 5000); // 5s
         }
         tick();
@@ -357,24 +355,21 @@
         window.location.href = "/login-propietarios.html";
       });
 
-      const owner = loadOwner();
-      if (owner) {
-        loadDashboard(owner, { useCacheFirst: true });
-        startPolling(owner);
+      // Inicialización
+      currentOwner = loadOwner();
+      if (currentOwner) {
+        loadDashboard(currentOwner, { useCacheFirst: true });
+        startPolling(currentOwner);
+
         document
           .getElementById("btnBorrarNotifs")
-          .addEventListener("click", async () => {
+          .addEventListener("click", () => {
             const msgEl = document.getElementById("accionMsg");
             msgEl.textContent = "Procesando...";
-            try {
-              const res = await borrarNotificaciones(owner.cedula);
-              msgEl.textContent = res.mensaje || `Borradas: ${res.borradas}`;
-              // Forzar refresh inmediato (version ya se incrementa en server)
-              const dto = await getDashboard(owner.cedula);
-              renderDashboard(dto, owner);
-            } catch (e) {
-              msgEl.textContent = e.message || "Error al borrar notificaciones";
-            }
+            submit(
+              "/propietarios/notificaciones/borrar",
+              "cedula=" + currentOwner.cedula
+            );
           });
       }
     </script>
