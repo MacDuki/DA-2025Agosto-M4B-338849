@@ -3,6 +3,7 @@ package PedroWattimo.Obligatorio.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import PedroWattimo.Obligatorio.dtos.AdminAutenticadoDto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 public class SistemaAuth {
@@ -43,5 +44,48 @@ public class SistemaAuth {
         }
 
         return dueño;
+    }
+
+    // --------------------------------------------------------------
+    // Autenticación de Administradores
+    // --------------------------------------------------------------
+    public AdminAutenticadoDto loginAdmin(int cedula, String password) throws OblException {
+        // Validaciones de entrada
+        if (password == null || password.isBlank()) {
+            throw new OblException("Acceso denegado");
+        }
+
+        Administrador admin = null;
+        for (Administrador a : this.administradores) {
+            if (a != null && a.getCedula() == cedula) {
+                admin = a;
+                break;
+            }
+        }
+
+        if (admin == null || !admin.passwordCorrecta(password)) {
+            throw new OblException("Acceso denegado");
+        }
+
+        if (admin.estaLogueado()) {
+            throw new OblException("Ud. Ya está logueado");
+        }
+
+        admin.loguear();
+        return new AdminAutenticadoDto(admin.getCedula(), admin.getNombreCompleto());
+    }
+
+    public void logoutAdmin(int cedula) throws OblException {
+        Administrador admin = null;
+        for (Administrador a : this.administradores) {
+            if (a != null && a.getCedula() == cedula) {
+                admin = a;
+                break;
+            }
+        }
+        if (admin == null) {
+            throw new OblException("Acceso denegado");
+        }
+        admin.desloguear();
     }
 }

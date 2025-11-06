@@ -2,8 +2,10 @@ package PedroWattimo.Obligatorio.models;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Propietario {
     private String cedula;
@@ -162,7 +164,101 @@ public class Propietario {
     public boolean puedeIngresar() {
         if (this.estadoActual == null)
             return true; // Por defecto habilitado
-        return !Estado.SUSPENDIDO.equals(this.estadoActual);
+        return this.estadoActual.permiteIngresar();
+    }
+
+    /**
+     * Patrón Experto: el Propietario sabe si puede transitar según su estado.
+     * Delega en el Estado la decisión.
+     */
+    public boolean puedeTransitar() {
+        if (this.estadoActual == null)
+            return true; // Por defecto habilitado
+        return this.estadoActual.permiteTransitar();
+    }
+
+    /**
+     * Patrón Experto: el Propietario sabe si tiene saldo insuficiente para un
+     * monto.
+     */
+    public boolean saldoInsuficientePara(double monto) {
+        return this.saldoActual < monto;
+    }
+
+    /**
+     * Patrón Experto: el Propietario debita un monto de su saldo.
+     * No permite saldo negativo.
+     */
+    public void debitar(double monto) {
+        if (monto <= 0)
+            return;
+        this.saldoActual -= (int) Math.round(monto);
+        if (this.saldoActual < 0)
+            this.saldoActual = 0;
+    }
+
+    /**
+     * Patrón Experto: el Propietario acredita un monto a su saldo.
+     */
+    public void acreditar(double monto) {
+        if (monto > 0) {
+            this.saldoActual += (int) Math.round(monto);
+        }
+    }
+
+    /**
+     * Patrón Experto: el Propietario busca su bonificación asignada para un puesto
+     * específico.
+     */
+    public Optional<AsignacionBonificacion> bonificacionAsignadaPara(Puesto p) {
+        if (p == null || this.asignaciones == null)
+            return Optional.empty();
+        return this.asignaciones.stream()
+                .filter(ab -> ab.activaPara(p, this))
+                .findFirst();
+    }
+
+    /**
+     * Patrón Experto: el Propietario sabe si debe alertar sobre su saldo.
+     */
+    public boolean debeAlertarSaldo() {
+        return this.saldoActual < this.saldoMinimoAlerta;
+    }
+
+    /**
+     * Patrón Experto: el Propietario registra una notificación para sí mismo.
+     */
+    public void registrarNotificacion(String mensaje, LocalDateTime fh) {
+        if (mensaje == null || fh == null)
+            return;
+        if (this.notificaciones == null)
+            this.notificaciones = new ArrayList<>();
+        Notificacion notif = new Notificacion(fh, mensaje, this);
+        this.notificaciones.add(notif);
+    }
+
+    /**
+     * Patrón Experto: el Propietario registra un tránsito en su historial.
+     */
+    public void registrarTransito(Transito transito) {
+        if (transito == null)
+            return;
+        if (this.transitos == null)
+            this.transitos = new ArrayList<>();
+        this.transitos.add(transito);
+    }
+
+    /**
+     * Patrón Experto: el Propietario busca un vehículo por matrícula entre sus
+     * vehículos.
+     */
+    public Vehiculo buscarVehiculoPorMatricula(String matricula) {
+        if (matricula == null || this.vehiculos == null)
+            return null;
+        return this.vehiculos.stream()
+                .filter(v -> matricula.equalsIgnoreCase(v.getMatricula()))
+                .findFirst()
+                .orElse(null);
     }
 
     // -----------------------------
@@ -183,14 +279,9 @@ public class Propietario {
     }
 
     public List<Transito> transitosOrdenadosDesc() {
+        // Solo retornar los tránsitos del propietario (ya registrados directamente)
+        // No agregar los de vehículos porque causaría duplicación
         List<Transito> all = new ArrayList<>(this.transitos);
-        if (this.vehiculos != null) {
-            for (Vehiculo v : this.vehiculos) {
-                if (v.getTransitos() != null) {
-                    all.addAll(v.getTransitos());
-                }
-            }
-        }
         all.sort((a, b) -> b.fechaHora().compareTo(a.fechaHora()));
         return all;
     }

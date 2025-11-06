@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Ingresar - Propietarios</title>
+    <title>Ingresar - Administrador</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/js/utilesVista.js"></script>
     <script src="/js/vistaWeb.js"></script>
@@ -16,7 +16,7 @@
     >
       <div class="mb-6 text-center">
         <h1 class="text-3xl font-bold">Ingresar</h1>
-        <p class="text-slate-300">Propietarios</p>
+        <p class="text-slate-300">Administradores</p>
       </div>
 
       <form id="loginForm" class="space-y-5">
@@ -27,11 +27,10 @@
             name="cedula"
             type="text"
             inputmode="numeric"
-            placeholder="Ej: 23456789"
+            placeholder="Ej: 12345678"
             class="w-full px-4 py-3 rounded-lg bg-slate-800/70 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
-
         <div>
           <label class="block text-sm mb-1" for="password">Contraseña</label>
           <input
@@ -42,12 +41,10 @@
             class="w-full px-4 py-3 rounded-lg bg-slate-800/70 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
-
         <p
           id="errorMsg"
           class="hidden text-sm text-red-400 bg-red-900/30 border border-red-700 rounded-md px-3 py-2"
         ></p>
-
         <button
           type="submit"
           class="w-full py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 font-semibold transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -76,13 +73,11 @@
         errorMsg.textContent = "";
       }
 
-      // Función para manejar errores de submit personalizada
       function procesarErrorSubmit(status, text) {
-        if (status === 401 || status === 403) {
-          showError(
-            text ||
-              (status === 401 ? "Acceso denegado" : "Usuario deshabilitado")
-          );
+        if (status === 401) {
+          showError("Acceso denegado");
+        } else if (status === 409) {
+          showError("Ud. Ya está logueado");
         } else if (status === 0) {
           showError("Error de conexión con el servidor.");
         } else {
@@ -90,19 +85,16 @@
         }
       }
 
-      // Función que se ejecuta cuando el login es exitoso
-      function mostrar_loginExitoso(dto) {
-        sessionStorage.setItem("owner", JSON.stringify(dto));
-        window.location.href = "/dashboard-propietarios.html";
+      function mostrar_adminLoginExitoso(dto) {
+        sessionStorage.setItem("admin", JSON.stringify(dto));
+        window.location.href = "/dashboard-admin.html";
       }
 
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         clearError();
-
         const cedulaStr = document.getElementById("cedula").value.trim();
         const password = document.getElementById("password").value;
-
         if (!cedulaStr || isNaN(Number(cedulaStr))) {
           showError("Ingresá una cédula válida (solo números).");
           return;
@@ -111,10 +103,8 @@
           showError("La contraseña no puede ser vacía.");
           return;
         }
-
-        // Usar submit() con datos URL-encoded
         const datos = serializarFormulario("loginForm");
-        submit("/auth/propietarios/login", datos);
+        submit("/auth/admin/login", datos);
       });
     </script>
   </body>

@@ -1,12 +1,15 @@
 package PedroWattimo.Obligatorio.models;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import PedroWattimo.Obligatorio.dtos.AdminAutenticadoDto;
 import PedroWattimo.Obligatorio.dtos.BonificacionAsignadaDto;
+import PedroWattimo.Obligatorio.dtos.EmularTransitoResultado;
 import PedroWattimo.Obligatorio.dtos.NotificacionDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioDTO;
 import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
@@ -14,6 +17,7 @@ import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
 import PedroWattimo.Obligatorio.dtos.TransitoDto;
 import PedroWattimo.Obligatorio.dtos.VehiculoResumenDto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
+import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
 
 public class Fachada {
 
@@ -41,6 +45,12 @@ public class Fachada {
         this.sistemaBonificaciones = new SistemaBonificaciones();
         this.sistemaAuth = new SistemaAuth();
         this.sistemaNotificaciones = new SistemaNotificaciones();
+
+        // Inyectar dependencias en SistemaTransitos
+        this.sistemaTransitos.setSistemaPropietarios(this.sistemaPropietarios);
+        this.sistemaTransitos.setSistemaPuestos(this.sistemaPuestos);
+        this.sistemaTransitos.setSistemaBonificaciones(this.sistemaBonificaciones);
+        this.sistemaTransitos.setSistemaNotificaciones(this.sistemaNotificaciones);
     }
 
     public static Fachada getInstancia() {
@@ -74,10 +84,6 @@ public class Fachada {
         return sistemaPuestos.getCategorias();
     }
 
-    List<Puesto> obtenerPuestos() {
-        return sistemaPuestos.getPuestos();
-    }
-
     Propietario buscarPropietarioPorCedula(String cedula) {
         return sistemaPropietarios.buscarPorCedula(cedula);
     }
@@ -105,6 +111,21 @@ public class Fachada {
                 propietario.getNombreCompleto(),
                 propietario.getEstadoActual() != null ? propietario.getEstadoActual().nombre()
                         : Estado.HABILITADO.nombre());
+    }
+
+    /**
+     * CU: Login de Administrador
+     * Delegado en SistemaAuth. Sin lógica de hashing aquí.
+     */
+    public AdminAutenticadoDto loginAdmin(int cedula, String password) throws OblException {
+        return this.sistemaAuth.loginAdmin(cedula, password);
+    }
+
+    /**
+     * CU: Logout de Administrador
+     */
+    public void logoutAdmin(int cedula) throws OblException {
+        this.sistemaAuth.logoutAdmin(cedula);
     }
 
     // --------------------------------------------------------------
@@ -185,6 +206,35 @@ public class Fachada {
         if (p == null)
             throw new OblException("El propietario no existe");
         return dashboardVersion.getOrDefault(p.getCedula(), 0L);
+    }
+
+    // --------------------------------------------------------------
+    // CU: Emular tránsito
+    // --------------------------------------------------------------
+    /**
+     * CU: Emular tránsito.
+     * Fachada como único punto de entrada: delega en SistemaTransitos con una sola
+     * línea.
+     */
+    public EmularTransitoResultado emularTransito(Long puestoId, String matricula, LocalDateTime fechaHora)
+            throws OblException, TarifaNoDefinidaException {
+        return sistemaTransitos.emularTransito(puestoId, matricula, fechaHora);
+    }
+
+    /**
+     * Obtiene la lista de puestos.
+     * Delegado en SistemaPuestos.
+     */
+    public List<Puesto> obtenerPuestos() {
+        return sistemaPuestos.getPuestos();
+    }
+
+    /**
+     * Obtiene un puesto por su ID.
+     * Delegado en SistemaPuestos.
+     */
+    public Puesto obtenerPuestoPorId(Long id) throws OblException {
+        return sistemaPuestos.obtenerPorId(id);
     }
 
 }

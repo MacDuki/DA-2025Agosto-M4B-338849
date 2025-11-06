@@ -2,6 +2,7 @@ package PedroWattimo.Obligatorio.models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class SistemaBonificaciones {
     private List<Bonificacion> bonificaciones = new ArrayList<Bonificacion>();
@@ -27,5 +28,18 @@ public class SistemaBonificaciones {
 
     List<AsignacionBonificacion> obtenerAsignacionesInternas() {
         return asignaciones;
+    }
+
+    /**
+     * Busca la bonificación vigente asignada a un propietario para un puesto
+     * específico.
+     * Delega en el Propietario la búsqueda de su asignación.
+     */
+    public Optional<Bonificacion> bonificacionVigente(Propietario p, Puesto puesto) {
+        if (p == null || puesto == null)
+            return Optional.empty();
+
+        Optional<AsignacionBonificacion> asignacion = p.bonificacionAsignadaPara(puesto);
+        return asignacion.map(AsignacionBonificacion::bonificacion);
     }
 }

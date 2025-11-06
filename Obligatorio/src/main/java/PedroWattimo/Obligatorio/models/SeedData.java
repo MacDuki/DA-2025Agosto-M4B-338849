@@ -26,8 +26,8 @@ public class SeedData {
     static void cargarAdministradores() {
         Fachada f = Fachada.getInstancia();
 
-        Administrador admin1 = new Administrador("99999999", "admin123", "Root Admin");
-        Administrador admin2 = new Administrador("88888888", "gestor123", "Gestor 1");
+        Administrador admin1 = new Administrador(99999999, "Root Admin", "admin123");
+        Administrador admin2 = new Administrador(88888888, "Gestor 1", "gestor123");
 
         f.obtenerAdministradoresInternos().add(admin1);
         f.obtenerAdministradoresInternos().add(admin2);
@@ -74,13 +74,40 @@ public class SeedData {
         if (camion == null)
             camion = cat.apply("Camion"); // tolerar sin tilde
 
-        for (Puesto puesto : f.obtenerPuestos()) {
+        // Obtener puestos
+        java.util.List<Puesto> puestos = f.obtenerPuestos();
+
+        // Peaje Ruta 1 (Interbalnearia) - Tarifas más altas por ser ruta principal
+        if (puestos.size() > 0) {
+            Puesto peajeRuta1 = puestos.get(0);
             if (auto != null)
-                puesto.obtenerTablaTarifasInterna().add(new Tarifa(120.0, auto));
+                peajeRuta1.obtenerTablaTarifasInterna().add(new Tarifa(150.0, auto));
             if (camioneta != null)
-                puesto.obtenerTablaTarifasInterna().add(new Tarifa(180.0, camioneta));
+                peajeRuta1.obtenerTablaTarifasInterna().add(new Tarifa(220.0, camioneta));
             if (camion != null)
-                puesto.obtenerTablaTarifasInterna().add(new Tarifa(300.0, camion));
+                peajeRuta1.obtenerTablaTarifasInterna().add(new Tarifa(380.0, camion));
+        }
+
+        // Peaje Ruta 3 (San José) - Tarifas estándar
+        if (puestos.size() > 1) {
+            Puesto peajeRuta3 = puestos.get(1);
+            if (auto != null)
+                peajeRuta3.obtenerTablaTarifasInterna().add(new Tarifa(120.0, auto));
+            if (camioneta != null)
+                peajeRuta3.obtenerTablaTarifasInterna().add(new Tarifa(180.0, camioneta));
+            if (camion != null)
+                peajeRuta3.obtenerTablaTarifasInterna().add(new Tarifa(300.0, camion));
+        }
+
+        // Peaje Ruta 8 (Pando) - Tarifas más bajas por ser ruta secundaria
+        if (puestos.size() > 2) {
+            Puesto peajeRuta8 = puestos.get(2);
+            if (auto != null)
+                peajeRuta8.obtenerTablaTarifasInterna().add(new Tarifa(100.0, auto));
+            if (camioneta != null)
+                peajeRuta8.obtenerTablaTarifasInterna().add(new Tarifa(150.0, camioneta));
+            if (camion != null)
+                peajeRuta8.obtenerTablaTarifasInterna().add(new Tarifa(250.0, camion));
         }
     }
 

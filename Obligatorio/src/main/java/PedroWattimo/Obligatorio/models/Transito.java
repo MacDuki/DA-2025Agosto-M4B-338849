@@ -14,6 +14,9 @@ public class Transito {
     private double montoBonificacion;
     private double totalPagado;
 
+    /**
+     * Constructor original (mantenido por compatibilidad).
+     */
     public Transito(LocalDateTime fechaHora,
             Puesto puesto,
             Vehiculo vehiculo,
@@ -32,6 +35,41 @@ public class Transito {
         this.porcentajeBonificacion = porcentajeBonificacion < 0 ? 0 : porcentajeBonificacion;
         this.montoBonificacion = this.costoConTarifa * (this.porcentajeBonificacion / 100.0);
         this.totalPagado = this.costoConTarifa - this.montoBonificacion;
+    }
+
+    /**
+     * Constructor experto: recibe los datos ya calculados según las reglas de
+     * negocio.
+     * Patrón Experto: el Transito encapsula toda la información de un tránsito
+     * realizado.
+     * 
+     * @param puesto               El puesto por donde transitó
+     * @param vehiculo             El vehículo que transitó
+     * @param tarifa               La tarifa aplicada
+     * @param montoBonificacion    El monto de descuento aplicado (0 si no hay
+     *                             bonificación)
+     * @param montoPagado          El monto efectivamente pagado (tarifa -
+     *                             bonificación)
+     * @param fechaHora            La fecha y hora del tránsito
+     * @param bonificacionAplicada La bonificación aplicada (null si no hay)
+     */
+    public Transito(Puesto puesto, Vehiculo vehiculo, Tarifa tarifa,
+            double montoBonificacion, double montoPagado,
+            LocalDateTime fechaHora, Bonificacion bonificacionAplicada) {
+        this.fechaHora = fechaHora;
+        this.puesto = puesto;
+        this.vehiculo = vehiculo;
+        this.categoriaVehiculo = vehiculo != null && vehiculo.getCategoria() != null
+                ? vehiculo.getCategoria().getNombre()
+                : "Desconocida";
+        this.costoBase = tarifa != null ? tarifa.getMonto() : 0.0;
+        this.costoConTarifa = this.costoBase;
+        this.nombreBonificacion = bonificacionAplicada != null ? bonificacionAplicada.getNombre() : null;
+        this.montoBonificacion = Math.max(0, montoBonificacion);
+        this.porcentajeBonificacion = this.costoBase > 0
+                ? (this.montoBonificacion / this.costoBase) * 100.0
+                : 0.0;
+        this.totalPagado = Math.max(0, montoPagado);
     }
 
     public LocalDateTime fechaHora() {

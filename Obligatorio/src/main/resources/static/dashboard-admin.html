@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Home Administrador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/utilesVista.js"></script>
+    <script src="/js/vistaWeb.js"></script>
+  </head>
+  <body
+    class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white"
+  >
+    <header class="border-b border-white/10 bg-slate-900/60 backdrop-blur">
+      <div
+        class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between"
+      >
+        <h1 class="text-xl font-semibold">Panel Administrador</h1>
+        <div class="flex items-center gap-3">
+          <span id="adminName" class="text-slate-300"></span>
+          <button
+            id="logoutBtn"
+            class="px-3 py-2 rounded-md bg-red-600 hover:bg-red-500 text-sm"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-10">
+      <!-- Información del Admin -->
+      <div class="bg-white/5 rounded-2xl border border-white/10 p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-2">Bienvenido</h2>
+        <p id="adminInfo" class="text-slate-300"></p>
+      </div>
+
+      <!-- Formulario de Emulación -->
+      <div class="bg-white/5 rounded-2xl border border-white/10 p-6 mb-6">
+        <h2 class="text-2xl font-semibold mb-6">🚗 Emular Tránsito</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Columna Izquierda: Formulario -->
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium mb-2"
+                >Puesto de Peaje</label
+              >
+              <select
+                id="puestoSelect"
+                class="w-full px-4 py-2 rounded-md bg-slate-800 border border-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+              >
+                <option value="">Cargando puestos...</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium mb-2"
+                >Matrícula del Vehículo</label
+              >
+              <input
+                type="text"
+                id="matriculaInput"
+                placeholder="Ej: ABC1234"
+                class="w-full px-4 py-2 rounded-md bg-slate-800 border border-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium mb-2">Fecha y Hora</label>
+              <input
+                type="datetime-local"
+                id="fechaHoraInput"
+                class="w-full px-4 py-2 rounded-md bg-slate-800 border border-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+              />
+            </div>
+
+            <button
+              id="emularBtn"
+              class="w-full px-6 py-3 rounded-md bg-indigo-600 hover:bg-indigo-500 font-semibold transition-colors"
+            >
+              🚦 Emular Tránsito
+            </button>
+          </div>
+
+          <!-- Columna Derecha: Tarifas del Puesto -->
+          <div>
+            <h3 class="text-lg font-semibold mb-3">
+              📋 Tarifas del Puesto Seleccionado
+            </h3>
+            <div
+              id="tarifasContainer"
+              class="bg-slate-800/50 rounded-lg p-4 border border-slate-700 min-h-[200px]"
+            >
+              <p class="text-slate-400 text-sm">
+                Seleccione un puesto para ver sus tarifas
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensaje de estado -->
+        <div
+          id="messageContainer"
+          class="hidden mt-4 p-4 rounded-lg border"
+        ></div>
+      </div>
+
+      <!-- Resultado de la Emulación -->
+      <div
+        id="resultadoContainer"
+        class="hidden bg-white/5 rounded-2xl border border-white/10 p-6 mb-6"
+      >
+        <h2 class="text-2xl font-semibold mb-6">✅ Resultado del Tránsito</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Información del Propietario -->
+          <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+            <h3 class="text-lg font-semibold mb-3 text-indigo-400">
+              👤 Propietario
+            </h3>
+            <div class="space-y-2 text-sm">
+              <p>
+                <span class="text-slate-400">Nombre:</span>
+                <span id="resNombre" class="ml-2 font-medium"></span>
+              </p>
+              <p>
+                <span class="text-slate-400">Estado:</span>
+                <span id="resEstado" class="ml-2 font-medium"></span>
+              </p>
+              <p>
+                <span class="text-slate-400">Saldo Posterior:</span>
+                <span id="resSaldo" class="ml-2 font-medium text-green-400"
+                  >$</span
+                >
+              </p>
+            </div>
+          </div>
+
+          <!-- Información del Vehículo -->
+          <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+            <h3 class="text-lg font-semibold mb-3 text-indigo-400">
+              🚗 Vehículo
+            </h3>
+            <div class="space-y-2 text-sm">
+              <p>
+                <span class="text-slate-400">Categoría:</span>
+                <span id="resCategoria" class="ml-2 font-medium"></span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Información de Costos -->
+          <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+            <h3 class="text-lg font-semibold mb-3 text-indigo-400">
+              💰 Costos
+            </h3>
+            <div class="space-y-2 text-sm">
+              <p>
+                <span class="text-slate-400">Tarifa Base:</span>
+                <span id="resCosto" class="ml-2 font-medium">$</span>
+              </p>
+              <p>
+                <span class="text-slate-400">Descuento:</span>
+                <span
+                  id="resBonificacion"
+                  class="ml-2 font-medium text-yellow-400"
+                  >$</span
+                >
+              </p>
+              <p class="pt-2 border-t border-slate-600">
+                <span class="text-slate-400">Total Pagado:</span>
+                <span
+                  id="resPagado"
+                  class="ml-2 font-bold text-lg text-green-400"
+                  >$</span
+                >
+              </p>
+            </div>
+          </div>
+
+          <!-- Información de Bonificación -->
+          <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+            <h3 class="text-lg font-semibold mb-3 text-indigo-400">
+              🎁 Bonificación
+            </h3>
+            <div class="space-y-2 text-sm">
+              <p id="resBonificacionNombre">
+                <span class="text-slate-400">Tipo:</span>
+                <span class="ml-2 font-medium"></span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Puestos -->
+      <div class="bg-white/5 rounded-2xl border border-white/10 p-6">
+        <h2 class="text-2xl font-semibold mb-4">📍 Puestos Disponibles</h2>
+        <div id="puestosListContainer" class="space-y-2">
+          <p class="text-slate-400">Cargando puestos...</p>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      let puestos = [];
+
+      function loadAdmin() {
+        const raw = sessionStorage.getItem("admin");
+        if (!raw) {
+          window.location.href = "/login-admin.html";
+          return null;
+        }
+        try {
+          return JSON.parse(raw);
+        } catch {
+          return null;
+        }
+      }
+
+      function setHeader(dto) {
+        document.getElementById("adminName").textContent =
+          dto?.nombreCompleto || "";
+        document.getElementById("adminInfo").textContent = `Cédula: ${
+          dto?.cedula ?? ""
+        }`;
+      }
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        const raw = sessionStorage.getItem("admin");
+        let data = "";
+        try {
+          const dto = raw ? JSON.parse(raw) : null;
+          if (dto && typeof dto.cedula !== "undefined") {
+            data = `cedula=${encodeURIComponent(dto.cedula)}`;
+          }
+        } catch {}
+
+        // Enviar la cédula si está disponible para asegurar el deslogueo del lado servidor
+        submit("/auth/admin/logout", data);
+        sessionStorage.removeItem("admin");
+        setTimeout(() => {
+          window.location.href = "/login-admin.html";
+        }, 400);
+      });
+
+      // Cargar puestos al iniciar
+      async function cargarPuestos() {
+        try {
+          const response = await fetch("/puestos");
+          if (!response.ok) {
+            throw new Error("Error al cargar puestos");
+          }
+          puestos = await response.json();
+          mostrarPuestosEnSelect();
+          mostrarPuestosEnLista();
+        } catch (error) {
+          console.error("Error:", error);
+          mostrarMensaje("Error al cargar puestos: " + error.message, "error");
+        }
+      }
+
+      // Mostrar puestos en el select
+      function mostrarPuestosEnSelect() {
+        const select = document.getElementById("puestoSelect");
+        select.innerHTML = '<option value="">Seleccione un puesto</option>';
+        puestos.forEach((puesto) => {
+          const option = document.createElement("option");
+          option.value = puesto.id;
+          option.textContent = `${puesto.nombre} - ${puesto.direccion}`;
+          select.appendChild(option);
+        });
+      }
+
+      // Mostrar puestos en la lista
+      function mostrarPuestosEnLista() {
+        const container = document.getElementById("puestosListContainer");
+        container.innerHTML = "";
+        puestos.forEach((puesto) => {
+          const div = document.createElement("div");
+          div.className =
+            "bg-slate-800/50 rounded-lg p-3 border border-slate-700 flex justify-between items-center";
+          div.innerHTML = `
+            <div>
+              <p class="font-medium">${puesto.nombre}</p>
+              <p class="text-sm text-slate-400">${puesto.direccion}</p>
+            </div>
+            <span class="text-slate-400 text-sm">ID: ${puesto.id}</span>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      // Cargar tarifas cuando cambia el puesto
+      document
+        .getElementById("puestoSelect")
+        .addEventListener("change", async (e) => {
+          const puestoId = e.target.value;
+          if (!puestoId) {
+            document.getElementById("tarifasContainer").innerHTML =
+              '<p class="text-slate-400 text-sm">Seleccione un puesto para ver sus tarifas</p>';
+            return;
+          }
+
+          try {
+            const response = await fetch(`/puestos/${puestoId}/tarifas`);
+            if (!response.ok) {
+              throw new Error("Error al cargar tarifas");
+            }
+            const tarifas = await response.json();
+            mostrarTarifas(tarifas);
+          } catch (error) {
+            console.error("Error:", error);
+            mostrarMensaje(
+              "Error al cargar tarifas: " + error.message,
+              "error"
+            );
+          }
+        });
+
+      // Mostrar tarifas
+      function mostrarTarifas(tarifas) {
+        const container = document.getElementById("tarifasContainer");
+        if (!tarifas || tarifas.length === 0) {
+          container.innerHTML =
+            '<p class="text-slate-400 text-sm">No hay tarifas definidas</p>';
+          return;
+        }
+
+        container.innerHTML = "";
+        tarifas.forEach((tarifa) => {
+          const div = document.createElement("div");
+          div.className =
+            "flex justify-between items-center py-2 border-b border-slate-600 last:border-0";
+          div.innerHTML = `
+            <span class="text-slate-300">${tarifa.categoria}</span>
+            <span class="font-semibold text-green-400">$${tarifa.monto.toFixed(
+              2
+            )}</span>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      // Establecer fecha/hora actual por defecto
+      function setFechaHoraActual() {
+        const now = new Date();
+        // Ajustar a la zona horaria local
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById("fechaHoraInput").value = now
+          .toISOString()
+          .slice(0, 16);
+      }
+
+      // Emular tránsito
+      document
+        .getElementById("emularBtn")
+        .addEventListener("click", async () => {
+          const puestoId = document.getElementById("puestoSelect").value;
+          const matricula = document
+            .getElementById("matriculaInput")
+            .value.trim();
+          const fechaHora = document.getElementById("fechaHoraInput").value;
+
+          // Validaciones
+          if (!puestoId) {
+            mostrarMensaje("Debe seleccionar un puesto", "error");
+            return;
+          }
+          if (!matricula) {
+            mostrarMensaje("Debe ingresar una matrícula", "error");
+            return;
+          }
+          if (!fechaHora) {
+            mostrarMensaje("Debe seleccionar fecha y hora", "error");
+            return;
+          }
+
+          // Convertir fecha a ISO-8601
+          const fechaISO = new Date(fechaHora).toISOString();
+
+          const request = {
+            puestoId: parseInt(puestoId),
+            matricula: matricula,
+            fechaHora: fechaISO,
+          };
+
+          try {
+            const response = await fetch("/admin/emular-transito", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(request),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || data.id === "error") {
+              throw new Error(data.parametro || "Error desconocido");
+            }
+
+            // Mostrar resultado
+            mostrarResultado(data.parametro);
+            mostrarMensaje("✅ Tránsito registrado exitosamente", "success");
+          } catch (error) {
+            console.error("Error:", error);
+            mostrarMensaje("❌ " + error.message, "error");
+            ocultarResultado();
+          }
+        });
+
+      // Mostrar resultado
+      function mostrarResultado(resultado) {
+        document.getElementById("resNombre").textContent =
+          resultado.nombrePropietario || "-";
+        document.getElementById("resEstado").textContent =
+          resultado.estadoPropietario || "-";
+        document.getElementById("resSaldo").textContent =
+          "$" + (resultado.saldoPost || 0);
+        document.getElementById("resCategoria").textContent =
+          resultado.categoriaVehiculo || "-";
+        document.getElementById("resCosto").textContent =
+          "$" + (resultado.costoTransito || 0).toFixed(2);
+        document.getElementById("resBonificacion").textContent =
+          "$" + (resultado.montoBonificacion || 0).toFixed(2);
+        document.getElementById("resPagado").textContent =
+          "$" + (resultado.montoPagado || 0).toFixed(2);
+
+        const bonifNombre = document.getElementById("resBonificacionNombre");
+        if (resultado.bonificacionNombre) {
+          bonifNombre.innerHTML = `
+            <span class="text-slate-400">Tipo:</span>
+            <span class="ml-2 font-medium text-yellow-400">${resultado.bonificacionNombre}</span>
+          `;
+        } else {
+          bonifNombre.innerHTML = `
+            <span class="text-slate-400">Sin bonificación aplicada</span>
+          `;
+        }
+
+        document
+          .getElementById("resultadoContainer")
+          .classList.remove("hidden");
+      }
+
+      // Ocultar resultado
+      function ocultarResultado() {
+        document.getElementById("resultadoContainer").classList.add("hidden");
+      }
+
+      // Mostrar mensaje
+      function mostrarMensaje(texto, tipo) {
+        const container = document.getElementById("messageContainer");
+        container.className =
+          "mt-4 p-4 rounded-lg border " +
+          (tipo === "error"
+            ? "bg-red-900/20 border-red-500 text-red-300"
+            : "bg-green-900/20 border-green-500 text-green-300");
+        container.textContent = texto;
+        container.classList.remove("hidden");
+
+        setTimeout(() => {
+          container.classList.add("hidden");
+        }, 5000);
+      }
+
+      // Inicializar
+      const dto = loadAdmin();
+      if (dto) setHeader(dto);
+      setFechaHoraActual();
+      cargarPuestos();
+    </script>
+  </body>
+</html>

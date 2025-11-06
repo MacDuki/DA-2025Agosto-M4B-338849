@@ -376,7 +376,7 @@
       document.getElementById("logoutBtn").addEventListener("click", () => {
         sessionStorage.removeItem("owner");
         // Llamar al endpoint de logout para limpiar la sesión del servidor
-        submit("/auth/logout", "");
+        submit("/auth/propietarios/logout", "");
         setTimeout(() => {
           window.location.href = "/login-propietarios.html";
         }, 500);

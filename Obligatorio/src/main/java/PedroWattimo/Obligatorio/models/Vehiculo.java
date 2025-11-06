@@ -50,6 +50,16 @@ public class Vehiculo {
         return color;
     }
 
+    /**
+     * Patrón Experto: el Vehiculo sabe si pertenece a una categoría específica.
+     */
+    public boolean esDeCategoria(Categoria c) {
+        if (c == null || this.categoria == null)
+            return false;
+        return this.categoria.equals(c) ||
+                (this.categoria.getNombre() != null && this.categoria.getNombre().equals(c.getNombre()));
+    }
+
     public int cantidadTransitos() {
         return transitos == null ? 0 : transitos.size();
     }
@@ -58,6 +68,17 @@ public class Vehiculo {
         if (transitos == null)
             return 0.0;
         return transitos.stream().mapToDouble(Transito::totalPagado).sum();
+    }
+
+    /**
+     * Patrón Experto: el Vehiculo mantiene su lista de tránsitos.
+     */
+    public void registrarTransito(Transito transito) {
+        if (transito == null)
+            return;
+        if (this.transitos == null)
+            this.transitos = new ArrayList<>();
+        this.transitos.add(transito);
     }
 
     @Override

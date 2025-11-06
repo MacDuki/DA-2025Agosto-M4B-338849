@@ -3,6 +3,8 @@ package PedroWattimo.Obligatorio.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
+
 public class Puesto {
     private String nombre;
     private String direccion;
@@ -48,6 +50,43 @@ public class Puesto {
     // Método interno para agregar tarifas (uso package-private para SeedData)
     List<Tarifa> obtenerTablaTarifasInterna() {
         return tablaTarifas;
+    }
+
+    /**
+     * Patrón Experto: el Puesto sabe encontrar la tarifa para una categoría
+     * específica.
+     * Lanza TarifaNoDefinidaException si no existe tarifa para la categoría.
+     */
+    public Tarifa tarifaPara(Categoria cat) throws TarifaNoDefinidaException {
+        if (cat == null) {
+            throw new TarifaNoDefinidaException("La categoría no puede ser nula");
+        }
+        if (tablaTarifas == null || tablaTarifas.isEmpty()) {
+            throw new TarifaNoDefinidaException(
+                    "No hay tarifas definidas en el puesto " + (nombre != null ? nombre : "desconocido"));
+        }
+        for (Tarifa t : tablaTarifas) {
+            if (t.getCategoria() != null &&
+                    (t.getCategoria().equals(cat) ||
+                            (t.getCategoria().getNombre() != null
+                                    && t.getCategoria().getNombre().equals(cat.getNombre())))) {
+                return t;
+            }
+        }
+        throw new TarifaNoDefinidaException(
+                "No existe tarifa para la categoría " + cat.getNombre() +
+                        " en el puesto " + (nombre != null ? nombre : "desconocido"));
+    }
+
+    /**
+     * Patrón Experto: el Puesto mantiene su lista de tránsitos.
+     */
+    public void registrarTransito(Transito transito) {
+        if (transito == null)
+            return;
+        if (this.transitos == null)
+            this.transitos = new ArrayList<>();
+        this.transitos.add(transito);
     }
 
 }

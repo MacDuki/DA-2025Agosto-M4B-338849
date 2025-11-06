@@ -3,6 +3,8 @@ package PedroWattimo.Obligatorio.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import PedroWattimo.Obligatorio.models.exceptions.OblException;
+
 public class SistemaPropietarios {
     private List<Propietario> propietarios = new ArrayList<Propietario>();
 
@@ -40,5 +42,24 @@ public class SistemaPropietarios {
      */
     public Propietario findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(int cedula) {
         return buscarPorCedula(String.valueOf(cedula));
+    }
+
+    /**
+     * Busca el propietario dueño de un vehículo por su matrícula.
+     * Valida que la matrícula sea única por propietario.
+     */
+    public Propietario propietarioPorMatricula(String matricula) throws OblException {
+        if (matricula == null || matricula.isBlank()) {
+            throw new OblException("La matrícula no puede estar vacía");
+        }
+
+        for (Propietario prop : propietarios) {
+            Vehiculo veh = prop.buscarVehiculoPorMatricula(matricula);
+            if (veh != null) {
+                return prop;
+            }
+        }
+
+        throw new OblException("No existe el vehículo con matrícula: " + matricula);
     }
 }
