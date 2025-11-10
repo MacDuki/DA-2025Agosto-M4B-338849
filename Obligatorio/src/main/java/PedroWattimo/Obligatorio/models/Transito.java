@@ -7,16 +7,15 @@ public class Transito {
     private Puesto puesto;
     private Vehiculo vehiculo;
     private String categoriaVehiculo;
+
     private double costoBase;
     private double costoConTarifa;
     private String nombreBonificacion;
-    private double porcentajeBonificacion;
     private double montoBonificacion;
+
+    private double porcentajeBonificacion;
     private double totalPagado;
 
-    /**
-     * Constructor original (mantenido por compatibilidad).
-     */
     public Transito(LocalDateTime fechaHora,
             Puesto puesto,
             Vehiculo vehiculo,
@@ -37,22 +36,6 @@ public class Transito {
         this.totalPagado = this.costoConTarifa - this.montoBonificacion;
     }
 
-    /**
-     * Constructor experto: recibe los datos ya calculados según las reglas de
-     * negocio.
-     * Patrón Experto: el Transito encapsula toda la información de un tránsito
-     * realizado.
-     * 
-     * @param puesto               El puesto por donde transitó
-     * @param vehiculo             El vehículo que transitó
-     * @param tarifa               La tarifa aplicada
-     * @param montoBonificacion    El monto de descuento aplicado (0 si no hay
-     *                             bonificación)
-     * @param montoPagado          El monto efectivamente pagado (tarifa -
-     *                             bonificación)
-     * @param fechaHora            La fecha y hora del tránsito
-     * @param bonificacionAplicada La bonificación aplicada (null si no hay)
-     */
     public Transito(Puesto puesto, Vehiculo vehiculo, Tarifa tarifa,
             double montoBonificacion, double montoPagado,
             LocalDateTime fechaHora, Bonificacion bonificacionAplicada) {

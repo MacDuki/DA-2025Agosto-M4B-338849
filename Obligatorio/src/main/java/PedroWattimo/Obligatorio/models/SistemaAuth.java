@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import PedroWattimo.Obligatorio.dtos.AdminAutenticadoDto;
+import PedroWattimo.Obligatorio.dtos.PropietarioDTO;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 public class SistemaAuth {
@@ -87,5 +88,20 @@ public class SistemaAuth {
             throw new OblException("Acceso denegado");
         }
         admin.desloguear();
+    }
+
+    // --------------------------------------------------------------
+    // Login de Propietario (DTO) - para que Fachada delegue en 1 línea
+    // --------------------------------------------------------------
+    public PropietarioDTO loginPropietario(SistemaPropietarios sistemaPropietarios, int cedula, String password)
+            throws OblException {
+        Propietario p = autenticarPropietario(sistemaPropietarios, String.valueOf(cedula), password);
+        if (!p.puedeIngresar()) {
+            throw new OblException("Usuario deshabilitado, no puede ingresar al sistema");
+        }
+        return new PropietarioDTO(
+                p.getCedula(),
+                p.getNombreCompleto(),
+                p.getEstadoActual() != null ? p.getEstadoActual().nombre() : Estado.HABILITADO.nombre());
     }
 }
