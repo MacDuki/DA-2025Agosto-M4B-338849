@@ -67,6 +67,14 @@ public class Fachada {
         return sistemaVehiculosYCategorias.obtenerVehiculosInternos();
     }
 
+    List<Bonificacion> obtenerBonificacionesInternas() {
+        return sistemaBonificaciones.obtenerBonificacionesInternas();
+    }
+
+    List<AsignacionBonificacion> obtenerAsignacionesBonificacionesInternas() {
+        return sistemaBonificaciones.obtenerAsignacionesInternas();
+    }
+
     List<Categoria> obtenerCategorias() {
         return sistemaVehiculosYCategorias.getCategorias();
     }

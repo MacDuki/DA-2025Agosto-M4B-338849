@@ -64,11 +64,8 @@ public class SistemaTransitos {
         this.transitos.add(t);
         if (puesto != null)
             puesto.registrarTransito(t);
-        if (veh != null) {
-            veh.registrarTransito(t);
-            if (veh.getPropietario() != null) {
-                veh.getPropietario().registrarTransito(t);
-            }
+        if (veh != null && veh.getPropietario() != null) {
+            veh.getPropietario().registrarTransito(t);
         }
         return t;
     }

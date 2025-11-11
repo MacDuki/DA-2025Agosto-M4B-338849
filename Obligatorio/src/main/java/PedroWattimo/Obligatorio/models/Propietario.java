@@ -249,6 +249,21 @@ public class Propietario {
     }
 
     /**
+     * Patrón Experto: el Propietario registra una asignación de bonificación
+     * para un puesto y fecha-hora dados.
+     */
+    public AsignacionBonificacion asignarBonificacion(Bonificacion bonificacion, Puesto puesto,
+            LocalDateTime fechaHora) {
+        if (bonificacion == null || puesto == null || fechaHora == null)
+            return null;
+        if (this.asignaciones == null)
+            this.asignaciones = new ArrayList<>();
+        AsignacionBonificacion ab = new AsignacionBonificacion(fechaHora, this, puesto, bonificacion);
+        this.asignaciones.add(ab);
+        return ab;
+    }
+
+    /**
      * Patrón Experto: el Propietario busca un vehículo por matrícula entre sus
      * vehículos.
      */
@@ -302,19 +317,28 @@ public class Propietario {
     }
 
     /**
-     * Patrón Experto: delega en el vehículo el cálculo de su total gastado.
-     * El Propietario no debe conocer la estructura interna del Vehiculo.
+     * Patrón Experto: calcula el total gastado por un vehículo específico
+     * a partir de los tránsitos del propietario.
      */
     public double totalGastadoPor(Vehiculo v) {
-        return v == null ? 0.0 : v.totalGastadoPorMi();
+        if (v == null || this.transitos == null)
+            return 0.0;
+        return this.transitos.stream()
+                .filter(t -> t.vehiculo() != null && t.vehiculo().equals(v))
+                .mapToDouble(Transito::totalPagado)
+                .sum();
     }
 
     /**
-     * Patrón Experto: delega en el vehículo el cálculo de sus tránsitos.
-     * El Propietario no debe conocer la estructura interna del Vehiculo.
+     * Patrón Experto: calcula la cantidad de tránsitos de un vehículo específico
+     * a partir de los tránsitos del propietario.
      */
     public int cantidadTransitosDe(Vehiculo v) {
-        return v == null ? 0 : v.cantidadTransitos();
+        if (v == null || this.transitos == null)
+            return 0;
+        return (int) this.transitos.stream()
+                .filter(t -> t.vehiculo() != null && t.vehiculo().equals(v))
+                .count();
     }
 
     // Helpers

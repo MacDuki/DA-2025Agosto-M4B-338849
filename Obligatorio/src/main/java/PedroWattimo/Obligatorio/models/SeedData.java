@@ -20,6 +20,9 @@ public class SeedData {
         // 6. Precargar Vehículos
         cargarVehiculos();
 
+        // 7. Precargar Bonificaciones y Asignaciones a propietarios
+        cargarBonificacionesYAsignaciones();
+
         System.out.println("✓ Datos precargados exitosamente");
     }
 
@@ -129,6 +132,7 @@ public class SeedData {
         Propietario p1 = f.buscarPropietarioPorCedula("11111111");
         Propietario p2 = f.buscarPropietarioPorCedula("22222222");
         Propietario p3 = f.buscarPropietarioPorCedula("33333333");
+        Propietario p4 = f.buscarPropietarioPorCedula("44444444");
 
         if (p1 != null) {
             Vehiculo v1 = p1.registrarVehiculo("SBA1234", "Ford Fiesta", "Rojo", catAuto);
@@ -145,6 +149,11 @@ public class SeedData {
         if (p3 != null) {
             Vehiculo v4 = p3.registrarVehiculo("TRK9000", "Scania R500", "Azul", catCamion);
             f.obtenerVehiculosInternos().add(v4);
+        }
+
+        if (p4 != null) {
+            Vehiculo v5 = p4.registrarVehiculo("DEF4321", "Chevrolet Onix", "Gris", catAuto);
+            f.obtenerVehiculosInternos().add(v5);
         }
     }
 
@@ -168,10 +177,66 @@ public class SeedData {
                 .ajustarSaldoMinimoAlerta(50)
                 .cambiarEstado(Estado.SUSPENDIDO);
 
+        // Propietario 4: habilitado, sin bonificación asignada
+        Propietario p4 = new Propietario("44444444", "Diego Ruiz", "diego123")
+                .acreditarSaldo(1200)
+                .ajustarSaldoMinimoAlerta(150)
+                .cambiarEstado(Estado.HABILITADO);
+
         // Registrar en el sistema usando método interno
         f.obtenerPropietariosInternos().add(p1);
         f.obtenerPropietariosInternos().add(p2);
         f.obtenerPropietariosInternos().add(p3);
+        f.obtenerPropietariosInternos().add(p4);
     }
 
+    static void cargarBonificacionesYAsignaciones() {
+        Fachada f = Fachada.getInstancia();
+
+        // Crear tipos de bonificación disponibles
+        Bonificacion exonerados = new BonificacionExonerados();
+        Bonificacion frecuentes = new BonificacionFrecuentes();
+        Bonificacion trabajadores = new BonificacionTrabajadores();
+
+        // Registrar bonificaciones en el sistema
+        f.obtenerBonificacionesInternas().add(exonerados);
+        f.obtenerBonificacionesInternas().add(frecuentes);
+        f.obtenerBonificacionesInternas().add(trabajadores);
+
+        // Obtener entidades necesarias
+        Propietario p1 = f.buscarPropietarioPorCedula("11111111");
+        Propietario p2 = f.buscarPropietarioPorCedula("22222222");
+        Propietario p4 = f.buscarPropietarioPorCedula("44444444");
+
+        java.util.List<Puesto> puestos = f.obtenerPuestos();
+        if (puestos.isEmpty())
+            return;
+
+        java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
+
+        // Asignaciones ejemplo:
+        // p1: Frecuentes en Puesto 0
+        if (p1 != null) {
+            Puesto puesto0 = puestos.get(0);
+            AsignacionBonificacion ab1 = p1.asignarBonificacion(frecuentes, puesto0, ahora.minusDays(5));
+            if (ab1 != null)
+                f.obtenerAsignacionesBonificacionesInternas().add(ab1);
+        }
+
+        // p2: Trabajadores en Puesto 1
+        if (p2 != null && puestos.size() > 1) {
+            Puesto puesto1 = puestos.get(1);
+            AsignacionBonificacion ab2 = p2.asignarBonificacion(trabajadores, puesto1, ahora.minusDays(3));
+            if (ab2 != null)
+                f.obtenerAsignacionesBonificacionesInternas().add(ab2);
+        }
+
+        // p4: Exonerados en Puesto 2 (p3 queda SIN bonificación)
+        if (p4 != null && puestos.size() > 2) {
+            Puesto puesto2 = puestos.get(2);
+            AsignacionBonificacion ab3 = p4.asignarBonificacion(exonerados, puesto2, ahora.minusDays(1));
+            if (ab3 != null)
+                f.obtenerAsignacionesBonificacionesInternas().add(ab3);
+        }
+    }
 }
