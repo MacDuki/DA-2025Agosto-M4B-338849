@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import PedroWattimo.Obligatorio.dtos.AdminAutenticadoDto;
 import PedroWattimo.Obligatorio.dtos.BonificacionAsignadaDto;
 import PedroWattimo.Obligatorio.dtos.NotificacionDto;
-import PedroWattimo.Obligatorio.dtos.PropietarioAutenticadoDTO;
 import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
 import PedroWattimo.Obligatorio.dtos.TransitoDto;
@@ -25,6 +23,8 @@ import PedroWattimo.Obligatorio.models.exceptions.OblException;
 public class SistemaPropietariosYAdmin {
     private final List<Propietario> propietarios = new ArrayList<>();
     private final List<Administrador> administradores = new ArrayList<>();
+    private final List<SesionPropietario> sesionesPropietarios = new ArrayList<>();
+    private final List<SesionAdmin> sesionesAdmin = new ArrayList<>();
 
     // Historial plano de notificaciones globales (opcional para auditoría).
     private final List<Notificacion> notificacionesGlobales = new ArrayList<>();
@@ -114,19 +114,24 @@ public class SistemaPropietariosYAdmin {
         return dueño;
     }
 
-    public PropietarioAutenticadoDTO loginPropietario(int cedula, String password) throws OblException {
+    public SesionPropietario loginPropietario(int cedula, String password) throws OblException {
         Propietario p = autenticarPropietario(cedula, password);
         if (!p.puedeIngresar()) {
             throw new OblException("Usuario deshabilitado, no puede ingresar al sistema");
         }
-        return new PropietarioAutenticadoDTO(
-                p.getCedula(),
-                p.getNombreCompleto(),
-                p.getEstadoActual() != null ? p.getEstadoActual().nombre() : Estado.HABILITADO.nombre());
+
+        SesionPropietario sesion = new SesionPropietario(LocalDateTime.now(), p);
+        sesionesPropietarios.add(sesion);
+        return sesion;
+    }
+
+    public void logoutPropietario(int cedula) {
+        // Eliminar la sesión del propietario
+        sesionesPropietarios.removeIf(s -> s.getPropietario().getCedula() == cedula);
     }
 
     // -------- Autenticación de Administradores --------
-    public AdminAutenticadoDto loginAdmin(int cedula, String password) throws OblException {
+    public SesionAdmin loginAdmin(int cedula, String password) throws OblException {
         if (password == null || password.isBlank()) {
             throw new OblException("Acceso denegado");
         }
@@ -148,7 +153,9 @@ public class SistemaPropietariosYAdmin {
         }
 
         admin.loguear();
-        return new AdminAutenticadoDto(admin.getCedula(), admin.getNombreCompleto());
+        SesionAdmin sesion = new SesionAdmin(LocalDateTime.now(), admin);
+        sesionesAdmin.add(sesion);
+        return sesion;
     }
 
     public void logoutAdmin(int cedula) throws OblException {
@@ -163,6 +170,9 @@ public class SistemaPropietariosYAdmin {
             throw new OblException("Acceso denegado");
         }
         admin.desloguear();
+
+        // Eliminar la sesión del administrador
+        sesionesAdmin.removeIf(s -> s.getAdministrador().getCedula() == cedula);
     }
 
     // -------- Dashboard de Propietario --------

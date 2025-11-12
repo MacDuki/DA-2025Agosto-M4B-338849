@@ -91,7 +91,12 @@ public class Fachada {
      * La fachada delega en una línea al SistemaPropietariosYAdmin.
      */
     public PropietarioAutenticadoDTO loginPropietario(int cedula, String password) throws OblException {
-        return this.sistemaPropietariosYAdmin.loginPropietario(cedula, password);
+        SesionPropietario sesion = this.sistemaPropietariosYAdmin.loginPropietario(cedula, password);
+        Propietario p = sesion.getPropietario();
+        return new PropietarioAutenticadoDTO(
+                p.getCedula(),
+                p.getNombreCompleto(),
+                p.getEstadoActual() != null ? p.getEstadoActual().nombre() : Estado.HABILITADO.nombre());
     }
 
     /**
@@ -99,7 +104,9 @@ public class Fachada {
      * Delegado en SistemaPropietariosYAdmin.
      */
     public AdminAutenticadoDto loginAdmin(int cedula, String password) throws OblException {
-        return this.sistemaPropietariosYAdmin.loginAdmin(cedula, password);
+        SesionAdmin sesion = this.sistemaPropietariosYAdmin.loginAdmin(cedula, password);
+        Administrador admin = sesion.getAdministrador();
+        return new AdminAutenticadoDto(admin.getCedula(), admin.getNombreCompleto());
     }
 
     /**
