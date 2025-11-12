@@ -16,26 +16,25 @@ public class Fachada {
 
     // Sistemas como atributos privados. Nunca gets ni sets de estos atributos.
     // Nueva topología refactorizada
-    private SistemaPropietarios sistemaPropietarios; // absorbe estados + notificaciones
+    private SistemaPropietariosYAdmin sistemaPropietariosYAdmin; // absorbe auth + propietarios + estados +
+                                                                 // notificaciones
     private SistemaVehiculosYCategorias sistemaVehiculosYCategorias; // vehiculos + categorias
     private SistemaPuestosYTarifas sistemaPuestosYTarifas; // puestos + tarifas
     private SistemaTransitos sistemaTransitos;
     private SistemaBonificaciones sistemaBonificaciones;
-    private SistemaAuth sistemaAuth;
 
     // Sin estado adicional: toda versión/estado vive en los subsistemas
 
     private Fachada() {
         // Instanciación de sub-sistemas
-        this.sistemaPropietarios = new SistemaPropietarios();
+        this.sistemaPropietariosYAdmin = new SistemaPropietariosYAdmin();
         this.sistemaVehiculosYCategorias = new SistemaVehiculosYCategorias();
         this.sistemaPuestosYTarifas = new SistemaPuestosYTarifas();
         this.sistemaTransitos = new SistemaTransitos();
         this.sistemaBonificaciones = new SistemaBonificaciones();
-        this.sistemaAuth = new SistemaAuth();
 
         // Inyecciones según nueva arquitectura
-        this.sistemaTransitos.setSistemaPropietarios(this.sistemaPropietarios);
+        this.sistemaTransitos.setSistemaPropietariosYAdmin(this.sistemaPropietariosYAdmin);
         this.sistemaTransitos.setSistemaPuestosYTarifas(this.sistemaPuestosYTarifas);
         this.sistemaTransitos.setSistemaBonificaciones(this.sistemaBonificaciones);
     }
@@ -48,7 +47,7 @@ public class Fachada {
     }
 
     List<Administrador> obtenerAdministradoresInternos() {
-        return sistemaAuth.obtenerAdministradoresInternos();
+        return sistemaPropietariosYAdmin.obtenerAdministradoresInternos();
     }
 
     List<Categoria> obtenerCategoriasInternos() {
@@ -60,7 +59,7 @@ public class Fachada {
     }
 
     List<Propietario> obtenerPropietariosInternos() {
-        return sistemaPropietarios.obtenerPropietariosInternos();
+        return sistemaPropietariosYAdmin.obtenerPropietariosInternos();
     }
 
     List<Vehiculo> obtenerVehiculosInternos() {
@@ -80,7 +79,7 @@ public class Fachada {
     }
 
     Propietario buscarPropietarioPorCedula(int cedula) {
-        return sistemaPropietarios.buscarPorCedula(cedula);
+        return sistemaPropietariosYAdmin.buscarPorCedula(cedula);
     }
 
     // --------------------------------------------------------------
@@ -89,40 +88,40 @@ public class Fachada {
 
     /**
      * CU: Ingresar a la aplicación (Propietarios)
-     * La fachada delega en una línea al SistemaAuth.
+     * La fachada delega en una línea al SistemaPropietariosYAdmin.
      */
     public PropietarioAutenticadoDTO loginPropietario(int cedula, String password) throws OblException {
-        return this.sistemaAuth.loginPropietario(this.sistemaPropietarios, cedula, password);
+        return this.sistemaPropietariosYAdmin.loginPropietario(cedula, password);
     }
 
     /**
      * CU: Login de Administrador
-     * Delegado en SistemaAuth. Sin lógica de hashing aquí.
+     * Delegado en SistemaPropietariosYAdmin.
      */
     public AdminAutenticadoDto loginAdmin(int cedula, String password) throws OblException {
-        return this.sistemaAuth.loginAdmin(cedula, password);
+        return this.sistemaPropietariosYAdmin.loginAdmin(cedula, password);
     }
 
     /**
      * CU: Logout de Administrador
      */
     public void logoutAdmin(int cedula) throws OblException {
-        this.sistemaAuth.logoutAdmin(cedula);
+        this.sistemaPropietariosYAdmin.logoutAdmin(cedula);
     }
 
     // --------------------------------------------------------------
     // CU: Dashboard del propietario
     // --------------------------------------------------------------
     public PropietarioDashboardDto dashboardDePropietario(int cedula) throws OblException {
-        return this.sistemaPropietarios.dashboardDePropietario(cedula);
+        return this.sistemaPropietariosYAdmin.dashboardDePropietario(cedula);
     }
 
     public int borrarNotificacionesDePropietario(int cedula) throws OblException {
-        return this.sistemaPropietarios.borrarNotificacionesDePropietario(cedula);
+        return this.sistemaPropietariosYAdmin.borrarNotificacionesDePropietario(cedula);
     }
 
     public long versionDashboardDePropietario(int cedula) throws OblException {
-        return this.sistemaPropietarios.versionDashboardDePropietario(cedula);
+        return this.sistemaPropietariosYAdmin.versionDashboardDePropietario(cedula);
     }
 
     // --------------------------------------------------------------

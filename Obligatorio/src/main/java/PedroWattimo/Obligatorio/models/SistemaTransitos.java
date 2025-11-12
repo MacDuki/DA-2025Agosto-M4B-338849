@@ -20,15 +20,15 @@ import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
 public class SistemaTransitos {
     private final List<Transito> transitos = new ArrayList<>();
 
-    private SistemaPropietarios sistemaPropietarios;
+    private SistemaPropietariosYAdmin sistemaPropietariosYAdmin;
     private SistemaPuestosYTarifas sistemaPuestosYTarifas;
     private SistemaBonificaciones sistemaBonificaciones;
 
     protected SistemaTransitos() {
     }
 
-    void setSistemaPropietarios(SistemaPropietarios sistemaPropietarios) {
-        this.sistemaPropietarios = sistemaPropietarios;
+    void setSistemaPropietariosYAdmin(SistemaPropietariosYAdmin sistemaPropietariosYAdmin) {
+        this.sistemaPropietariosYAdmin = sistemaPropietariosYAdmin;
     }
 
     void setSistemaPuestosYTarifas(SistemaPuestosYTarifas sistemaPuestosYTarifas) {
@@ -74,7 +74,7 @@ public class SistemaTransitos {
             throws OblException, TarifaNoDefinidaException {
 
         Puesto puesto = sistemaPuestosYTarifas.obtenerPorId(puestoId);
-        Propietario prop = sistemaPropietarios.propietarioPorMatricula(matricula);
+        Propietario prop = sistemaPropietariosYAdmin.propietarioPorMatricula(matricula);
 
         Estado estado = prop.getEstadoActual();
         if (estado != null && !estado.permiteTransitar()) {
@@ -118,11 +118,11 @@ public class SistemaTransitos {
         if (estado == null || estado.permiteNotificaciones()) {
             String mensajeTransito = String.format("[%s] Pasaste por el puesto %s con el vehículo %s",
                     fechaHora.toString(), puesto.getNombre(), veh.getMatricula());
-            sistemaPropietarios.registrarNotificacion(prop, mensajeTransito, fechaHora);
+            sistemaPropietariosYAdmin.registrarNotificacion(prop, mensajeTransito, fechaHora);
             if (prop.debeAlertarSaldo()) {
                 String mensajeSaldo = String.format("[%s] Tu saldo actual es $%d. Te recomendamos hacer una recarga",
                         fechaHora.toString(), prop.getSaldoActual());
-                sistemaPropietarios.registrarNotificacion(prop, mensajeSaldo, fechaHora);
+                sistemaPropietariosYAdmin.registrarNotificacion(prop, mensajeSaldo, fechaHora);
             }
         }
 

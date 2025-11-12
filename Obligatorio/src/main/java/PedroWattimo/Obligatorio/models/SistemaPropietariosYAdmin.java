@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import PedroWattimo.Obligatorio.dtos.AdminAutenticadoDto;
 import PedroWattimo.Obligatorio.dtos.BonificacionAsignadaDto;
 import PedroWattimo.Obligatorio.dtos.NotificacionDto;
+import PedroWattimo.Obligatorio.dtos.PropietarioAutenticadoDTO;
 import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
 import PedroWattimo.Obligatorio.dtos.TransitoDto;
@@ -16,25 +18,19 @@ import PedroWattimo.Obligatorio.dtos.VehiculoResumenDto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 /**
- * SistemaPropietarios (refactor): absorbe responsabilidades de
- * - SistemaEstados (colección de estados globales ya no necesarias)
- * - SistemaNotificaciones (registro centralizado redundante: las notificaciones
- * viven en el Propietario)
- *
- * Mantiene SOLO orquestación mínima y acceso a la colección raíz de
- * Propietarios.
- * No incluye lógica de negocio: los cálculos permanecen en las entidades
- * (Propietario, Bonificacion, Transito).
+ * SistemaPropietariosYAdmin: fusión de SistemaAuth y SistemaPropietarios.
+ * Concentra la lógica de autenticación de propietarios y administradores,
+ * así como la gestión de propietarios, notificaciones y dashboards.
  */
-public class SistemaPropietarios {
+public class SistemaPropietariosYAdmin {
     private final List<Propietario> propietarios = new ArrayList<>();
+    private final List<Administrador> administradores = new ArrayList<>();
 
     // Historial plano de notificaciones globales (opcional para auditoría).
-    // Se mantiene como lista separada solo para trazabilidad, sin mover lógica.
     private final List<Notificacion> notificacionesGlobales = new ArrayList<>();
     private final Map<Integer, Long> dashboardVersion = new ConcurrentHashMap<>();
 
-    protected SistemaPropietarios() {
+    protected SistemaPropietariosYAdmin() {
     }
 
     // -------- Accesos Encapsulados --------
@@ -46,12 +42,20 @@ public class SistemaPropietarios {
         return propietarios;
     }
 
+    public List<Administrador> getAdministradores() {
+        return List.copyOf(administradores);
+    }
+
+    List<Administrador> obtenerAdministradoresInternos() {
+        return administradores;
+    }
+
     /** Acceso sólo lectura a trazabilidad de notificaciones globales. */
     public List<Notificacion> getNotificacionesGlobales() {
         return List.copyOf(notificacionesGlobales);
     }
 
-    // -------- Operaciones de Orquestación (sin lógica de cálculo) --------
+    // -------- Operaciones de Propietarios --------
     /** Busca un propietario por su cédula. */
     public Propietario buscarPorCedula(int cedula) {
         for (Propietario p : propietarios) {
@@ -83,16 +87,85 @@ public class SistemaPropietarios {
 
     /**
      * Registrar notificación: delega en Propietario su almacenamiento interno y
-     * agrega a trazabilidad global (sin lógica de alerta aquí).
+     * agrega a trazabilidad global.
      */
     public void registrarNotificacion(Propietario propietario, String mensaje, LocalDateTime fechaHora) {
         if (propietario == null || mensaje == null || fechaHora == null)
             return;
-        propietario.registrarNotificacion(mensaje, fechaHora); // Delegación a entidad
+        propietario.registrarNotificacion(mensaje, fechaHora);
         notificacionesGlobales.add(new Notificacion(fechaHora, mensaje, propietario));
     }
 
-    // -------- Casos de uso orientados a Propietario (DTOs) --------
+    // -------- Autenticación de Propietarios --------
+    public Propietario autenticarPropietario(int cedula, String password) throws OblException {
+        if (password == null || password.isBlank()) {
+            throw new OblException("Acceso denegado");
+        }
+
+        Propietario dueño = buscarPorCedula(cedula);
+        if (dueño == null) {
+            throw new OblException("Acceso denegado");
+        }
+
+        if (!dueño.passwordCorrecta(password)) {
+            throw new OblException("Acceso denegado");
+        }
+
+        return dueño;
+    }
+
+    public PropietarioAutenticadoDTO loginPropietario(int cedula, String password) throws OblException {
+        Propietario p = autenticarPropietario(cedula, password);
+        if (!p.puedeIngresar()) {
+            throw new OblException("Usuario deshabilitado, no puede ingresar al sistema");
+        }
+        return new PropietarioAutenticadoDTO(
+                p.getCedula(),
+                p.getNombreCompleto(),
+                p.getEstadoActual() != null ? p.getEstadoActual().nombre() : Estado.HABILITADO.nombre());
+    }
+
+    // -------- Autenticación de Administradores --------
+    public AdminAutenticadoDto loginAdmin(int cedula, String password) throws OblException {
+        if (password == null || password.isBlank()) {
+            throw new OblException("Acceso denegado");
+        }
+
+        Administrador admin = null;
+        for (Administrador a : this.administradores) {
+            if (a != null && a.getCedula() == cedula) {
+                admin = a;
+                break;
+            }
+        }
+
+        if (admin == null || !admin.passwordCorrecta(password)) {
+            throw new OblException("Acceso denegado");
+        }
+
+        if (admin.estaLogueado()) {
+            throw new OblException("Ud. Ya está logueado");
+        }
+
+        admin.loguear();
+        return new AdminAutenticadoDto(admin.getCedula(), admin.getNombreCompleto());
+    }
+
+    public void logoutAdmin(int cedula) throws OblException {
+        Administrador admin = null;
+        for (Administrador a : this.administradores) {
+            if (a != null && a.getCedula() == cedula) {
+                admin = a;
+                break;
+            }
+        }
+        if (admin == null) {
+            throw new OblException("Acceso denegado");
+        }
+        admin.desloguear();
+    }
+
+    // -------- Dashboard de Propietario --------
     public PropietarioDashboardDto dashboardDePropietario(int cedula) throws OblException {
         Propietario p = findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(cedula);
         if (p == null)
