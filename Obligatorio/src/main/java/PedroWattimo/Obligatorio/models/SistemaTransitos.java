@@ -62,8 +62,6 @@ public class SistemaTransitos {
             LocalDateTime fh, Bonificacion bonifAplicada) {
         Transito t = new Transito(puesto, veh, tarifa, montoBonif, montoPagado, fh, bonifAplicada);
         this.transitos.add(t);
-        if (puesto != null)
-            puesto.registrarTransito(t);
         if (veh != null && veh.getPropietario() != null) {
             veh.getPropietario().registrarTransito(t);
         }

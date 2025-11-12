@@ -9,13 +9,9 @@ public class Puesto {
     private String nombre;
     private String direccion;
     private List<Tarifa> tablaTarifas;
-    private List<Transito> transitos;
-    private List<AsignacionBonificacion> asignaciones;
 
     public Puesto() {
         this.tablaTarifas = new ArrayList<>();
-        this.transitos = new ArrayList<>();
-        this.asignaciones = new ArrayList<>();
     }
 
     public Puesto(String nombre, String direccion) {
@@ -36,14 +32,6 @@ public class Puesto {
     // externas
     public List<Tarifa> getTablaTarifas() {
         return tablaTarifas == null ? List.of() : List.copyOf(tablaTarifas);
-    }
-
-    public List<Transito> getTransitos() {
-        return transitos == null ? List.of() : List.copyOf(transitos);
-    }
-
-    public List<AsignacionBonificacion> getAsignaciones() {
-        return asignaciones == null ? List.of() : List.copyOf(asignaciones);
     }
 
     // Patrón Experto: el Puesto conoce sus propias tarifas
@@ -76,17 +64,6 @@ public class Puesto {
         throw new TarifaNoDefinidaException(
                 "No existe tarifa para la categoría " + cat.getNombre() +
                         " en el puesto " + (nombre != null ? nombre : "desconocido"));
-    }
-
-    /**
-     * Patrón Experto: el Puesto mantiene su lista de tránsitos.
-     */
-    public void registrarTransito(Transito transito) {
-        if (transito == null)
-            return;
-        if (this.transitos == null)
-            this.transitos = new ArrayList<>();
-        this.transitos.add(transito);
     }
 
 }
