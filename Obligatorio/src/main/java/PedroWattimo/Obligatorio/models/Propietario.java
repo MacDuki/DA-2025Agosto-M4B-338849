@@ -1,16 +1,11 @@
 package PedroWattimo.Obligatorio.models;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class Propietario {
-    private String cedula;
-    private String nombreCompleto;
-    private String contraseña;
+public class Propietario extends Usuario {
     private int saldoActual;
     private int saldoMinimoAlerta;
     private Estado estadoActual;
@@ -23,28 +18,18 @@ public class Propietario {
      * Constructor sencillo: define identidad y credenciales.
      * Estado por defecto: HABILITADO. Saldos en 0.
      */
-    public Propietario(String cedula, String nombreCompleto, String contraseña) {
+    public Propietario(int cedula, String nombreCompleto, String contraseña) {
+        super(cedula, nombreCompleto, contraseña);
         // Inicialización de colecciones
         this.vehiculos = new ArrayList<>();
         this.transitos = new ArrayList<>();
         this.asignaciones = new ArrayList<>();
         this.notificaciones = new ArrayList<>();
 
-        // Datos básicos
-        this.cedula = cedula;
-        this.nombreCompleto = nombreCompleto;
-        this.contraseña = hash(contraseña);
+        // Datos específicos de Propietario
         this.saldoActual = 0;
         this.saldoMinimoAlerta = 0;
         this.estadoActual = Estado.HABILITADO;
-    }
-
-    public String getCedula() {
-        return cedula;
-    }
-
-    public String getNombreCompleto() {
-        return nombreCompleto;
     }
 
     public String getcontraseña() {
@@ -81,7 +66,6 @@ public class Propietario {
         return notificaciones == null ? List.of() : List.copyOf(notificaciones);
     }
 
-    // --- Estilo sin setters: métodos de dominio explícitos ---
     /** Cambia el estado actual del propietario. */
     public Propietario cambiarEstado(Estado nuevoEstado) {
         this.estadoActual = (nuevoEstado == null) ? Estado.HABILITADO : nuevoEstado;
@@ -147,19 +131,8 @@ public class Propietario {
     // ---------------------------------------------
 
     /**
-     * Verifica si la contraseña ingresada coincide con el hash almacenado.
-     * Valida nulos o vacíos devolviendo false.
-     */
-    public boolean passwordCorrecta(String pwd) {
-        if (pwd == null || pwd.isBlank() || this.contraseña == null || this.contraseña.isBlank()) {
-            return false;
-        }
-        return this.contraseña.equals(hash(pwd));
-    }
-
-    /**
      * Indica si el propietario puede ingresar al sistema según su estado actual.
-     * Por ahora, solo el estado SUSPENDIDO impide el ingreso.
+     *  solo el estado SUSPENDIDO impide el ingreso.
      */
     public boolean puedeIngresar() {
         if (this.estadoActual == null)
@@ -340,30 +313,4 @@ public class Propietario {
                 .filter(t -> t.vehiculo() != null && t.vehiculo().equals(v))
                 .count();
     }
-
-    // Helpers
-    private String hash(String input) {
-        if (input == null)
-            return null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] digest = md.digest(input.getBytes());
-            return bytesToHex(digest);
-        } catch (NoSuchAlgorithmException e) {
-            // No debería ocurrir; en caso de error, retornar tal cual (evita NPE)
-            return input;
-        }
-    }
-
-    private String bytesToHex(byte[] bytes) {
-        StringBuilder hexString = new StringBuilder(2 * bytes.length);
-        for (byte b : bytes) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1)
-                hexString.append('0');
-            hexString.append(hex);
-        }
-        return hexString.toString();
-    }
-
 }

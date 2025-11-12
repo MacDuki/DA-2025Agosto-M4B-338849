@@ -129,10 +129,10 @@ public class SeedData {
                 catCamion = c;
         }
 
-        Propietario p1 = f.buscarPropietarioPorCedula("11111111");
-        Propietario p2 = f.buscarPropietarioPorCedula("22222222");
-        Propietario p3 = f.buscarPropietarioPorCedula("33333333");
-        Propietario p4 = f.buscarPropietarioPorCedula("44444444");
+        Propietario p1 = f.buscarPropietarioPorCedula(11111111);
+        Propietario p2 = f.buscarPropietarioPorCedula(22222222);
+        Propietario p3 = f.buscarPropietarioPorCedula(33333333);
+        Propietario p4 = f.buscarPropietarioPorCedula(44444444);
 
         if (p1 != null) {
             Vehiculo v1 = p1.registrarVehiculo("SBA1234", "Ford Fiesta", "Rojo", catAuto);
@@ -161,24 +161,24 @@ public class SeedData {
         Fachada f = Fachada.getInstancia();
 
         // Propietario 1: habilitado, con saldo y mínimo de alerta
-        Propietario p1 = new Propietario("11111111", "Ana Pérez", "ana123")
+        Propietario p1 = new Propietario(11111111, "Ana Pérez", "ana123")
                 .acreditarSaldo(1500)
                 .ajustarSaldoMinimoAlerta(200)
                 .cambiarEstado(Estado.HABILITADO);
 
         // Propietario 2: penalizado
-        Propietario p2 = new Propietario("22222222", "Bruno López", "bruno123")
+        Propietario p2 = new Propietario(22222222, "Bruno López", "bruno123")
                 .acreditarSaldo(800)
                 .ajustarSaldoMinimoAlerta(100)
                 .cambiarEstado(Estado.PENALIZADO);
 
         // Propietario 3: suspendido, sin saldo
-        Propietario p3 = new Propietario("33333333", "Carla Gómez", "carla123")
+        Propietario p3 = new Propietario(33333333, "Carla Gómez", "carla123")
                 .ajustarSaldoMinimoAlerta(50)
                 .cambiarEstado(Estado.SUSPENDIDO);
 
         // Propietario 4: habilitado, sin bonificación asignada
-        Propietario p4 = new Propietario("44444444", "Diego Ruiz", "diego123")
+        Propietario p4 = new Propietario(44444444, "Diego Ruiz", "diego123")
                 .acreditarSaldo(1200)
                 .ajustarSaldoMinimoAlerta(150)
                 .cambiarEstado(Estado.HABILITADO);
@@ -204,9 +204,9 @@ public class SeedData {
         f.obtenerBonificacionesInternas().add(trabajadores);
 
         // Obtener entidades necesarias
-        Propietario p1 = f.buscarPropietarioPorCedula("11111111");
-        Propietario p2 = f.buscarPropietarioPorCedula("22222222");
-        Propietario p4 = f.buscarPropietarioPorCedula("44444444");
+        Propietario p1 = f.buscarPropietarioPorCedula(11111111);
+        Propietario p2 = f.buscarPropietarioPorCedula(22222222);
+        Propietario p4 = f.buscarPropietarioPorCedula(44444444);
 
         java.util.List<Puesto> puestos = f.obtenerPuestos();
         if (puestos.isEmpty())

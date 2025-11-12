@@ -36,6 +36,6 @@ public class Notificacion {
     }
 
     public boolean esDePropietario(Propietario propietario) {
-        return this.destinatario.getCedula().equals(propietario.getCedula());
+        return this.destinatario.getCedula() == propietario.getCedula();
     }
 }

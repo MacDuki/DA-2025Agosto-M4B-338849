@@ -5,7 +5,7 @@ import java.util.List;
 
 import PedroWattimo.Obligatorio.dtos.AdminAutenticadoDto;
 import PedroWattimo.Obligatorio.dtos.EmularTransitoResultado;
-import PedroWattimo.Obligatorio.dtos.PropietarioDTO;
+import PedroWattimo.Obligatorio.dtos.PropietarioAutenticadoDTO;
 import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
@@ -79,7 +79,7 @@ public class Fachada {
         return sistemaVehiculosYCategorias.getCategorias();
     }
 
-    Propietario buscarPropietarioPorCedula(String cedula) {
+    Propietario buscarPropietarioPorCedula(int cedula) {
         return sistemaPropietarios.buscarPorCedula(cedula);
     }
 
@@ -91,7 +91,7 @@ public class Fachada {
      * CU: Ingresar a la aplicación (Propietarios)
      * La fachada delega en una línea al SistemaAuth.
      */
-    public PropietarioDTO loginPropietario(int cedula, String password) throws OblException {
+    public PropietarioAutenticadoDTO loginPropietario(int cedula, String password) throws OblException {
         return this.sistemaAuth.loginPropietario(this.sistemaPropietarios, cedula, password);
     }
 

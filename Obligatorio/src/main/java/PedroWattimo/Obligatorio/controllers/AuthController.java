@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import PedroWattimo.Obligatorio.Respuesta;
 import PedroWattimo.Obligatorio.dtos.AdminAutenticadoDto;
-import PedroWattimo.Obligatorio.dtos.PropietarioDTO;
+import PedroWattimo.Obligatorio.dtos.PropietarioAutenticadoDTO;
 import PedroWattimo.Obligatorio.models.Fachada;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import jakarta.servlet.http.HttpSession;
@@ -27,7 +27,7 @@ public class AuthController {
             @RequestParam int cedula,
             @RequestParam String password,
             HttpSession session) throws OblException {
-        PropietarioDTO dto = Fachada.getInstancia().loginPropietario(cedula, password);
+        PropietarioAutenticadoDTO dto = Fachada.getInstancia().loginPropietario(cedula, password);
         session.setAttribute("propietario", dto);
         Respuesta respuesta = new Respuesta("loginExitoso", dto);
         return ResponseEntity.ok(List.of(respuesta));

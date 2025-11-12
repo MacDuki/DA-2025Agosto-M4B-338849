@@ -32,7 +32,7 @@ public class SistemaPropietarios {
     // Historial plano de notificaciones globales (opcional para auditoría).
     // Se mantiene como lista separada solo para trazabilidad, sin mover lógica.
     private final List<Notificacion> notificacionesGlobales = new ArrayList<>();
-    private final Map<String, Long> dashboardVersion = new ConcurrentHashMap<>();
+    private final Map<Integer, Long> dashboardVersion = new ConcurrentHashMap<>();
 
     protected SistemaPropietarios() {
     }
@@ -52,12 +52,10 @@ public class SistemaPropietarios {
     }
 
     // -------- Operaciones de Orquestación (sin lógica de cálculo) --------
-    /** Busca un propietario por su cédula (texto exacto). */
-    public Propietario buscarPorCedula(String cedula) {
-        if (cedula == null)
-            return null;
+    /** Busca un propietario por su cédula. */
+    public Propietario buscarPorCedula(int cedula) {
         for (Propietario p : propietarios) {
-            if (cedula.equals(p.getCedula())) {
+            if (cedula == p.getCedula()) {
                 return p;
             }
         }
@@ -66,7 +64,7 @@ public class SistemaPropietarios {
 
     /** Repositorio compuesto en memoria (ya embebido). */
     public Propietario findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(int cedula) {
-        return buscarPorCedula(String.valueOf(cedula));
+        return buscarPorCedula(cedula);
     }
 
     /** Busca propietario dueño de un vehículo por matrícula. */
