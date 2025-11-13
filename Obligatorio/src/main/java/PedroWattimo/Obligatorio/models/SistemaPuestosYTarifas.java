@@ -47,4 +47,11 @@ public class SistemaPuestosYTarifas {
                 .findFirst()
                 .orElseThrow(() -> new OblException("Puesto no encontrado: " + nombre));
     }
+
+    /**
+     * Lista todos los puestos del sistema.
+     */
+    public List<Puesto> listarPuestos() {
+        return List.copyOf(puestos);
+    }
 }

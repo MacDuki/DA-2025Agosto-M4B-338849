@@ -20,6 +20,16 @@ public class AsignacionBonificacion {
         this.bonificacion = bonificacion;
     }
 
+    /**
+     * Constructor que toma fecha/hora actual automáticamente.
+     */
+    public AsignacionBonificacion(Propietario propietario, Puesto puesto, Bonificacion bonificacion) {
+        this.fechaHora = LocalDateTime.now();
+        this.propietario = propietario;
+        this.puesto = puesto;
+        this.bonificacion = bonificacion;
+    }
+
     boolean activaPara(Puesto puesto, Propietario propietario) {
         return this.puesto.equals(puesto) && this.propietario.equals(propietario);
     }

@@ -132,7 +132,7 @@ public class Propietario extends Usuario {
 
     /**
      * Indica si el propietario puede ingresar al sistema según su estado actual.
-     *  solo el estado SUSPENDIDO impide el ingreso.
+     * solo el estado SUSPENDIDO impide el ingreso.
      */
     public boolean puedeIngresar() {
         if (this.estadoActual == null)
@@ -222,9 +222,37 @@ public class Propietario extends Usuario {
     }
 
     /**
-     * Patrón Experto: el Propietario registra una asignación de bonificación
-     * para un puesto y fecha-hora dados.
+     * Patrón Experto: el Propietario verifica si tiene una bonificación asignada
+     * para un puesto específico.
      */
+    public boolean tieneBonificacionPara(Puesto puesto) {
+        if (puesto == null || this.asignaciones == null)
+            return false;
+        return this.asignaciones.stream()
+                .anyMatch(ab -> ab.activaPara(puesto, this));
+    }
+
+    /**
+     * Patrón Experto: el Propietario asigna una bonificación validando su estado.
+     * Solo se permite asignar si el propietario está HABILITADO.
+     */
+    public void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) {
+        if (bonificacion == null || puesto == null)
+            return;
+        if (this.estadoActual == Estado.DESHABILITADO) {
+            throw new IllegalStateException("El propietario esta deshabilitado. No se pueden asignar bonificaciones");
+        }
+        if (this.asignaciones == null)
+            this.asignaciones = new ArrayList<>();
+        AsignacionBonificacion ab = new AsignacionBonificacion(this, puesto, bonificacion);
+        this.asignaciones.add(ab);
+    }
+
+    /**
+     * Patrón Experto: el Propietario registra una asignación de bonificación
+     * para un puesto y fecha-hora dados (mantenido para compatibilidad).
+     */
+    /* Compatibilidad con seedData */
     public AsignacionBonificacion asignarBonificacion(Bonificacion bonificacion, Puesto puesto,
             LocalDateTime fechaHora) {
         if (bonificacion == null || puesto == null || fechaHora == null)

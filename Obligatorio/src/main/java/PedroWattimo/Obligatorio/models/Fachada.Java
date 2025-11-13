@@ -160,4 +160,41 @@ public class Fachada {
         return sistemaPuestosYTarifas.obtenerPorId(id);
     }
 
+    // --------------------------------------------------------------
+    // CU: Asignar bonificación a propietario
+    // --------------------------------------------------------------
+
+    /**
+     * Lista todas las bonificaciones definidas en el sistema.
+     */
+    public List<Bonificacion> listarBonificaciones() {
+        return sistemaBonificaciones.listarBonificaciones();
+    }
+
+    /**
+     * Lista todos los puestos del sistema.
+     */
+    public List<Puesto> listarPuestos() {
+        return sistemaPuestosYTarifas.listarPuestos();
+    }
+
+    /**
+     * Busca un propietario por cédula.
+     * Lanza OblException si no existe.
+     */
+    public Propietario buscarPropietarioPorCedula(String cedula) throws OblException {
+        return sistemaPropietariosYAdmin.buscarPorCedula(cedula);
+    }
+
+    /**
+     * Asigna una bonificación a un propietario para un puesto específico.
+     */
+    public void asignarBonificacion(String cedula, String nombreBonificacion, String nombrePuesto)
+            throws OblException {
+        Propietario propietario = sistemaPropietariosYAdmin.buscarPorCedula(cedula);
+        Bonificacion bonificacion = sistemaBonificaciones.buscarPorNombre(nombreBonificacion);
+        Puesto puesto = sistemaPuestosYTarifas.obtenerPorNombre(nombrePuesto);
+        sistemaBonificaciones.asignarBonificacionAPropietario(propietario, bonificacion, puesto);
+    }
+
 }

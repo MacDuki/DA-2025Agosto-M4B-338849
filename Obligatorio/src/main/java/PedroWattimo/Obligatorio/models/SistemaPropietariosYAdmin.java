@@ -66,6 +66,26 @@ public class SistemaPropietariosYAdmin {
         return null;
     }
 
+    /**
+     * Busca un propietario por cédula (String).
+     * Lanza OblException si no existe.
+     */
+    public Propietario buscarPorCedula(String cedula) throws OblException {
+        if (cedula == null || cedula.isBlank()) {
+            throw new OblException("La cédula no puede estar vacía");
+        }
+        try {
+            int cedulaInt = Integer.parseInt(cedula);
+            Propietario prop = buscarPorCedula(cedulaInt);
+            if (prop == null) {
+                throw new OblException("no existe el propietario");
+            }
+            return prop;
+        } catch (NumberFormatException e) {
+            throw new OblException("Cédula inválida");
+        }
+    }
+
     /** Repositorio compuesto en memoria (ya embebido). */
     public Propietario findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(int cedula) {
         return buscarPorCedula(cedula);

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Asignar Bonificación - Administrador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white"
+  >
+    <header class="border-b border-white/10 bg-slate-900/60 backdrop-blur">
+      <div
+        class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between"
+      >
+        <h1 class="text-xl font-semibold">
+          Asignar Bonificación a Propietario
+        </h1>
+        <div class="flex items-center gap-3">
+          <span id="adminName" class="text-slate-300"></span>
+          <a
+            href="/dashboard-admin.html"
+            class="px-3 py-2 rounded-md bg-slate-700 hover:bg-slate-600 text-sm"
+          >
+            ← Volver al Dashboard
+          </a>
+          <button
+            id="logoutBtn"
+            class="px-3 py-2 rounded-md bg-red-600 hover:bg-red-500 text-sm"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-10">
+      <!-- Paso 1: Listas de Bonificaciones y Puestos -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Bonificaciones Disponibles -->
+        <div class="bg-white/5 rounded-2xl border border-white/10 p-6">
+          <h2 class="text-2xl font-semibold mb-4">
+            🎁 Bonificaciones Disponibles
+          </h2>
+          <div id="bonificacionesContainer" class="space-y-2">
+            <p class="text-slate-400">Cargando bonificaciones...</p>
+          </div>
+        </div>
+
+        <!-- Puestos Registrados -->
+        <div class="bg-white/5 rounded-2xl border border-white/10 p-6">
+          <h2 class="text-2xl font-semibold mb-4">📍 Puestos Registrados</h2>
+          <div id="puestosContainer" class="space-y-2">
+            <p class="text-slate-400">Cargando puestos...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 2: Buscar Propietario -->
+      <div class="bg-white/5 rounded-2xl border border-white/10 p-6 mb-6">
+        <h2 class="text-2xl font-semibold mb-6">🔍 Buscar Propietario</h2>
+
+        <div class="flex gap-4 mb-4">
+          <div class="flex-1">
+            <label class="block text-sm font-medium mb-2"
+              >Cédula del Propietario</label
+            >
+            <input
+              type="text"
+              id="cedulaInput"
+              placeholder="Ej: 12345678"
+              class="w-full px-4 py-2 rounded-md bg-slate-800 border border-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+            />
+          </div>
+          <div class="flex items-end">
+            <button
+              id="buscarBtn"
+              class="px-6 py-2 rounded-md bg-indigo-600 hover:bg-indigo-500 font-semibold transition-colors"
+            >
+              Buscar
+            </button>
+          </div>
+        </div>
+
+        <!-- Resultado de la búsqueda -->
+        <div
+          id="propietarioInfo"
+          class="hidden mt-6 bg-slate-800/50 rounded-lg p-4 border border-slate-700"
+        >
+          <h3 class="text-lg font-semibold mb-3 text-indigo-400">
+            👤 Datos del Propietario
+          </h3>
+          <div class="space-y-2 text-sm">
+            <p>
+              <span class="text-slate-400">Nombre Completo:</span>
+              <span id="propNombre" class="ml-2 font-medium"></span>
+            </p>
+            <p>
+              <span class="text-slate-400">Estado:</span>
+              <span id="propEstado" class="ml-2 font-medium"></span>
+            </p>
+          </div>
+
+          <div class="mt-4">
+            <h4 class="text-md font-semibold mb-2 text-yellow-400">
+              🎁 Bonificaciones Asignadas
+            </h4>
+            <div id="bonificacionesAsignadas" class="space-y-2">
+              <p class="text-slate-400 text-sm">
+                No tiene bonificaciones asignadas
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 3: Asignar Bonificación -->
+      <div
+        id="asignarSection"
+        class="hidden bg-white/5 rounded-2xl border border-white/10 p-6 mb-6"
+      >
+        <h2 class="text-2xl font-semibold mb-6">➕ Asignar Bonificación</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-sm font-medium mb-2"
+              >Seleccionar Bonificación</label
+            >
+            <select
+              id="bonificacionSelect"
+              class="w-full px-4 py-2 rounded-md bg-slate-800 border border-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+            >
+              <option value="">Seleccione una bonificación</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2"
+              >Seleccionar Puesto</label
+            >
+            <select
+              id="puestoSelect"
+              class="w-full px-4 py-2 rounded-md bg-slate-800 border border-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+            >
+              <option value="">Seleccione un puesto</option>
+            </select>
+          </div>
+        </div>
+
+        <button
+          id="asignarBtn"
+          class="w-full px-6 py-3 rounded-md bg-green-600 hover:bg-green-500 font-semibold transition-colors"
+        >
+          ✓ Asignar Bonificación
+        </button>
+      </div>
+
+      <!-- Mensaje de estado -->
+      <div
+        id="messageContainer"
+        class="hidden mt-4 p-4 rounded-lg border"
+      ></div>
+    </main>
+
+    <script>
+      // Estado de la aplicación
+      let bonificaciones = [];
+      let puestos = [];
+      let propietarioCedula = "";
+      let propietarioData = null;
+
+      // Cargar datos del administrador
+      function loadAdmin() {
+        const raw = sessionStorage.getItem("admin");
+        if (!raw) {
+          window.location.href = "/login-admin.html";
+          return null;
+        }
+        try {
+          return JSON.parse(raw);
+        } catch {
+          return null;
+        }
+      }
+
+      function setHeader(dto) {
+        document.getElementById("adminName").textContent =
+          dto?.nombreCompleto || "";
+      }
+
+      // Logout
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        const raw = sessionStorage.getItem("admin");
+        let data = "";
+        try {
+          const dto = raw ? JSON.parse(raw) : null;
+          if (dto && typeof dto.cedula !== "undefined") {
+            data = `cedula=${encodeURIComponent(dto.cedula)}`;
+          }
+        } catch {}
+
+        fetch("/auth/admin/logout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: data,
+        }).catch(() => {});
+
+        sessionStorage.removeItem("admin");
+        setTimeout(() => {
+          window.location.href = "/login-admin.html";
+        }, 400);
+      });
+
+      // Cargar bonificaciones
+      async function cargarBonificaciones() {
+        try {
+          const response = await fetch("/admin/bonificaciones");
+          if (!response.ok) {
+            throw new Error("Error al cargar bonificaciones");
+          }
+          bonificaciones = await response.json();
+          mostrarBonificaciones();
+          poblarSelectBonificaciones();
+        } catch (error) {
+          console.error("Error:", error);
+          mostrarMensaje(
+            "Error al cargar bonificaciones: " + error.message,
+            "error"
+          );
+        }
+      }
+
+      // Mostrar bonificaciones
+      function mostrarBonificaciones() {
+        const container = document.getElementById("bonificacionesContainer");
+        if (!bonificaciones || bonificaciones.length === 0) {
+          container.innerHTML =
+            '<p class="text-slate-400 text-sm">No hay bonificaciones definidas</p>';
+          return;
+        }
+
+        container.innerHTML = "";
+        bonificaciones.forEach((bonif) => {
+          const div = document.createElement("div");
+          div.className =
+            "bg-slate-800/50 rounded-lg p-3 border border-slate-700";
+          div.innerHTML = `
+            <div class="flex justify-between items-center">
+              <span class="font-medium">${bonif.nombre}</span>
+              <span class="text-yellow-400 text-sm">${bonif.porcentaje}%</span>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      // Cargar puestos
+      async function cargarPuestos() {
+        try {
+          const response = await fetch("/admin/puestos");
+          if (!response.ok) {
+            throw new Error("Error al cargar puestos");
+          }
+          puestos = await response.json();
+          mostrarPuestos();
+          poblarSelectPuestos();
+        } catch (error) {
+          console.error("Error:", error);
+          mostrarMensaje("Error al cargar puestos: " + error.message, "error");
+        }
+      }
+
+      // Mostrar puestos
+      function mostrarPuestos() {
+        const container = document.getElementById("puestosContainer");
+        if (!puestos || puestos.length === 0) {
+          container.innerHTML =
+            '<p class="text-slate-400 text-sm">No hay puestos registrados</p>';
+          return;
+        }
+
+        container.innerHTML = "";
+        puestos.forEach((puesto) => {
+          const div = document.createElement("div");
+          div.className =
+            "bg-slate-800/50 rounded-lg p-3 border border-slate-700";
+          div.innerHTML = `
+            <p class="font-medium">${puesto.nombre}</p>
+            <p class="text-sm text-slate-400">${puesto.direccion}</p>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      // Poblar select de bonificaciones
+      function poblarSelectBonificaciones() {
+        const select = document.getElementById("bonificacionSelect");
+        select.innerHTML =
+          '<option value="">Seleccione una bonificación</option>';
+        bonificaciones.forEach((bonif) => {
+          const option = document.createElement("option");
+          option.value = bonif.nombre;
+          option.textContent = `${bonif.nombre} (${bonif.porcentaje}%)`;
+          select.appendChild(option);
+        });
+      }
+
+      // Poblar select de puestos
+      function poblarSelectPuestos() {
+        const select = document.getElementById("puestoSelect");
+        select.innerHTML = '<option value="">Seleccione un puesto</option>';
+        puestos.forEach((puesto) => {
+          const option = document.createElement("option");
+          option.value = puesto.nombre;
+          option.textContent = `${puesto.nombre} - ${puesto.direccion}`;
+          select.appendChild(option);
+        });
+      }
+
+      // Buscar propietario
+      document
+        .getElementById("buscarBtn")
+        .addEventListener("click", async () => {
+          const cedula = document.getElementById("cedulaInput").value.trim();
+
+          if (!cedula) {
+            mostrarMensaje("Debe ingresar una cédula", "error");
+            return;
+          }
+
+          try {
+            const response = await fetch(
+              `/admin/propietario?cedula=${encodeURIComponent(cedula)}`
+            );
+            const data = await response.json();
+
+            if (!response.ok || data.id === "error") {
+              throw new Error(data.parametro || "Error al buscar propietario");
+            }
+
+            // Guardar datos del propietario
+            propietarioCedula = cedula;
+            propietarioData = data.parametro;
+
+            // Mostrar información del propietario
+            mostrarPropietario(propietarioData);
+            document
+              .getElementById("propietarioInfo")
+              .classList.remove("hidden");
+            document
+              .getElementById("asignarSection")
+              .classList.remove("hidden");
+            mostrarMensaje("✓ Propietario encontrado", "success");
+          } catch (error) {
+            console.error("Error:", error);
+            mostrarMensaje("❌ " + error.message, "error");
+            document.getElementById("propietarioInfo").classList.add("hidden");
+            document.getElementById("asignarSection").classList.add("hidden");
+          }
+        });
+
+      // Mostrar información del propietario
+      function mostrarPropietario(data) {
+        document.getElementById("propNombre").textContent =
+          data.nombreCompleto || "-";
+
+        const estadoSpan = document.getElementById("propEstado");
+        estadoSpan.textContent = data.estado || "-";
+
+        // Colorear según el estado
+        if (data.estado === "Deshabilitado") {
+          estadoSpan.className = "ml-2 font-medium text-red-400";
+        } else if (data.estado === "Suspendido") {
+          estadoSpan.className = "ml-2 font-medium text-orange-400";
+        } else if (data.estado === "Penalizado") {
+          estadoSpan.className = "ml-2 font-medium text-yellow-400";
+        } else {
+          estadoSpan.className = "ml-2 font-medium text-green-400";
+        }
+
+        // Mostrar bonificaciones asignadas
+        const bonifContainer = document.getElementById(
+          "bonificacionesAsignadas"
+        );
+        if (!data.bonificaciones || data.bonificaciones.length === 0) {
+          bonifContainer.innerHTML =
+            '<p class="text-slate-400 text-sm">No tiene bonificaciones asignadas</p>';
+        } else {
+          bonifContainer.innerHTML = "";
+          data.bonificaciones.forEach((bonif) => {
+            const div = document.createElement("div");
+            div.className =
+              "bg-slate-700/50 rounded p-2 border border-slate-600 text-sm";
+            const fecha = bonif.fechaAsignada
+              ? new Date(bonif.fechaAsignada).toLocaleString("es-UY")
+              : "-";
+            div.innerHTML = `
+              <span class="text-yellow-400">${bonif.nombre || "-"}</span>
+              <span class="text-slate-400"> en </span>
+              <span class="text-indigo-400">${bonif.puesto || "-"}</span>
+              <span class="text-slate-500 text-xs block mt-1">${fecha}</span>
+            `;
+            bonifContainer.appendChild(div);
+          });
+        }
+      }
+
+      // Asignar bonificación
+      document
+        .getElementById("asignarBtn")
+        .addEventListener("click", async () => {
+          const bonificacion =
+            document.getElementById("bonificacionSelect").value;
+          const puesto = document.getElementById("puestoSelect").value;
+
+          if (!bonificacion) {
+            mostrarMensaje("Debe seleccionar una bonificación", "error");
+            return;
+          }
+          if (!puesto) {
+            mostrarMensaje("Debe seleccionar un puesto", "error");
+            return;
+          }
+
+          const request = {
+            cedula: propietarioCedula,
+            nombreBonificacion: bonificacion,
+            nombrePuesto: puesto,
+          };
+
+          try {
+            const response = await fetch("/admin/asignar-bonificacion", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(request),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || data.id === "error") {
+              throw new Error(
+                data.parametro || "Error al asignar bonificación"
+              );
+            }
+
+            mostrarMensaje("✅ Bonificación asignada exitosamente", "success");
+
+            // Recargar información del propietario
+            setTimeout(() => {
+              document.getElementById("buscarBtn").click();
+            }, 1000);
+
+            // Limpiar selects
+            document.getElementById("bonificacionSelect").value = "";
+            document.getElementById("puestoSelect").value = "";
+          } catch (error) {
+            console.error("Error:", error);
+            mostrarMensaje("❌ " + error.message, "error");
+          }
+        });
+
+      // Mostrar mensaje
+      function mostrarMensaje(texto, tipo) {
+        const container = document.getElementById("messageContainer");
+        container.className =
+          "mt-4 p-4 rounded-lg border " +
+          (tipo === "error"
+            ? "bg-red-900/20 border-red-500 text-red-300"
+            : "bg-green-900/20 border-green-500 text-green-300");
+        container.textContent = texto;
+        container.classList.remove("hidden");
+
+        setTimeout(() => {
+          container.classList.add("hidden");
+        }, 5000);
+      }
+
+      // Inicializar
+      const dto = loadAdmin();
+      if (dto) setHeader(dto);
+      cargarBonificaciones();
+      cargarPuestos();
+
+      // Persistencia de estado en sessionStorage
+      window.addEventListener("beforeunload", () => {
+        if (propietarioCedula && propietarioData) {
+          sessionStorage.setItem(
+            "asignarBonifState",
+            JSON.stringify({
+              cedula: propietarioCedula,
+              data: propietarioData,
+            })
+          );
+        }
+      });
+
+      // Restaurar estado al cargar
+      window.addEventListener("load", () => {
+        const state = sessionStorage.getItem("asignarBonifState");
+        if (state) {
+          try {
+            const parsed = JSON.parse(state);
+            document.getElementById("cedulaInput").value = parsed.cedula;
+            // No auto-buscar, esperar a que el usuario haga click
+          } catch (e) {}
+        }
+      });
+    </script>
+  </body>
+</html>
