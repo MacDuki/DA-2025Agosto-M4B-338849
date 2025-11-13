@@ -17,6 +17,10 @@ public class Estado {
         return nombre;
     }
 
+    public String getNombre() {
+        return nombre;
+    }
+
     /**
      * Patrón Experto: el Estado sabe si permite transitar.
      * Reglas:

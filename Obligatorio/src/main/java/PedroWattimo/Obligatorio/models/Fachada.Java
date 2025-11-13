@@ -22,6 +22,7 @@ public class Fachada {
     private SistemaPuestosYTarifas sistemaPuestosYTarifas; // puestos + tarifas
     private SistemaTransitos sistemaTransitos;
     private SistemaBonificaciones sistemaBonificaciones;
+    private SistemaEstados sistemaEstados; // gestión de estados
 
     // Sin estado adicional: toda versión/estado vive en los subsistemas
 
@@ -32,6 +33,7 @@ public class Fachada {
         this.sistemaPuestosYTarifas = new SistemaPuestosYTarifas();
         this.sistemaTransitos = new SistemaTransitos();
         this.sistemaBonificaciones = new SistemaBonificaciones();
+        this.sistemaEstados = new SistemaEstados();
 
         // Inyecciones según nueva arquitectura
         this.sistemaTransitos.setSistemaPropietariosYAdmin(this.sistemaPropietariosYAdmin);
@@ -195,6 +197,28 @@ public class Fachada {
         Bonificacion bonificacion = sistemaBonificaciones.buscarPorNombre(nombreBonificacion);
         Puesto puesto = sistemaPuestosYTarifas.obtenerPorNombre(nombrePuesto);
         sistemaBonificaciones.asignarBonificacionAPropietario(propietario, bonificacion, puesto);
+    }
+
+    // --------------------------------------------------------------
+    // CU: Cambiar estado de propietario
+    // --------------------------------------------------------------
+
+    /**
+     * Lista todos los estados disponibles en el sistema.
+     */
+    public List<Estado> listarEstados() {
+        return sistemaEstados.listarEstados();
+    }
+
+    /**
+     * Cambia el estado de un propietario.
+     * Valida que el propietario exista y que el nuevo estado sea diferente del
+     * actual.
+     */
+    public void cambiarEstadoPropietario(String cedulaPropietario, String nombreNuevoEstado) throws OblException {
+        Propietario propietario = sistemaPropietariosYAdmin.buscarPorCedula(cedulaPropietario);
+        Estado nuevoEstado = sistemaEstados.buscarPorNombre(nombreNuevoEstado);
+        sistemaPropietariosYAdmin.cambiarEstadoDePropietario(propietario, nuevoEstado);
     }
 
 }

@@ -266,4 +266,36 @@ public class SistemaPropietariosYAdmin {
             throw new OblException("El propietario no existe");
         return dashboardVersion.getOrDefault(p.getCedula(), 0L);
     }
+
+    /**
+     * Cambia el estado del propietario validando que el nuevo estado sea diferente
+     * del actual.
+     * Registra siempre una notificación de cambio de estado.
+     */
+    public void cambiarEstadoDePropietario(Propietario propietario, Estado nuevoEstado) throws OblException {
+        if (propietario == null || nuevoEstado == null) {
+            throw new OblException("Propietario y estado no pueden ser nulos");
+        }
+
+        Estado estadoActual = propietario.getEstadoActual();
+
+        // Validar que el estado nuevo es diferente del actual
+        if (estadoActual != null && estadoActual.equals(nuevoEstado)) {
+            throw new OblException("El propietario ya esta en estado " + estadoActual.nombre());
+        }
+
+        // Cambiar el estado usando el método experto del propietario
+        propietario.cambiarEstado(nuevoEstado);
+
+        // Registrar notificación de cambio de estado (siempre, sin importar el estado)
+        LocalDateTime ahora = LocalDateTime.now();
+        propietario.registrarNotificacionCambioEstado(nuevoEstado, ahora);
+
+        // También registrar en notificaciones globales
+        String mensaje = "Se ha cambiado tu estado en el sistema. Tu estado actual es " + nuevoEstado.nombre();
+        notificacionesGlobales.add(new Notificacion(ahora, mensaje, propietario));
+
+        // Incrementar versión del dashboard
+        dashboardVersion.merge(propietario.getCedula(), 1L, Long::sum);
+    }
 }

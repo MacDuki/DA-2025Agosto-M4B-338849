@@ -211,6 +211,18 @@ public class Propietario extends Usuario {
     }
 
     /**
+     * Patrón Experto: el Propietario registra una notificación específica de cambio
+     * de estado.
+     * Construye el mensaje con el formato exacto requerido.
+     */
+    public void registrarNotificacionCambioEstado(Estado estadoActual, LocalDateTime fechaHora) {
+        if (estadoActual == null || fechaHora == null)
+            return;
+        String mensaje = "Se ha cambiado tu estado en el sistema. Tu estado actual es " + estadoActual.nombre();
+        registrarNotificacion(mensaje, fechaHora);
+    }
+
+    /**
      * Patrón Experto: el Propietario registra un tránsito en su historial.
      */
     public void registrarTransito(Transito transito) {
