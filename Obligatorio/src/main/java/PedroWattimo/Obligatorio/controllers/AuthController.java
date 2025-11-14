@@ -14,6 +14,8 @@ import PedroWattimo.Obligatorio.Respuesta;
 import PedroWattimo.Obligatorio.dtos.AdminAutenticadoDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioAutenticadoDTO;
 import PedroWattimo.Obligatorio.models.Fachada;
+import PedroWattimo.Obligatorio.models.SesionAdmin;
+import PedroWattimo.Obligatorio.models.SesionPropietario;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import jakarta.servlet.http.HttpSession;
 
@@ -27,15 +29,41 @@ public class AuthController {
             @RequestParam int cedula,
             @RequestParam String password,
             HttpSession session) throws OblException {
-        PropietarioAutenticadoDTO dto = Fachada.getInstancia().loginPropietario(cedula, password);
+        // Login retorna la sesión del dominio
+        SesionPropietario sesionDominio = Fachada.getInstancia().loginPropietario(cedula, password);
+
+        // Crear DTO para la respuesta
+        PropietarioAutenticadoDTO dto = new PropietarioAutenticadoDTO(
+                sesionDominio.getPropietario().getCedula(),
+                sesionDominio.getPropietario().getNombreCompleto(),
+                sesionDominio.getPropietario().getEstadoActual() != null
+                        ? sesionDominio.getPropietario().getEstadoActual().nombre()
+                        : "HABILITADO");
+
+        // Almacenar ambos en la sesión HTTP
         session.setAttribute("propietario", dto);
+        session.setAttribute("sesionPropietario", sesionDominio);
+
         Respuesta respuesta = new Respuesta("loginExitoso", dto);
         return ResponseEntity.ok(List.of(respuesta));
     }
 
     @PostMapping("/propietarios/logout")
     public ResponseEntity<List<Respuesta>> logoutPropietario(HttpSession session) {
-        session.invalidate();
+        // Recuperar la sesión del dominio
+        SesionPropietario sesionDominio = (SesionPropietario) session.getAttribute("sesionPropietario");
+
+        // Si existe, hacer logout en el sistema
+        if (sesionDominio != null) {
+            Fachada.getInstancia().logoutPropietario(sesionDominio);
+        }
+
+        // Invalidar sesión HTTP
+        try {
+            session.invalidate();
+        } catch (IllegalStateException ignore) {
+        }
+
         Map<String, String> resultado = new HashMap<>();
         resultado.put("mensaje", "Sesión cerrada exitosamente");
         Respuesta respuesta = new Respuesta("logoutExitoso", resultado);
@@ -48,8 +76,18 @@ public class AuthController {
             @RequestParam int cedula,
             @RequestParam String password,
             HttpSession session) throws OblException {
-        AdminAutenticadoDto dto = Fachada.getInstancia().loginAdmin(cedula, password);
+        // Login retorna la sesión del dominio
+        SesionAdmin sesionDominio = Fachada.getInstancia().loginAdmin(cedula, password);
+
+        // Crear DTO para la respuesta
+        AdminAutenticadoDto dto = new AdminAutenticadoDto(
+                sesionDominio.getAdministrador().getCedula(),
+                sesionDominio.getAdministrador().getNombreCompleto());
+
+        // Almacenar ambos en la sesión HTTP
         session.setAttribute("admin", dto);
+        session.setAttribute("sesionAdmin", sesionDominio);
+
         Respuesta respuesta = new Respuesta("adminLoginExitoso", dto);
         return ResponseEntity.ok(List.of(respuesta));
     }
@@ -58,25 +96,16 @@ public class AuthController {
     public ResponseEntity<List<Respuesta>> logoutAdmin(
             HttpSession session,
             @RequestParam(name = "cedula", required = false) Integer cedula) throws OblException {
-        boolean hizoLogout = false;
 
-        Object adminObj = session.getAttribute("admin");
-        if (adminObj instanceof AdminAutenticadoDto dto) {
-            Fachada.getInstancia().logoutAdmin(dto.getCedula());
-            hizoLogout = true;
-        } else if (cedula != null) {
-            // Permitir desloguear por cédula si no hay sesión asociada (p. ej., Postman o
-            // sesión expirada)
-            Fachada.getInstancia().logoutAdmin(cedula);
-            hizoLogout = true;
+        // Recuperar la sesión del dominio
+        SesionAdmin sesionDominio = (SesionAdmin) session.getAttribute("sesionAdmin");
+
+        // Si existe, hacer logout en el sistema
+        if (sesionDominio != null) {
+            Fachada.getInstancia().logoutAdmin(sesionDominio);
         }
 
-        // Si no se pudo identificar ninguna sesión/admin, informar explícitamente
-        if (!hizoLogout) {
-            throw new OblException("No hay sesión activa");
-        }
-
-        // Invalidar la sesión HTTP si existía
+        // Invalidar la sesión HTTP
         try {
             session.invalidate();
         } catch (IllegalStateException ignore) {

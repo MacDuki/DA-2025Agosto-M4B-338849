@@ -3,9 +3,7 @@ package PedroWattimo.Obligatorio.models;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.dtos.AdminAutenticadoDto;
 import PedroWattimo.Obligatorio.dtos.EmularTransitoResultado;
-import PedroWattimo.Obligatorio.dtos.PropietarioAutenticadoDTO;
 import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
@@ -23,6 +21,7 @@ public class Fachada {
     private SistemaTransitos sistemaTransitos;
     private SistemaBonificaciones sistemaBonificaciones;
     private SistemaEstados sistemaEstados; // gestión de estados
+    private SistemaAcceso sistemaAcceso; // gestión de sesiones y login/logout
 
     // Sin estado adicional: toda versión/estado vive en los subsistemas
 
@@ -34,11 +33,13 @@ public class Fachada {
         this.sistemaTransitos = new SistemaTransitos();
         this.sistemaBonificaciones = new SistemaBonificaciones();
         this.sistemaEstados = new SistemaEstados();
+        this.sistemaAcceso = new SistemaAcceso();
 
         // Inyecciones según nueva arquitectura
         this.sistemaTransitos.setSistemaPropietariosYAdmin(this.sistemaPropietariosYAdmin);
         this.sistemaTransitos.setSistemaPuestosYTarifas(this.sistemaPuestosYTarifas);
         this.sistemaTransitos.setSistemaBonificaciones(this.sistemaBonificaciones);
+        this.sistemaAcceso.setSistemaPropietariosYAdmin(this.sistemaPropietariosYAdmin);
     }
 
     public static Fachada getInstancia() {
@@ -90,32 +91,34 @@ public class Fachada {
 
     /**
      * CU: Ingresar a la aplicación (Propietarios)
-     * La fachada delega en una línea al SistemaPropietariosYAdmin.
+     * Retorna la sesión del dominio.
      */
-    public PropietarioAutenticadoDTO loginPropietario(int cedula, String password) throws OblException {
-        SesionPropietario sesion = this.sistemaPropietariosYAdmin.loginPropietario(cedula, password);
-        Propietario p = sesion.getPropietario();
-        return new PropietarioAutenticadoDTO(
-                p.getCedula(),
-                p.getNombreCompleto(),
-                p.getEstadoActual() != null ? p.getEstadoActual().nombre() : Estado.HABILITADO.nombre());
+    public SesionPropietario loginPropietario(int cedula, String password) throws OblException {
+        return this.sistemaAcceso.loginPropietario(cedula, password);
     }
 
     /**
      * CU: Login de Administrador
-     * Delegado en SistemaPropietariosYAdmin.
+     * Retorna la sesión del dominio.
      */
-    public AdminAutenticadoDto loginAdmin(int cedula, String password) throws OblException {
-        SesionAdmin sesion = this.sistemaPropietariosYAdmin.loginAdmin(cedula, password);
-        Administrador admin = sesion.getAdministrador();
-        return new AdminAutenticadoDto(admin.getCedula(), admin.getNombreCompleto());
+    public SesionAdmin loginAdmin(int cedula, String password) throws OblException {
+        return this.sistemaAcceso.loginAdmin(cedula, password);
     }
 
     /**
      * CU: Logout de Administrador
+     * Delegado en SistemaAcceso.
      */
-    public void logoutAdmin(int cedula) throws OblException {
-        this.sistemaPropietariosYAdmin.logoutAdmin(cedula);
+    public void logoutAdmin(SesionAdmin sesion) {
+        this.sistemaAcceso.logoutAdmin(sesion);
+    }
+
+    /**
+     * CU: Logout de Propietario
+     * Delegado en SistemaAcceso.
+     */
+    public void logoutPropietario(SesionPropietario sesion) {
+        this.sistemaAcceso.logoutPropietario(sesion);
     }
 
     // --------------------------------------------------------------

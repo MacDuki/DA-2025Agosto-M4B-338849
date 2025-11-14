@@ -16,22 +16,20 @@ import PedroWattimo.Obligatorio.dtos.VehiculoResumenDto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 /**
- * SistemaPropietariosYAdmin: fusión de SistemaAuth y SistemaPropietarios.
- * Concentra la lógica de autenticación de propietarios y administradores,
- * así como la gestión de propietarios, notificaciones y dashboards.
+ * SistemaPropietariosYAdmin: gestión de propietarios y administradores.
+ * Concentra la lógica de gestión de propietarios, notificaciones y dashboards.
  */
 public class SistemaPropietariosYAdmin {
+
+    protected SistemaPropietariosYAdmin() {
+    }
+
     private final List<Propietario> propietarios = new ArrayList<>();
     private final List<Administrador> administradores = new ArrayList<>();
-    private final List<SesionPropietario> sesionesPropietarios = new ArrayList<>();
-    private final List<SesionAdmin> sesionesAdmin = new ArrayList<>();
 
     // Historial plano de notificaciones globales (opcional para auditoría).
     private final List<Notificacion> notificacionesGlobales = new ArrayList<>();
     private final Map<Integer, Long> dashboardVersion = new ConcurrentHashMap<>();
-
-    protected SistemaPropietariosYAdmin() {
-    }
 
     // -------- Accesos Encapsulados --------
     public List<Propietario> getPropietarios() {
@@ -56,7 +54,7 @@ public class SistemaPropietariosYAdmin {
     }
 
     // -------- Operaciones de Propietarios --------
-    /** Busca un propietario por su cédula. */
+    /** Busca un propietario por su cédula (Int). */
     public Propietario buscarPorCedula(int cedula) {
         for (Propietario p : propietarios) {
             if (cedula == p.getCedula()) {
@@ -134,24 +132,16 @@ public class SistemaPropietariosYAdmin {
         return dueño;
     }
 
-    public SesionPropietario loginPropietario(int cedula, String password) throws OblException {
+    public Propietario autenticarYValidarPropietario(int cedula, String password) throws OblException {
         Propietario p = autenticarPropietario(cedula, password);
         if (!p.puedeIngresar()) {
             throw new OblException("Usuario deshabilitado, no puede ingresar al sistema");
         }
-
-        SesionPropietario sesion = new SesionPropietario(LocalDateTime.now(), p);
-        sesionesPropietarios.add(sesion);
-        return sesion;
-    }
-
-    public void logoutPropietario(int cedula) {
-        // Eliminar la sesión del propietario
-        sesionesPropietarios.removeIf(s -> s.getPropietario().getCedula() == cedula);
+        return p;
     }
 
     // -------- Autenticación de Administradores --------
-    public SesionAdmin loginAdmin(int cedula, String password) throws OblException {
+    public Administrador autenticarYValidarAdmin(int cedula, String password) throws OblException {
         if (password == null || password.isBlank()) {
             throw new OblException("Acceso denegado");
         }
@@ -173,26 +163,13 @@ public class SistemaPropietariosYAdmin {
         }
 
         admin.loguear();
-        SesionAdmin sesion = new SesionAdmin(LocalDateTime.now(), admin);
-        sesionesAdmin.add(sesion);
-        return sesion;
+        return admin;
     }
 
-    public void logoutAdmin(int cedula) throws OblException {
-        Administrador admin = null;
-        for (Administrador a : this.administradores) {
-            if (a != null && a.getCedula() == cedula) {
-                admin = a;
-                break;
-            }
+    public void desloguearAdmin(Administrador admin) {
+        if (admin != null) {
+            admin.desloguear();
         }
-        if (admin == null) {
-            throw new OblException("Acceso denegado");
-        }
-        admin.desloguear();
-
-        // Eliminar la sesión del administrador
-        sesionesAdmin.removeIf(s -> s.getAdministrador().getCedula() == cedula);
     }
 
     // -------- Dashboard de Propietario --------
