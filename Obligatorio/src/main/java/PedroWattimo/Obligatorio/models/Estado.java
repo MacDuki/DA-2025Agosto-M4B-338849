@@ -1,15 +1,20 @@
 package PedroWattimo.Obligatorio.models;
 
-public class Estado {
+/**
+ * Clase abstracta que representa un estado de propietario en el sistema de
+ * peajes.
+ * Patrón State: cada tipo de estado implementa su propia lógica de permisos.
+ */
+public abstract class Estado {
 
-    private String nombre; // "Habilitado", "Penalizado", "Suspendido", "Deshabilitado"
+    protected String nombre;
 
-    public static Estado HABILITADO = new Estado("Habilitado");
-    public static Estado PENALIZADO = new Estado("Penalizado");
-    public static Estado SUSPENDIDO = new Estado("Suspendido");
-    public static Estado DESHABILITADO = new Estado("Deshabilitado");
+    public static final Estado HABILITADO = new EstadoHabilitado();
+    public static final Estado PENALIZADO = new EstadoPenalizado();
+    public static final Estado SUSPENDIDO = new EstadoSuspendido();
+    public static final Estado DESHABILITADO = new EstadoDeshabilitado();
 
-    private Estado(String nombre) {
+    protected Estado(String nombre) {
         this.nombre = nombre;
     }
 
@@ -23,39 +28,23 @@ public class Estado {
 
     /**
      * Patrón Experto: el Estado sabe si permite transitar.
-     * Reglas:
-     * - Habilitado: puede transitar
-     * - Penalizado: puede transitar (pero sin bonificaciones ni notificaciones)
-     * - Suspendido: NO puede transitar
-     * - Deshabilitado: NO puede transitar
      */
-    public boolean permiteTransitar() {
-        return this.equals(HABILITADO) || this.equals(PENALIZADO);
-    }
+    public abstract boolean permiteTransitar();
 
     /**
      * Patrón Experto: el Estado sabe si permite aplicar bonificaciones.
-     * Solo Penalizado NO permite bonificaciones.
      */
-    public boolean permiteBonificaciones() {
-        return !this.equals(PENALIZADO);
-    }
+    public abstract boolean permiteBonificaciones();
 
     /**
      * Patrón Experto: el Estado sabe si permite registrar notificaciones.
-     * Solo Penalizado NO permite notificaciones.
      */
-    public boolean permiteNotificaciones() {
-        return !this.equals(PENALIZADO);
-    }
+    public abstract boolean permiteNotificaciones();
 
     /**
      * Patrón Experto: el Estado sabe si permite ingresar al sistema.
-     * Solo Deshabilitado NO permite ingresar.
      */
-    public boolean permiteIngresar() {
-        return !this.equals(DESHABILITADO);
-    }
+    public abstract boolean permiteIngresar();
 
     @Override
     public boolean equals(Object o) {

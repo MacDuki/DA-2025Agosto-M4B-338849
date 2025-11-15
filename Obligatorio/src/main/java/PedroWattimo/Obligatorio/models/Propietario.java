@@ -246,12 +246,12 @@ public class Propietario extends Usuario {
 
     /**
      * Patrón Experto: el Propietario asigna una bonificación validando su estado.
-     * Solo se permite asignar si el propietario está HABILITADO.
+     * Solo se permite asignar si el propietario no está deshabilitado.
      */
     public void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) {
         if (bonificacion == null || puesto == null)
             return;
-        if (this.estadoActual == Estado.DESHABILITADO) {
+        if (this.estadoActual != null && !this.estadoActual.permiteIngresar()) {
             throw new IllegalStateException("El propietario esta deshabilitado. No se pueden asignar bonificaciones");
         }
         if (this.asignaciones == null)

@@ -76,12 +76,7 @@ public class SistemaTransitos {
 
         Estado estado = prop.getEstadoActual();
         if (estado != null && !estado.permiteTransitar()) {
-            if (estado.equals(Estado.DESHABILITADO)) {
-                throw new OblException("El propietario del vehículo está deshabilitado, no puede realizar tránsitos");
-            }
-            if (estado.equals(Estado.SUSPENDIDO)) {
-                throw new OblException("El propietario del vehículo está suspendido, no puede realizar tránsitos");
-            }
+            throw new OblException("El propietario del vehículo no puede realizar tránsitos en su estado actual");
         }
 
         Vehiculo veh = prop.buscarVehiculoPorMatricula(matricula);

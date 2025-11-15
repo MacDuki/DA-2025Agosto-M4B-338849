@@ -83,7 +83,7 @@ public class SistemaBonificaciones {
         }
 
         // Validar estado del propietario
-        if (propietario.getEstadoActual() == Estado.DESHABILITADO) {
+        if (propietario.getEstadoActual() != null && !propietario.getEstadoActual().permiteIngresar()) {
             throw new OblException("El propietario esta deshabilitado. No se pueden asignar bonificaciones");
         }
 
