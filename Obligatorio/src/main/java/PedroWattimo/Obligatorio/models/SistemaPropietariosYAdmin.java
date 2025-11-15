@@ -180,7 +180,7 @@ public class SistemaPropietariosYAdmin {
 
         PropietarioDashboardDto dto = new PropietarioDashboardDto();
         dto.setPropietario(new PropietarioResumenDto(p.getNombreCompleto(),
-                p.getEstadoActual() != null ? p.getEstadoActual().nombre() : Estado.HABILITADO.nombre(),
+                p.getEstadoActual() != null ? p.getEstadoActual().nombre() : FabricaEstados.crearHabilitado().nombre(),
                 p.getSaldoActual()));
 
         List<BonificacionAsignadaDto> bonos = new ArrayList<>();

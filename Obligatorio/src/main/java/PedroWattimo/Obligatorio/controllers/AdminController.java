@@ -25,7 +25,7 @@ import PedroWattimo.Obligatorio.dtos.PropietarioConBonificacionesDto;
 import PedroWattimo.Obligatorio.dtos.PuestoDto;
 import PedroWattimo.Obligatorio.models.AsignacionBonificacion;
 import PedroWattimo.Obligatorio.models.Bonificacion;
-import PedroWattimo.Obligatorio.models.Estado;
+import PedroWattimo.Obligatorio.models.FabricaEstados;
 import PedroWattimo.Obligatorio.models.Fachada;
 import PedroWattimo.Obligatorio.models.Propietario;
 import PedroWattimo.Obligatorio.models.Puesto;
@@ -162,7 +162,7 @@ public class AdminController {
             PropietarioConBonificacionesDto dto = new PropietarioConBonificacionesDto(
                     propietario.getNombreCompleto(),
                     propietario.getEstadoActual() != null ? propietario.getEstadoActual().nombre()
-                            : Estado.HABILITADO.nombre(),
+                            : FabricaEstados.crearHabilitado().nombre(),
                     bonificaciones);
 
             return ResponseEntity.ok(new Respuesta("ok", dto));

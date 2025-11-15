@@ -53,16 +53,25 @@ public class SistemaBonificaciones {
     }
 
     /**
-     * Busca una bonificación por nombre.
+     * Busca una bonificación por nombre usando la fábrica.
      */
     public Bonificacion buscarPorNombre(String nombre) throws OblException {
         if (nombre == null || nombre.isBlank()) {
             throw new OblException("El nombre de la bonificación no puede estar vacío");
         }
-        return bonificaciones.stream()
-                .filter(b -> nombre.equalsIgnoreCase(b.getNombre()))
-                .findFirst()
-                .orElseThrow(() -> new OblException("Bonificación no encontrada: " + nombre));
+
+        // Usar la fábrica para crear/obtener la bonificación
+        Bonificacion bonificacion = FabricaBonificaciones.crear(nombre);
+
+        // Verificar que existe en el sistema
+        boolean existe = bonificaciones.stream()
+                .anyMatch(b -> nombre.equalsIgnoreCase(b.getNombre()));
+
+        if (!existe) {
+            throw new OblException("Bonificación no encontrada: " + nombre);
+        }
+
+        return bonificacion;
     }
 
     /**

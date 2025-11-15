@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import PedroWattimo.Obligatorio.Respuesta;
 import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
 import PedroWattimo.Obligatorio.models.Estado;
+import PedroWattimo.Obligatorio.models.FabricaEstados;
 import PedroWattimo.Obligatorio.models.Fachada;
 import PedroWattimo.Obligatorio.models.Propietario;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
@@ -40,7 +41,7 @@ public class EstadosController {
             PropietarioResumenDto dto = new PropietarioResumenDto(
                     propietario.getNombreCompleto(),
                     propietario.getEstadoActual() != null ? propietario.getEstadoActual().nombre()
-                            : Estado.HABILITADO.nombre(),
+                            : FabricaEstados.crearHabilitado().nombre(),
                     propietario.getSaldoActual());
             return ResponseEntity.ok(new Respuesta("ok", dto));
         } catch (OblException e) {

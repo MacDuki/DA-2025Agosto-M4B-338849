@@ -121,7 +121,7 @@ public class SistemaTransitos {
 
         return new EmularTransitoResultado(
                 prop.getNombreCompleto(),
-                estado != null ? estado.nombre() : Estado.HABILITADO.nombre(),
+                estado != null ? estado.nombre() : FabricaEstados.crearHabilitado().nombre(),
                 cat != null ? cat.getNombre() : "Desconocida",
                 bonifAplicada != null ? bonifAplicada.getNombre() : null,
                 montoBase,

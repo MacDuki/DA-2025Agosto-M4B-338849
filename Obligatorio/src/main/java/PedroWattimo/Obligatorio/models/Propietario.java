@@ -29,7 +29,7 @@ public class Propietario extends Usuario {
         // Datos específicos de Propietario
         this.saldoActual = 0;
         this.saldoMinimoAlerta = 0;
-        this.estadoActual = Estado.HABILITADO;
+        this.estadoActual = FabricaEstados.crearHabilitado();
     }
 
     public String getcontraseña() {
@@ -68,7 +68,7 @@ public class Propietario extends Usuario {
 
     /** Cambia el estado actual del propietario. */
     public Propietario cambiarEstado(Estado nuevoEstado) {
-        this.estadoActual = (nuevoEstado == null) ? Estado.HABILITADO : nuevoEstado;
+        this.estadoActual = (nuevoEstado == null) ? FabricaEstados.crearHabilitado() : nuevoEstado;
         return this;
     }
 
@@ -326,7 +326,7 @@ public class Propietario extends Usuario {
     }
 
     public String estadoActual() {
-        return this.estadoActual != null ? this.estadoActual.nombre() : Estado.HABILITADO.nombre();
+        return this.estadoActual != null ? this.estadoActual.nombre() : FabricaEstados.crearHabilitado().nombre();
     }
 
     /**

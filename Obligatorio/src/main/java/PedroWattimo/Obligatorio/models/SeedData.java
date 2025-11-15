@@ -164,24 +164,24 @@ public class SeedData {
         Propietario p1 = new Propietario(11111111, "Ana Pérez", "ana123")
                 .acreditarSaldo(1500)
                 .ajustarSaldoMinimoAlerta(200)
-                .cambiarEstado(Estado.HABILITADO);
+                .cambiarEstado(FabricaEstados.crearHabilitado());
 
         // Propietario 2: penalizado
         Propietario p2 = new Propietario(22222222, "Bruno López", "bruno123")
                 .acreditarSaldo(800)
                 .ajustarSaldoMinimoAlerta(100)
-                .cambiarEstado(Estado.PENALIZADO);
+                .cambiarEstado(FabricaEstados.crearPenalizado());
 
         // Propietario 3: suspendido, sin saldo
         Propietario p3 = new Propietario(33333333, "Carla Gómez", "carla123")
                 .ajustarSaldoMinimoAlerta(50)
-                .cambiarEstado(Estado.SUSPENDIDO);
+                .cambiarEstado(FabricaEstados.crearSuspendido());
 
         // Propietario 4: habilitado, sin bonificación asignada
         Propietario p4 = new Propietario(44444444, "Diego Ruiz", "diego123")
                 .acreditarSaldo(1200)
                 .ajustarSaldoMinimoAlerta(150)
-                .cambiarEstado(Estado.HABILITADO);
+                .cambiarEstado(FabricaEstados.crearHabilitado());
 
         // Registrar en el sistema usando método interno
         f.obtenerPropietariosInternos().add(p1);
@@ -193,10 +193,10 @@ public class SeedData {
     static void cargarBonificacionesYAsignaciones() {
         Fachada f = Fachada.getInstancia();
 
-        // Crear tipos de bonificación disponibles
-        Bonificacion exonerados = new BonificacionExonerados();
-        Bonificacion frecuentes = new BonificacionFrecuentes();
-        Bonificacion trabajadores = new BonificacionTrabajadores();
+        // Crear tipos de bonificación disponibles usando la fábrica
+        Bonificacion exonerados = FabricaBonificaciones.crearExonerados();
+        Bonificacion frecuentes = FabricaBonificaciones.crearFrecuentes();
+        Bonificacion trabajadores = FabricaBonificaciones.crearTrabajadores();
 
         // Registrar bonificaciones en el sistema
         f.obtenerBonificacionesInternas().add(exonerados);

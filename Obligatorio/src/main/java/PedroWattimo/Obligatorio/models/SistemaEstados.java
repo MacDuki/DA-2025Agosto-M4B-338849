@@ -14,11 +14,11 @@ public class SistemaEstados {
 
     protected SistemaEstados() {
         this.estados = new ArrayList<>();
-        // Inicializar con los estados disponibles
-        this.estados.add(Estado.HABILITADO);
-        this.estados.add(Estado.PENALIZADO);
-        this.estados.add(Estado.SUSPENDIDO);
-        this.estados.add(Estado.DESHABILITADO);
+        // Inicializar con los estados disponibles usando la fábrica
+        this.estados.add(FabricaEstados.crearHabilitado());
+        this.estados.add(FabricaEstados.crearPenalizado());
+        this.estados.add(FabricaEstados.crearSuspendido());
+        this.estados.add(FabricaEstados.crearDeshabilitado());
     }
 
     /**
@@ -29,20 +29,10 @@ public class SistemaEstados {
     }
 
     /**
-     * Busca un estado por su nombre.
+     * Busca un estado por su nombre usando la fábrica.
      * Lanza excepción si no existe.
      */
     public Estado buscarPorNombre(String nombreEstado) throws OblException {
-        if (nombreEstado == null || nombreEstado.isBlank()) {
-            throw new OblException("El nombre del estado no puede estar vacío");
-        }
-
-        for (Estado estado : estados) {
-            if (estado.nombre().equalsIgnoreCase(nombreEstado)) {
-                return estado;
-            }
-        }
-
-        throw new OblException("No existe el estado: " + nombreEstado);
+        return FabricaEstados.crear(nombreEstado);
     }
 }

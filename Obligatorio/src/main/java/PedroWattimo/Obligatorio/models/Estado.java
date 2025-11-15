@@ -9,10 +9,10 @@ public abstract class Estado {
 
     protected String nombre;
 
-    public static final Estado HABILITADO = new EstadoHabilitado();
-    public static final Estado PENALIZADO = new EstadoPenalizado();
-    public static final Estado SUSPENDIDO = new EstadoSuspendido();
-    public static final Estado DESHABILITADO = new EstadoDeshabilitado();
+    public static final Estado HABILITADO = FabricaEstados.crearHabilitado();
+    public static final Estado PENALIZADO = FabricaEstados.crearPenalizado();
+    public static final Estado SUSPENDIDO = FabricaEstados.crearSuspendido();
+    public static final Estado DESHABILITADO = FabricaEstados.crearDeshabilitado();
 
     protected Estado(String nombre) {
         this.nombre = nombre;
