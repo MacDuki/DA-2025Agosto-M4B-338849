@@ -1,8 +1,5 @@
 package PedroWattimo.Obligatorio.dtos;
 
-/**
- * DTO para la solicitud de asignación de bonificación.
- */
 public class AsignarBonificacionRequest {
     private String cedula;
     private String nombreBonificacion;

@@ -7,7 +7,6 @@ import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 /**
  * SistemaPuestosYTarifas: fusiona gestión de Puestos y acceso a sus Tarifas.
- * No mantiene Categorias (migradas a SistemaVehiculosYCategorias).
  */
 public class SistemaPuestosYTarifas {
     private final List<Puesto> puestos = new ArrayList<>();
@@ -29,7 +28,7 @@ public class SistemaPuestosYTarifas {
         return puesto == null ? List.of() : puesto.getTablaTarifas();
     }
 
-    /** Obtener puesto por índice (ID lógico en memoria). */
+    /** Obtener puesto por índice */
     public Puesto obtenerPorId(Long id) throws OblException {
         if (id == null || id < 0 || id >= puestos.size()) {
             throw new OblException("Puesto no encontrado con ID: " + id);
@@ -53,5 +52,35 @@ public class SistemaPuestosYTarifas {
      */
     public List<Puesto> listarPuestos() {
         return List.copyOf(puestos);
+    }
+
+    /**
+     * Obtiene las tarifas de un puesto como DTOs.
+     * Patrón Experto: el sistema que conoce los puestos transforma a DTO.
+     */
+    public List<PedroWattimo.Obligatorio.dtos.TarifaDto> obtenerTarifasDePuesto(Long puestoId) throws OblException {
+        Puesto puesto = obtenerPorId(puestoId);
+        List<Tarifa> tarifas = puesto.getTablaTarifas();
+        List<PedroWattimo.Obligatorio.dtos.TarifaDto> dtos = new ArrayList<>();
+
+        for (Tarifa t : tarifas) {
+            String categoria = t.getCategoria() != null ? t.getCategoria().getNombre() : "Desconocida";
+            dtos.add(new PedroWattimo.Obligatorio.dtos.TarifaDto(categoria, t.getMonto()));
+        }
+
+        return dtos;
+    }
+
+    /**
+     * Lista todos los puestos como DTOs.
+     * Patrón Experto: el sistema que conoce los puestos transforma a DTO.
+     */
+    public List<PedroWattimo.Obligatorio.dtos.PuestoDto> listarPuestosDto() {
+        List<PedroWattimo.Obligatorio.dtos.PuestoDto> dtos = new ArrayList<>();
+        for (int i = 0; i < puestos.size(); i++) {
+            Puesto p = puestos.get(i);
+            dtos.add(new PedroWattimo.Obligatorio.dtos.PuestoDto((long) i, p.getNombre(), p.getDireccion()));
+        }
+        return dtos;
     }
 }

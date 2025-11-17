@@ -41,6 +41,9 @@ public class Fachada extends Observable {
         this.sistemaTransitos.setSistemaPuestosYTarifas(this.sistemaPuestosYTarifas);
         this.sistemaTransitos.setSistemaBonificaciones(this.sistemaBonificaciones);
         this.sistemaAcceso.setSistemaPropietariosYAdmin(this.sistemaPropietariosYAdmin);
+        this.sistemaBonificaciones.setSistemaPropietarios(this.sistemaPropietariosYAdmin);
+        this.sistemaBonificaciones.setSistemaPuestos(this.sistemaPuestosYTarifas);
+        this.sistemaPropietariosYAdmin.setSistemaEstados(this.sistemaEstados);
     }
 
     public static Fachada getInstancia() {
@@ -222,13 +225,11 @@ public class Fachada extends Observable {
 
     /**
      * Asigna una bonificación a un propietario para un puesto específico.
+     * Fachada solo orquesta: delega completamente al sistema de bonificaciones.
      */
     public void asignarBonificacion(String cedula, String nombreBonificacion, String nombrePuesto)
             throws OblException {
-        Propietario propietario = sistemaPropietariosYAdmin.buscarPorCedula(cedula);
-        Bonificacion bonificacion = sistemaBonificaciones.buscarPorNombre(nombreBonificacion);
-        Puesto puesto = sistemaPuestosYTarifas.obtenerPorNombre(nombrePuesto);
-        sistemaBonificaciones.asignarBonificacionAPropietario(propietario, bonificacion, puesto);
+        sistemaBonificaciones.asignarBonificacion(cedula, nombreBonificacion, nombrePuesto);
     }
 
     // --------------------------------------------------------------
@@ -244,13 +245,65 @@ public class Fachada extends Observable {
 
     /**
      * Cambia el estado de un propietario.
-     * Valida que el propietario exista y que el nuevo estado sea diferente del
-     * actual.
+     * Fachada solo orquesta: delega completamente al sistema de propietarios.
      */
     public void cambiarEstadoPropietario(String cedulaPropietario, String nombreNuevoEstado) throws OblException {
-        Propietario propietario = sistemaPropietariosYAdmin.buscarPorCedula(cedulaPropietario);
-        Estado nuevoEstado = sistemaEstados.buscarPorNombre(nombreNuevoEstado);
-        sistemaPropietariosYAdmin.cambiarEstadoDePropietario(propietario, nuevoEstado);
+        sistemaPropietariosYAdmin.cambiarEstadoPropietario(cedulaPropietario, nombreNuevoEstado);
+    }
+
+    // --------------------------------------------------------------
+    // Métodos para transformación de datos (Patrón Experto)
+    // --------------------------------------------------------------
+
+    /**
+     * Obtiene un propietario con sus bonificaciones asignadas.
+     * Fachada solo orquesta: delega al sistema correspondiente.
+     */
+    public PedroWattimo.Obligatorio.dtos.PropietarioConBonificacionesDto obtenerPropietarioConBonificaciones(
+            String cedula) throws OblException {
+        return sistemaPropietariosYAdmin.obtenerPropietarioConBonificaciones(cedula);
+    }
+
+    /**
+     * Obtiene las tarifas de un puesto como DTOs.
+     * Fachada solo orquesta: delega al sistema correspondiente.
+     */
+    public java.util.List<PedroWattimo.Obligatorio.dtos.TarifaDto> obtenerTarifasDePuesto(Long puestoId)
+            throws OblException {
+        return sistemaPuestosYTarifas.obtenerTarifasDePuesto(puestoId);
+    }
+
+    /**
+     * Lista todos los puestos como DTOs.
+     * Fachada solo orquesta: delega al sistema correspondiente.
+     */
+    public java.util.List<PedroWattimo.Obligatorio.dtos.PuestoDto> listarPuestosDto() {
+        return sistemaPuestosYTarifas.listarPuestosDto();
+    }
+
+    /**
+     * Lista todos los estados como DTOs.
+     * Fachada solo orquesta: delega al sistema correspondiente.
+     */
+    public java.util.List<PedroWattimo.Obligatorio.dtos.EstadoDto> listarEstadosDto() {
+        return sistemaEstados.listarEstadosDto();
+    }
+
+    /**
+     * Busca un propietario y devuelve un resumen como DTO.
+     * Fachada solo orquesta: delega al sistema correspondiente.
+     */
+    public PedroWattimo.Obligatorio.dtos.PropietarioResumenDto buscarPropietarioResumenDto(String cedula)
+            throws OblException {
+        return sistemaPropietariosYAdmin.buscarPropietarioResumenDto(cedula);
+    }
+
+    /**
+     * Lista todas las bonificaciones como DTOs.
+     * Fachada solo orquesta: delega al sistema correspondiente.
+     */
+    public java.util.List<PedroWattimo.Obligatorio.dtos.BonificacionDto> listarBonificacionesDto() {
+        return sistemaBonificaciones.listarBonificacionesDto();
     }
 
 }

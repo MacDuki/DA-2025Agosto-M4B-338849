@@ -153,7 +153,7 @@
           }
         } catch {}
 
-        fetch("/auth/admin/logout", {
+        fetch("/admin/logout", {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -170,7 +170,7 @@
       // Cargar estados disponibles
       async function cargarEstados() {
         try {
-          const response = await fetch("/estados/listar");
+          const response = await fetch("/admin/cambiar-estado/estados");
           if (!response.ok) {
             throw new Error("Error al cargar estados");
           }
@@ -260,7 +260,9 @@
 
           try {
             const response = await fetch(
-              `/estados/buscar-propietario?cedula=${encodeURIComponent(cedula)}`
+              `/admin/cambiar-estado/propietario?cedula=${encodeURIComponent(
+                cedula
+              )}`
             );
             const data = await response.json();
 
@@ -343,7 +345,7 @@
           };
 
           try {
-            const response = await fetch("/estados/cambiar-estado", {
+            const response = await fetch("/admin/cambiar-estado", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

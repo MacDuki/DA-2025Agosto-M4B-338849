@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * SistemaVehiculosYCategorias: fusiona el antiguo SistemaVehiculos y la
- * colección global de Categorias (antes alojada en SistemaPuestos).
+ * SistemaVehiculosYCategorias:
  * Responsable ÚNICAMENTE de proveer acceso a las colecciones y búsquedas
- * simples. No realiza cálculos (mantienen las entidades).
+ * simples. No realiza cálculos .
  */
 public class SistemaVehiculosYCategorias {
     private final List<Vehiculo> vehiculos = new ArrayList<>();

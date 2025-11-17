@@ -366,7 +366,7 @@
       document.getElementById("logoutBtn").addEventListener("click", () => {
         sessionStorage.removeItem("owner");
         // Llamar al endpoint de logout para limpiar la sesión del servidor
-        submit("/auth/propietarios/logout", "");
+        submit("/propietarios/logout", "");
         setTimeout(() => {
           window.location.href = "/login-propietarios.html";
         }, 500);
@@ -383,7 +383,7 @@
             const msgEl = document.getElementById("accionMsg");
             msgEl.textContent = "Procesando...";
             // No enviar cédula, se obtiene de la sesión del servidor
-            submit("/propietarios/notificaciones/borrar", "");
+            submit("/propietarios/dashboard/notificaciones/borrar", "");
           });
       }
     </script>

@@ -1,8 +1,5 @@
 package PedroWattimo.Obligatorio.dtos;
 
-/**
- * DTO para representar un puesto en listas.
- */
 public class PuestoDto {
     private Long id;
     private String nombre;

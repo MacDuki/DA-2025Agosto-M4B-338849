@@ -39,7 +39,6 @@ public abstract class Usuario {
         return this.contraseña.equals(hash(pwd));
     }
 
-    // Método protegido para hash reutilizable en subclases
     protected String hash(String input) {
         if (input == null)
             return null;
@@ -48,7 +47,7 @@ public abstract class Usuario {
             byte[] digest = md.digest(input.getBytes());
             return bytesToHex(digest);
         } catch (NoSuchAlgorithmException e) {
-            return input; // fallback defensivo
+            return input;
         }
     }
 

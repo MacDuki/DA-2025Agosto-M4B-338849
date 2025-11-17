@@ -2,9 +2,6 @@ package PedroWattimo.Obligatorio.dtos;
 
 import java.util.List;
 
-/**
- * DTO para transferir información de un propietario con sus bonificaciones.
- */
 public class PropietarioConBonificacionesDto {
     private String nombreCompleto;
     private String estado;

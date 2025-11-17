@@ -21,9 +21,6 @@ import observador.Observable;
  */
 public class SistemaTransitos extends Observable {
 
-    /**
-     * Enum de eventos que pueden ocurrir en el sistema de tránsitos.
-     */
     public enum Eventos {
         TRANSITO_REGISTRADO
     }
@@ -129,7 +126,6 @@ public class SistemaTransitos extends Observable {
             }
         }
 
-        // Notifica a las vistas que se registró un nuevo tránsito para este propietario
         avisar(Eventos.TRANSITO_REGISTRADO);
 
         return new EmularTransitoResultado(
@@ -143,8 +139,4 @@ public class SistemaTransitos extends Observable {
                 prop.getSaldoActual());
     }
 
-    @Deprecated
-    public void emularTransito(Puesto puesto, String matriculaVehiculo, LocalDateTime fechaHora) {
-        return; // método obsoleto
-    }
 }

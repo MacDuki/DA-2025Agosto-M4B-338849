@@ -1,8 +1,5 @@
 package PedroWattimo.Obligatorio.dtos;
 
-/**
- * DTO para la request de emular tránsito.
- */
 public class EmularTransitoRequest {
     private Long puestoId;
     private String matricula;

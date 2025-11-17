@@ -267,7 +267,7 @@
         } catch {}
 
         // Enviar la cédula si está disponible para asegurar el deslogueo del lado servidor
-        submit("/auth/admin/logout", data);
+        submit("/admin/logout", data);
         sessionStorage.removeItem("admin");
         setTimeout(() => {
           window.location.href = "/login-admin.html";
@@ -277,7 +277,7 @@
       // Cargar puestos al iniciar
       async function cargarPuestos() {
         try {
-          const response = await fetch("/puestos");
+          const response = await fetch("/admin/emular-transito/puestos");
           if (!response.ok) {
             throw new Error("Error al cargar puestos");
           }
@@ -333,7 +333,9 @@
           }
 
           try {
-            const response = await fetch(`/puestos/${puestoId}/tarifas`);
+            const response = await fetch(
+              `/admin/emular-transito/puestos/${puestoId}/tarifas`
+            );
             if (!response.ok) {
               throw new Error("Error al cargar tarifas");
             }

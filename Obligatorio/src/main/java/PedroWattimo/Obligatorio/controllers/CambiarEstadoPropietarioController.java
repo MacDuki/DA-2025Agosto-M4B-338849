@@ -1,6 +1,5 @@
 package PedroWattimo.Obligatorio.controllers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,39 +15,31 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import PedroWattimo.Obligatorio.Respuesta;
+import PedroWattimo.Obligatorio.dtos.CambiarEstadoRequest;
+import PedroWattimo.Obligatorio.dtos.EstadoDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
 import PedroWattimo.Obligatorio.models.ConexionNavegador;
-import PedroWattimo.Obligatorio.models.Estado;
-import PedroWattimo.Obligatorio.models.FabricaEstados;
 import PedroWattimo.Obligatorio.models.Fachada;
-import PedroWattimo.Obligatorio.models.Propietario;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import observador.Observable;
 import observador.Observador;
 
-/**
- * Controlador REST para el caso de uso: Cambiar estado de propietario.
- * Sin lógica de negocio: solo coordina request/response y delega en Fachada.
- * Observador: reacciona a cambios en el modelo y envía notificaciones SSE.
- */
 @RestController
-@RequestMapping("/estados")
+@RequestMapping("/admin/cambiar-estado")
 @Scope("session")
-public class EstadosController implements Observador {
+public class CambiarEstadoPropietarioController implements Observador {
 
     private final Fachada fachada = Fachada.getInstancia();
     private final ConexionNavegador conexionNavegador;
 
-    public EstadosController(ConexionNavegador conexionNavegador) {
+    public CambiarEstadoPropietarioController(ConexionNavegador conexionNavegador) {
         this.conexionNavegador = conexionNavegador;
-        // Suscribirse a los sistemas observables al crear el controlador
         fachada.registrarObservador(this);
     }
 
     @Override
     public void actualizar(Observable origen, Object evento) {
-        // Cuando ocurre un evento, enviar notificación SSE
-        System.out.println("[EstadosController] Evento recibido: " + evento);
+        System.out.println("[CambiarEstadoPropietarioController] Evento recibido: " + evento);
 
         Map<String, Object> notificacion = new HashMap<>();
         notificacion.put("tipo", "estado_propietario_cambiado");
@@ -59,37 +50,13 @@ public class EstadosController implements Observador {
     }
 
     /**
-     * GET /estados/buscar-propietario?cedula=XXX
-     * Busca un propietario por cédula y devuelve sus datos básicos.
-     */
-    @GetMapping("/buscar-propietario")
-    public ResponseEntity<Respuesta> buscarPropietario(@RequestParam String cedula) {
-        try {
-            Propietario propietario = fachada.buscarPropietarioPorCedula(cedula);
-            PropietarioResumenDto dto = new PropietarioResumenDto(
-                    propietario.getNombreCompleto(),
-                    propietario.getEstadoActual() != null ? propietario.getEstadoActual().nombre()
-                            : FabricaEstados.crearHabilitado().nombre(),
-                    propietario.getSaldoActual());
-            return ResponseEntity.ok(new Respuesta("ok", dto));
-        } catch (OblException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new Respuesta("error", e.getMessage()));
-        }
-    }
-
-    /**
-     * GET /estados/listar
      * Lista todos los estados disponibles.
      */
-    @GetMapping("/listar")
+    @GetMapping("/estados")
     public ResponseEntity<Respuesta> listarEstados() {
         try {
-            List<Estado> estados = fachada.listarEstados();
-            List<EstadoDto> estadoDtos = new ArrayList<>();
-            for (Estado estado : estados) {
-                estadoDtos.add(new EstadoDto(estado.nombre()));
-            }
+
+            List<EstadoDto> estadoDtos = fachada.listarEstadosDto();
             return ResponseEntity.ok(new Respuesta("ok", estadoDtos));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -98,11 +65,24 @@ public class EstadosController implements Observador {
     }
 
     /**
-     * POST /estados/cambiar-estado
-     * Cambia el estado de un propietario.
-     * Request: {cedula, nuevoEstado}
+     * Busca un propietario por cédula y devuelve sus datos básicos.
      */
-    @PostMapping("/cambiar-estado")
+    @GetMapping("/propietario")
+    public ResponseEntity<Respuesta> buscarPropietario(@RequestParam String cedula) {
+        try {
+
+            PropietarioResumenDto dto = fachada.buscarPropietarioResumenDto(cedula);
+            return ResponseEntity.ok(new Respuesta("ok", dto));
+        } catch (OblException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Respuesta("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * Cambia el estado de un propietario.
+     */
+    @PostMapping
     public ResponseEntity<Respuesta> cambiarEstado(@RequestBody CambiarEstadoRequest request) {
         try {
             if (request.getCedula() == null || request.getCedula().isBlank()) {
@@ -116,57 +96,13 @@ public class EstadosController implements Observador {
 
             fachada.cambiarEstadoPropietario(request.getCedula(), request.getNuevoEstado());
             return ResponseEntity.ok(new Respuesta("ok", "Estado cambiado exitosamente"));
+
         } catch (OblException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new Respuesta("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new Respuesta("error", "Error al cambiar el estado"));
-        }
-    }
-
-    // DTO interno para estado
-    public static class EstadoDto {
-        private String nombre;
-
-        public EstadoDto() {
-        }
-
-        public EstadoDto(String nombre) {
-            this.nombre = nombre;
-        }
-
-        public String getNombre() {
-            return nombre;
-        }
-
-        public void setNombre(String nombre) {
-            this.nombre = nombre;
-        }
-    }
-
-    // DTO para la request de cambiar estado
-    public static class CambiarEstadoRequest {
-        private String cedula;
-        private String nuevoEstado;
-
-        public CambiarEstadoRequest() {
-        }
-
-        public String getCedula() {
-            return cedula;
-        }
-
-        public void setCedula(String cedula) {
-            this.cedula = cedula;
-        }
-
-        public String getNuevoEstado() {
-            return nuevoEstado;
-        }
-
-        public void setNuevoEstado(String nuevoEstado) {
-            this.nuevoEstado = nuevoEstado;
         }
     }
 }

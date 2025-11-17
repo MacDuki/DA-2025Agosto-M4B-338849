@@ -7,14 +7,8 @@ import java.util.Optional;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import observador.Observable;
 
-/**
- * Observable: notifica cuando se asignan bonificaciones a propietarios
- */
 public class SistemaBonificaciones extends Observable {
 
-    /**
-     * Enum de eventos que pueden ocurrir en el sistema de bonificaciones.
-     */
     public enum Eventos {
         BONIFICACION_ASIGNADA
     }
@@ -118,5 +112,41 @@ public class SistemaBonificaciones extends Observable {
 
         // Notifica a las vistas que se asignó una nueva bonificación
         avisar(Eventos.BONIFICACION_ASIGNADA);
+    }
+
+    // Inyección de dependencias para resolver objetos
+    private SistemaPropietariosYAdmin sistemaPropietarios;
+    private SistemaPuestosYTarifas sistemaPuestos;
+
+    public void setSistemaPropietarios(SistemaPropietariosYAdmin sistema) {
+        this.sistemaPropietarios = sistema;
+    }
+
+    public void setSistemaPuestos(SistemaPuestosYTarifas sistema) {
+        this.sistemaPuestos = sistema;
+    }
+
+    /**
+     * Asigna una bonificación resolviendo los objetos por sus identificadores.
+     * Orquesta la resolución de objetos y delega la asignación.
+     */
+    public void asignarBonificacion(String cedula, String nombreBonificacion, String nombrePuesto)
+            throws OblException {
+        Propietario propietario = sistemaPropietarios.buscarPorCedula(cedula);
+        Bonificacion bonificacion = buscarPorNombre(nombreBonificacion);
+        Puesto puesto = sistemaPuestos.obtenerPorNombre(nombrePuesto);
+        asignarBonificacionAPropietario(propietario, bonificacion, puesto);
+    }
+
+    /**
+     * Lista todas las bonificaciones como DTOs.
+     * Patrón Experto: el sistema que conoce las bonificaciones transforma a DTO.
+     */
+    public List<PedroWattimo.Obligatorio.dtos.BonificacionDto> listarBonificacionesDto() {
+        List<PedroWattimo.Obligatorio.dtos.BonificacionDto> dtos = new ArrayList<>();
+        for (Bonificacion b : bonificaciones) {
+            dtos.add(new PedroWattimo.Obligatorio.dtos.BonificacionDto(b.getNombre(), b.getPorcentaje()));
+        }
+        return dtos;
     }
 }

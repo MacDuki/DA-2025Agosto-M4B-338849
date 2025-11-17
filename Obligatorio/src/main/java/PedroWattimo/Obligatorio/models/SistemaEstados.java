@@ -14,7 +14,7 @@ public class SistemaEstados {
 
     protected SistemaEstados() {
         this.estados = new ArrayList<>();
-        // Inicializar con los estados disponibles usando la fábrica
+
         this.estados.add(FabricaEstados.crearHabilitado());
         this.estados.add(FabricaEstados.crearPenalizado());
         this.estados.add(FabricaEstados.crearSuspendido());
@@ -30,9 +30,21 @@ public class SistemaEstados {
 
     /**
      * Busca un estado por su nombre usando la fábrica.
-     * Lanza excepción si no existe.
+     * 
      */
     public Estado buscarPorNombre(String nombreEstado) throws OblException {
         return FabricaEstados.crear(nombreEstado);
+    }
+
+    /**
+     * Lista todos los estados como DTOs.
+     * Patrón Experto: el sistema que conoce los estados transforma a DTO.
+     */
+    public List<PedroWattimo.Obligatorio.dtos.EstadoDto> listarEstadosDto() {
+        List<PedroWattimo.Obligatorio.dtos.EstadoDto> estadoDtos = new ArrayList<>();
+        for (Estado estado : estados) {
+            estadoDtos.add(new PedroWattimo.Obligatorio.dtos.EstadoDto(estado.nombre()));
+        }
+        return estadoDtos;
     }
 }

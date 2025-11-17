@@ -1,8 +1,5 @@
 package PedroWattimo.Obligatorio.dtos;
 
-/**
- * DTO para transferir información de una bonificación.
- */
 public class BonificacionDto {
     private String nombre;
     private double porcentaje;

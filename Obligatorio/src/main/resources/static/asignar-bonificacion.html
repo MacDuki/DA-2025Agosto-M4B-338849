@@ -199,7 +199,7 @@
           }
         } catch {}
 
-        fetch("/auth/admin/logout", {
+        fetch("/admin/logout", {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -216,7 +216,9 @@
       // Cargar bonificaciones
       async function cargarBonificaciones() {
         try {
-          const response = await fetch("/admin/bonificaciones");
+          const response = await fetch(
+            "/admin/asignar-bonificacion/bonificaciones"
+          );
           if (!response.ok) {
             throw new Error("Error al cargar bonificaciones");
           }
@@ -259,7 +261,7 @@
       // Cargar puestos
       async function cargarPuestos() {
         try {
-          const response = await fetch("/admin/puestos");
+          const response = await fetch("/admin/asignar-bonificacion/puestos");
           if (!response.ok) {
             throw new Error("Error al cargar puestos");
           }
@@ -332,7 +334,9 @@
 
           try {
             const response = await fetch(
-              `/admin/propietario?cedula=${encodeURIComponent(cedula)}`
+              `/admin/asignar-bonificacion/propietario?cedula=${encodeURIComponent(
+                cedula
+              )}`
             );
             const data = await response.json();
 

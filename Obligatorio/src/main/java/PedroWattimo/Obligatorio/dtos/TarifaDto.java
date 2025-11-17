@@ -1,8 +1,5 @@
 package PedroWattimo.Obligatorio.dtos;
 
-/**
- * DTO para representar una tarifa de un puesto.
- */
 public class TarifaDto {
     private String categoria;
     private double monto;

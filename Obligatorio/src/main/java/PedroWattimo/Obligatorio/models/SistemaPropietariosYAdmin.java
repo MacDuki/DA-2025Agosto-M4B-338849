@@ -24,9 +24,6 @@ import observador.Observable;
  */
 public class SistemaPropietariosYAdmin extends Observable {
 
-    /**
-     * Enum de eventos que pueden ocurrir en el sistema de propietarios.
-     */
     public enum Eventos {
         CAMBIO_ESTADO,
         NOTIFICACION_REGISTRADA,
@@ -295,5 +292,59 @@ public class SistemaPropietariosYAdmin extends Observable {
         dashboardVersion.merge(propietario.getCedula(), 1L, Long::sum);
         // Notifica a las vistas que cambió el estado del propietario
         avisar(Eventos.CAMBIO_ESTADO);
+    }
+
+    // Inyección de dependencias para resolver estados
+    private SistemaEstados sistemaEstados;
+
+    public void setSistemaEstados(SistemaEstados sistema) {
+        this.sistemaEstados = sistema;
+    }
+
+    /**
+     * Cambia el estado de un propietario resolviendo los objetos por
+     * identificadores.
+     * Orquesta la resolución de objetos y delega el cambio de estado.
+     */
+    public void cambiarEstadoPropietario(String cedulaPropietario, String nombreNuevoEstado) throws OblException {
+        Propietario propietario = buscarPorCedula(cedulaPropietario);
+        Estado nuevoEstado = sistemaEstados.buscarPorNombre(nombreNuevoEstado);
+        cambiarEstadoDePropietario(propietario, nuevoEstado);
+    }
+
+    /**
+     * Obtiene un propietario con sus bonificaciones como DTO.
+     * Patrón Experto: el sistema que conoce a los propietarios transforma a DTO.
+     */
+    public PedroWattimo.Obligatorio.dtos.PropietarioConBonificacionesDto obtenerPropietarioConBonificaciones(
+            String cedula) throws OblException {
+        Propietario propietario = buscarPorCedula(cedula);
+
+        // Transformar asignaciones a DTOs
+        List<BonificacionAsignadaDto> bonificaciones = new ArrayList<>();
+        for (AsignacionBonificacion ab : propietario.getAsignaciones()) {
+            String nombreBonif = ab.getBonificacion() != null ? ab.getBonificacion().getNombre() : null;
+            String nombrePuesto = ab.getPuesto() != null ? ab.getPuesto().getNombre() : null;
+            bonificaciones.add(new BonificacionAsignadaDto(nombreBonif, nombrePuesto, ab.getFechaHora()));
+        }
+
+        return new PedroWattimo.Obligatorio.dtos.PropietarioConBonificacionesDto(
+                propietario.getNombreCompleto(),
+                propietario.getEstadoActual() != null ? propietario.getEstadoActual().nombre()
+                        : FabricaEstados.crearHabilitado().nombre(),
+                bonificaciones);
+    }
+
+    /**
+     * Busca un propietario por cédula y devuelve un resumen como DTO.
+     * Patrón Experto: el sistema que conoce a los propietarios transforma a DTO.
+     */
+    public PropietarioResumenDto buscarPropietarioResumenDto(String cedula) throws OblException {
+        Propietario propietario = buscarPorCedula(cedula);
+        return new PropietarioResumenDto(
+                propietario.getNombreCompleto(),
+                propietario.getEstadoActual() != null ? propietario.getEstadoActual().nombre()
+                        : FabricaEstados.crearHabilitado().nombre(),
+                propietario.getSaldoActual());
     }
 }

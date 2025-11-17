@@ -1,4 +1,4 @@
-package PedroWattimo.Obligatorio.controllers;
+package PedroWattimo.Obligatorio;
 
 import java.util.List;
 
@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import PedroWattimo.Obligatorio.Respuesta;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 @ControllerAdvice
@@ -18,7 +17,6 @@ public class GlobalExceptionHandler {
         String mensaje = ex.getMessage();
         Respuesta respuesta = new Respuesta("error", mensaje);
 
-        // Determinar el código HTTP según el mensaje
         if (mensaje.contains("Acceso denegado")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(List.of(respuesta));
         } else if (mensaje.contains("Ud. Ya está logueado")) {
@@ -33,7 +31,6 @@ public class GlobalExceptionHandler {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(List.of(respuesta));
         }
 
-        // Por defecto, error 400 Bad Request
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(List.of(respuesta));
     }
 }

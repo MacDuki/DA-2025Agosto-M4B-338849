@@ -1,10 +1,5 @@
 package PedroWattimo.Obligatorio.dtos;
 
-/**
- * DTO para el resultado de emular un tránsito.
- * Contiene toda la información del tránsito registrado y el estado
- * post-operación.
- */
 public class EmularTransitoResultado {
     private String nombrePropietario;
     private String estadoPropietario;
@@ -32,7 +27,6 @@ public class EmularTransitoResultado {
         this.saldoPost = saldoPost;
     }
 
-    // Getters y setters
     public String getNombrePropietario() {
         return nombrePropietario;
     }
