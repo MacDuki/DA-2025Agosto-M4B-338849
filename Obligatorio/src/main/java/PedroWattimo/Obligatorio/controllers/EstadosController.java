@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,14 +33,14 @@ import observador.Observador;
  */
 @RestController
 @RequestMapping("/estados")
+@Scope("session")
 public class EstadosController implements Observador {
 
     private final Fachada fachada = Fachada.getInstancia();
+    private final ConexionNavegador conexionNavegador;
 
-    @Autowired
-    private ConexionNavegador conexionNavegador;
-
-    public EstadosController() {
+    public EstadosController(ConexionNavegador conexionNavegador) {
+        this.conexionNavegador = conexionNavegador;
         // Suscribirse a los sistemas observables al crear el controlador
         fachada.registrarObservador(this);
     }

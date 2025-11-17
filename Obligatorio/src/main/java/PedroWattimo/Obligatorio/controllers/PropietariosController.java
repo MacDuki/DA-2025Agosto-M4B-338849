@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,12 +26,13 @@ import observador.Observador;
  */
 @RestController
 @RequestMapping("/propietarios")
+@Scope("session")
 public class PropietariosController implements Observador {
 
-    @Autowired
-    private ConexionNavegador conexionNavegador;
+    private final ConexionNavegador conexionNavegador;
 
-    public PropietariosController() {
+    public PropietariosController(ConexionNavegador conexionNavegador) {
+        this.conexionNavegador = conexionNavegador;
         // Suscribirse a los sistemas observables al crear el controlador
         Fachada.getInstancia().registrarObservador(this);
     }

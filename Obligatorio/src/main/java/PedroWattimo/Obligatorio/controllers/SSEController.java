@@ -1,6 +1,6 @@
 package PedroWattimo.Obligatorio.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,10 +17,14 @@ import jakarta.servlet.http.HttpSession;
  */
 @RestController
 @RequestMapping("/sse")
+@Scope("session")
 public class SSEController {
 
-    @Autowired
-    private ConexionNavegador conexionNavegador;
+    private final ConexionNavegador conexionNavegador;
+
+    public SSEController(ConexionNavegador conexionNavegador) {
+        this.conexionNavegador = conexionNavegador;
+    }
 
     /**
      * Endpoint SSE único para conectar el navegador del cliente.
