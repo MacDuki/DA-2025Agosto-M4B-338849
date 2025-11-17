@@ -14,12 +14,24 @@ import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
 import PedroWattimo.Obligatorio.dtos.TransitoDto;
 import PedroWattimo.Obligatorio.dtos.VehiculoResumenDto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
+import observador.Observable;
 
 /**
  * SistemaPropietariosYAdmin: gestión de propietarios y administradores.
  * Concentra la lógica de gestión de propietarios, notificaciones y dashboards.
+ * Observable: notifica cuando cambian los datos de propietarios (estado, saldo,
+ * notificaciones, etc.)
  */
-public class SistemaPropietariosYAdmin {
+public class SistemaPropietariosYAdmin extends Observable {
+
+    /**
+     * Enum de eventos que pueden ocurrir en el sistema de propietarios.
+     */
+    public enum Eventos {
+        CAMBIO_ESTADO,
+        NOTIFICACION_REGISTRADA,
+        NOTIFICACIONES_BORRADAS
+    }
 
     protected SistemaPropietariosYAdmin() {
     }
@@ -27,7 +39,7 @@ public class SistemaPropietariosYAdmin {
     private final List<Propietario> propietarios = new ArrayList<>();
     private final List<Administrador> administradores = new ArrayList<>();
 
-    // Historial plano de notificaciones globales (opcional para auditoría).
+    // Historial plano de notificaciones globales .
     private final List<Notificacion> notificacionesGlobales = new ArrayList<>();
     private final Map<Integer, Long> dashboardVersion = new ConcurrentHashMap<>();
 
@@ -106,12 +118,17 @@ public class SistemaPropietariosYAdmin {
     /**
      * Registrar notificación: delega en Propietario su almacenamiento interno y
      * agrega a trazabilidad global.
+     * Notifica a observadores sobre la nueva notificación.
      */
     public void registrarNotificacion(Propietario propietario, String mensaje, LocalDateTime fechaHora) {
         if (propietario == null || mensaje == null || fechaHora == null)
             return;
         propietario.registrarNotificacion(mensaje, fechaHora);
         notificacionesGlobales.add(new Notificacion(fechaHora, mensaje, propietario));
+        // Incrementar versión del dashboard e notificar cambios
+        dashboardVersion.merge(propietario.getCedula(), 1L, Long::sum);
+        // Notifica a las vistas que hay una nueva notificación para el propietario
+        avisar(Eventos.NOTIFICACION_REGISTRADA);
     }
 
     // -------- Autenticación de Propietarios --------
@@ -234,6 +251,8 @@ public class SistemaPropietariosYAdmin {
             throw new OblException("El propietario no existe");
         int borradas = p.borrarNotificaciones();
         dashboardVersion.merge(p.getCedula(), 1L, Long::sum);
+        // Notifica a las vistas que se borraron las notificaciones del propietario
+        avisar(Eventos.NOTIFICACIONES_BORRADAS);
         return borradas;
     }
 
@@ -274,5 +293,7 @@ public class SistemaPropietariosYAdmin {
 
         // Incrementar versión del dashboard
         dashboardVersion.merge(propietario.getCedula(), 1L, Long::sum);
+        // Notifica a las vistas que cambió el estado del propietario
+        avisar(Eventos.CAMBIO_ESTADO);
     }
 }

@@ -1,8 +1,11 @@
 package PedroWattimo.Obligatorio.controllers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,21 +17,46 @@ import org.springframework.web.bind.annotation.RestController;
 
 import PedroWattimo.Obligatorio.Respuesta;
 import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
+import PedroWattimo.Obligatorio.models.ConexionNavegador;
 import PedroWattimo.Obligatorio.models.Estado;
 import PedroWattimo.Obligatorio.models.FabricaEstados;
 import PedroWattimo.Obligatorio.models.Fachada;
 import PedroWattimo.Obligatorio.models.Propietario;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
+import observador.Observable;
+import observador.Observador;
 
 /**
  * Controlador REST para el caso de uso: Cambiar estado de propietario.
  * Sin lógica de negocio: solo coordina request/response y delega en Fachada.
+ * Observador: reacciona a cambios en el modelo y envía notificaciones SSE.
  */
 @RestController
 @RequestMapping("/estados")
-public class EstadosController {
+public class EstadosController implements Observador {
 
     private final Fachada fachada = Fachada.getInstancia();
+
+    @Autowired
+    private ConexionNavegador conexionNavegador;
+
+    public EstadosController() {
+        // Suscribirse a los sistemas observables al crear el controlador
+        fachada.registrarObservador(this);
+    }
+
+    @Override
+    public void actualizar(Observable origen, Object evento) {
+        // Cuando ocurre un evento, enviar notificación SSE
+        System.out.println("[EstadosController] Evento recibido: " + evento);
+
+        Map<String, Object> notificacion = new HashMap<>();
+        notificacion.put("tipo", "estado_propietario_cambiado");
+        notificacion.put("mensaje", "Estado de propietario actualizado");
+
+        Respuesta respuesta = new Respuesta("estado_actualizado", notificacion);
+        conexionNavegador.enviarJSON(List.of(respuesta));
+    }
 
     /**
      * GET /estados/buscar-propietario?cedula=XXX

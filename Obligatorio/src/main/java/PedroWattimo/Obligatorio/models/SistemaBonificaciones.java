@@ -5,8 +5,20 @@ import java.util.List;
 import java.util.Optional;
 
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
+import observador.Observable;
 
-public class SistemaBonificaciones {
+/**
+ * Observable: notifica cuando se asignan bonificaciones a propietarios
+ */
+public class SistemaBonificaciones extends Observable {
+
+    /**
+     * Enum de eventos que pueden ocurrir en el sistema de bonificaciones.
+     */
+    public enum Eventos {
+        BONIFICACION_ASIGNADA
+    }
+
     private List<Bonificacion> bonificaciones = new ArrayList<Bonificacion>();
     private List<AsignacionBonificacion> asignaciones = new ArrayList<AsignacionBonificacion>();
 
@@ -103,5 +115,8 @@ public class SistemaBonificaciones {
 
         // Delegar al propietario la asignación (Patrón Experto)
         propietario.asignarBonificacion(bonificacion, puesto);
+
+        // Notifica a las vistas que se asignó una nueva bonificación
+        avisar(Eventos.BONIFICACION_ASIGNADA);
     }
 }

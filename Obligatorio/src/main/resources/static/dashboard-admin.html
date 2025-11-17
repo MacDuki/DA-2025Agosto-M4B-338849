@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/js/utilesVista.js"></script>
     <script src="/js/vistaWeb.js"></script>
+    <script src="/js/sse.js"></script>
   </head>
   <body
     class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white"
@@ -229,6 +230,9 @@
     </main>
 
     <script>
+      // Configurar URL para SSE
+      var urlRegistroSSE = "/sse/conectar";
+
       let puestos = [];
 
       function loadAdmin() {

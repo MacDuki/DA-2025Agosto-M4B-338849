@@ -7,8 +7,9 @@ import PedroWattimo.Obligatorio.dtos.EmularTransitoResultado;
 import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
+import observador.Observable;
 
-public class Fachada {
+public class Fachada extends Observable {
 
     private static Fachada instancia;
 
@@ -47,6 +48,34 @@ public class Fachada {
             instancia = new Fachada();
         }
         return instancia;
+    }
+
+    // --------------------------------------------------------------
+    // Gestión de Observadores: suscribir observadores a los sistemas observables
+    // --------------------------------------------------------------
+
+    /**
+     * Registra un observador en los sistemas de dominio que notifican cambios.
+     * Esto permite que los controladores/vistas reaccionen a cambios en el modelo.
+     */
+    public void registrarObservador(observador.Observador observador) {
+        if (observador != null) {
+            this.sistemaPropietariosYAdmin.agregarObservador(observador);
+            this.sistemaTransitos.agregarObservador(observador);
+            this.sistemaBonificaciones.agregarObservador(observador);
+        }
+    }
+
+    /**
+     * Remueve un observador de los sistemas de dominio.
+     * Útil al cerrar sesión o destruir componentes de UI.
+     */
+    public void removerObservador(observador.Observador observador) {
+        if (observador != null) {
+            this.sistemaPropietariosYAdmin.eliminarObservador(observador);
+            this.sistemaTransitos.eliminarObservador(observador);
+            this.sistemaBonificaciones.eliminarObservador(observador);
+        }
     }
 
     List<Administrador> obtenerAdministradoresInternos() {

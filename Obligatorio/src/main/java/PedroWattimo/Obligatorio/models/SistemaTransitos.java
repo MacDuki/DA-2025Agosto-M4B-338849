@@ -10,14 +10,24 @@ import java.util.stream.Collectors;
 import PedroWattimo.Obligatorio.dtos.EmularTransitoResultado;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
+import observador.Observable;
 
 /**
  * SistemaTransitos: se mantiene con responsabilidades de orquestación del CU
  * Emular Tránsito, sin absorber cálculos que pertenecen a entidades. Se ajusta
  * para utilizar el nuevo SistemaPropietarios (que maneja notificaciones) y
  * SistemaPuestosYTarifas.
+ * Observable: notifica cuando se registran nuevos tránsitos
  */
-public class SistemaTransitos {
+public class SistemaTransitos extends Observable {
+
+    /**
+     * Enum de eventos que pueden ocurrir en el sistema de tránsitos.
+     */
+    public enum Eventos {
+        TRANSITO_REGISTRADO
+    }
+
     private final List<Transito> transitos = new ArrayList<>();
 
     private SistemaPropietariosYAdmin sistemaPropietariosYAdmin;
@@ -102,7 +112,7 @@ public class SistemaTransitos {
 
         double montoAPagar = montoBase - montoBonif;
         if (prop.saldoInsuficientePara(montoAPagar)) {
-            throw new OblException(String.format("Saldo insuficiente: $%.2f", prop.getSaldoActual()));
+            throw new OblException(String.format("Saldo insuficiente: $%d", prop.getSaldoActual()));
         }
         prop.debitar(montoAPagar);
 
@@ -118,6 +128,9 @@ public class SistemaTransitos {
                 sistemaPropietariosYAdmin.registrarNotificacion(prop, mensajeSaldo, fechaHora);
             }
         }
+
+        // Notifica a las vistas que se registró un nuevo tránsito para este propietario
+        avisar(Eventos.TRANSITO_REGISTRADO);
 
         return new EmularTransitoResultado(
                 prop.getNombreCompleto(),

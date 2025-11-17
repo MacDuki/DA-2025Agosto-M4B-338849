@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/js/utilesVista.js"></script>
     <script src="/js/vistaWeb.js"></script>
+    <script src="/js/sse.js"></script>
     <style>
       /* Estilos para las tablas generadas por utilesVista.js */
       table {
@@ -130,6 +131,9 @@
     </main>
 
     <script>
+      // Configurar URL para SSE antes de cargar vistaWeb.js
+      var urlRegistroSSE = "/sse/conectar";
+
       let currentOwner = null;
 
       function loadOwner() {
@@ -305,16 +309,11 @@
         renderDashboard(dto, currentOwner);
       }
 
-      // Función mostrar_ para recibir la versión desde el servidor
-      function mostrar_version(versionData) {
-        const remoteV = Number(versionData?.version ?? 0);
-        const localV = Number(
-          sessionStorage.getItem(`dash:${currentOwner.cedula}:version`) || 0
-        );
-        if (remoteV !== localV) {
-          // La versión cambió, recargar dashboard
-          submit("/propietarios/dashboard", "cedula=" + currentOwner.cedula);
-        }
+      // Función para manejar actualizaciones del dashboard vía SSE
+      function mostrar_dashboard_actualizado(notificacion) {
+        console.log("Actualización SSE recibida:", notificacion);
+        // Recargar dashboard cuando llega notificación SSE
+        submit("/propietarios/dashboard", "");
       }
 
       // Función mostrar_ para cuando se borran notificaciones
@@ -364,15 +363,6 @@
         submit("/propietarios/dashboard", "");
       }
 
-      function startPolling(owner) {
-        function tick() {
-          // Consultar versión para ver si hay cambios (sin enviar cédula, se obtiene de la sesión)
-          submit("/propietarios/dashboard/version", "");
-          setTimeout(tick, 5000); // 5s
-        }
-        tick();
-      }
-
       document.getElementById("logoutBtn").addEventListener("click", () => {
         sessionStorage.removeItem("owner");
         // Llamar al endpoint de logout para limpiar la sesión del servidor
@@ -386,7 +376,6 @@
       currentOwner = loadOwner();
       if (currentOwner) {
         loadDashboard(currentOwner, { useCacheFirst: true });
-        startPolling(currentOwner);
 
         document
           .getElementById("btnBorrarNotifs")
