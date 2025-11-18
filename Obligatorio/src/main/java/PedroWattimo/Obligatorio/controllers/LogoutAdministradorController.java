@@ -1,8 +1,6 @@
 package PedroWattimo.Obligatorio.controllers;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import PedroWattimo.Obligatorio.Respuesta;
+import PedroWattimo.Obligatorio.dtos.LogoutResultadoDto;
 import PedroWattimo.Obligatorio.models.Fachada;
 import PedroWattimo.Obligatorio.models.SesionAdmin;
 import jakarta.servlet.http.HttpSession;
@@ -43,8 +42,7 @@ public class LogoutAdministradorController {
 
         }
 
-        Map<String, String> resultado = new HashMap<>();
-        resultado.put("mensaje", "Sesión cerrada exitosamente");
+        LogoutResultadoDto resultado = new LogoutResultadoDto("Sesión cerrada exitosamente");
         Respuesta respuesta = new Respuesta("logoutExitoso", resultado);
         return ResponseEntity.ok(List.of(respuesta));
     }

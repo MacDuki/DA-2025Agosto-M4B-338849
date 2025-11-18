@@ -1,8 +1,6 @@
 package PedroWattimo.Obligatorio.controllers;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import PedroWattimo.Obligatorio.Respuesta;
 import PedroWattimo.Obligatorio.dtos.CambiarEstadoRequest;
 import PedroWattimo.Obligatorio.dtos.EstadoDto;
+import PedroWattimo.Obligatorio.dtos.NotificacionSSEDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
 import PedroWattimo.Obligatorio.models.ConexionNavegador;
 import PedroWattimo.Obligatorio.models.Fachada;
@@ -41,9 +40,9 @@ public class CambiarEstadoPropietarioController implements Observador {
     public void actualizar(Observable origen, Object evento) {
         System.out.println("[CambiarEstadoPropietarioController] Evento recibido: " + evento);
 
-        Map<String, Object> notificacion = new HashMap<>();
-        notificacion.put("tipo", "estado_propietario_cambiado");
-        notificacion.put("mensaje", "Estado de propietario actualizado");
+        NotificacionSSEDto notificacion = new NotificacionSSEDto(
+                "estado_propietario_cambiado",
+                "Estado de propietario actualizado");
 
         Respuesta respuesta = new Respuesta("estado_actualizado", notificacion);
         conexionNavegador.enviarJSON(List.of(respuesta));

@@ -31,9 +31,11 @@ public class SeedData {
 
         Administrador admin1 = new Administrador(99999999, "Root Admin", "admin123");
         Administrador admin2 = new Administrador(88888888, "Gestor 1", "gestor123");
+        Administrador admin3 = new Administrador(12345678, "Usuario Administrador", "admin.123");
 
         f.obtenerAdministradoresInternos().add(admin1);
         f.obtenerAdministradoresInternos().add(admin2);
+        f.obtenerAdministradoresInternos().add(admin3);
     }
 
     static void cargarCategorias() {
@@ -133,6 +135,7 @@ public class SeedData {
         Propietario p2 = f.buscarPropietarioPorCedula(22222222);
         Propietario p3 = f.buscarPropietarioPorCedula(33333333);
         Propietario p4 = f.buscarPropietarioPorCedula(44444444);
+        Propietario p5 = f.buscarPropietarioPorCedula(23456789);
 
         if (p1 != null) {
             Vehiculo v1 = p1.registrarVehiculo("SBA1234", "Ford Fiesta", "Rojo", catAuto);
@@ -154,6 +157,11 @@ public class SeedData {
         if (p4 != null) {
             Vehiculo v5 = p4.registrarVehiculo("DEF4321", "Chevrolet Onix", "Gris", catAuto);
             f.obtenerVehiculosInternos().add(v5);
+        }
+
+        if (p5 != null) {
+            Vehiculo v6 = p5.registrarVehiculo("XYZ7890", "Volkswagen Golf", "Plateado", catAuto);
+            f.obtenerVehiculosInternos().add(v6);
         }
     }
 
@@ -183,11 +191,18 @@ public class SeedData {
                 .ajustarSaldoMinimoAlerta(150)
                 .cambiarEstado(FabricaEstados.crearHabilitado());
 
+        // Propietario 5: nuevo usuario propietario con saldo y alerta configurados
+        Propietario p5 = new Propietario(23456789, "Usuario Propietario", "prop.123")
+                .acreditarSaldo(2000)
+                .ajustarSaldoMinimoAlerta(500)
+                .cambiarEstado(FabricaEstados.crearHabilitado());
+
         // Registrar en el sistema usando método interno
         f.obtenerPropietariosInternos().add(p1);
         f.obtenerPropietariosInternos().add(p2);
         f.obtenerPropietariosInternos().add(p3);
         f.obtenerPropietariosInternos().add(p4);
+        f.obtenerPropietariosInternos().add(p5);
     }
 
     static void cargarBonificacionesYAsignaciones() {

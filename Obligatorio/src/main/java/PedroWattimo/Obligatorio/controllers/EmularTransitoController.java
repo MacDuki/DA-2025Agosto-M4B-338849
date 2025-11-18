@@ -3,9 +3,7 @@ package PedroWattimo.Obligatorio.controllers;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import PedroWattimo.Obligatorio.Respuesta;
 import PedroWattimo.Obligatorio.dtos.EmularTransitoRequest;
 import PedroWattimo.Obligatorio.dtos.EmularTransitoResultado;
+import PedroWattimo.Obligatorio.dtos.NotificacionSSEDto;
 import PedroWattimo.Obligatorio.dtos.PuestoDto;
 import PedroWattimo.Obligatorio.dtos.TarifaDto;
 import PedroWattimo.Obligatorio.models.ConexionNavegador;
@@ -51,9 +50,9 @@ public class EmularTransitoController implements Observador {
 
         System.out.println("[EmularTransitoController] Evento recibido: " + evento);
 
-        Map<String, Object> notificacion = new HashMap<>();
-        notificacion.put("tipo", "evento_sistema");
-        notificacion.put("mensaje", "Cambio en el sistema detectado");
+        NotificacionSSEDto notificacion = new NotificacionSSEDto(
+                "evento_sistema",
+                "Cambio en el sistema detectado");
 
         Respuesta respuesta = new Respuesta("sistema_actualizado", notificacion);
         conexionNavegador.enviarJSON(List.of(respuesta));

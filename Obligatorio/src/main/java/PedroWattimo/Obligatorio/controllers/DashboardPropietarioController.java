@@ -1,8 +1,6 @@
 package PedroWattimo.Obligatorio.controllers;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import PedroWattimo.Obligatorio.Respuesta;
+import PedroWattimo.Obligatorio.dtos.NotificacionSSEDto;
+import PedroWattimo.Obligatorio.dtos.NotificacionesBorradasDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioAutenticadoDTO;
 import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
 import PedroWattimo.Obligatorio.models.ConexionNavegador;
@@ -41,9 +41,9 @@ public class DashboardPropietarioController implements Observador {
     @Override
     public void actualizar(Observable origen, Object evento) {
 
-        Map<String, Object> notificacion = new HashMap<>();
-        notificacion.put("tipo", "dashboard_actualizado");
-        notificacion.put("mensaje", "Hay cambios en tu dashboard");
+        NotificacionSSEDto notificacion = new NotificacionSSEDto(
+                "dashboard_actualizado",
+                "Hay cambios en tu dashboard");
 
         Respuesta respuesta = new Respuesta("dashboard_actualizado", notificacion);
         conexionNavegador.enviarJSON(List.of(respuesta));
@@ -81,17 +81,17 @@ public class DashboardPropietarioController implements Observador {
 
         int borradas = fachada.borrarNotificacionesDePropietario(propietario.getCedula());
 
-        Map<String, Object> resultado = new HashMap<>();
-        resultado.put("borradas", borradas);
-        resultado.put("mensaje", borradas == 0
-                ? "No hay notificaciones para borrar"
-                : "Se borraron " + borradas + " notificaciones");
+        NotificacionesBorradasDto resultado = new NotificacionesBorradasDto(
+                borradas,
+                borradas == 0
+                        ? "No hay notificaciones para borrar"
+                        : "Se borraron " + borradas + " notificaciones");
 
         Respuesta respuesta = new Respuesta("notificacionesBorradas", resultado);
 
-        Map<String, Object> notificacion = new HashMap<>();
-        notificacion.put("tipo", "notificaciones_borradas");
-        notificacion.put("mensaje", "Notificaciones borradas");
+        NotificacionSSEDto notificacion = new NotificacionSSEDto(
+                "notificaciones_borradas",
+                "Notificaciones borradas");
         Respuesta notifSSE = new Respuesta("dashboard_actualizado", notificacion);
         conexionNavegador.enviarJSON(List.of(notifSSE));
 

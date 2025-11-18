@@ -1,8 +1,6 @@
 package PedroWattimo.Obligatorio.controllers;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import PedroWattimo.Obligatorio.Respuesta;
 import PedroWattimo.Obligatorio.dtos.AsignarBonificacionRequest;
 import PedroWattimo.Obligatorio.dtos.BonificacionDto;
+import PedroWattimo.Obligatorio.dtos.NotificacionSSEDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioConBonificacionesDto;
 import PedroWattimo.Obligatorio.dtos.PuestoDto;
 import PedroWattimo.Obligatorio.models.ConexionNavegador;
@@ -42,9 +41,9 @@ public class AsignarBonificacionesController implements Observador {
     public void actualizar(Observable origen, Object evento) {
         System.out.println("[AsignarBonificacionesController] Evento recibido: " + evento);
 
-        Map<String, Object> notificacion = new HashMap<>();
-        notificacion.put("tipo", "evento_sistema");
-        notificacion.put("mensaje", "Cambio en el sistema detectado");
+        NotificacionSSEDto notificacion = new NotificacionSSEDto(
+                "evento_sistema",
+                "Cambio en el sistema detectado");
 
         Respuesta respuesta = new Respuesta("sistema_actualizado", notificacion);
         conexionNavegador.enviarJSON(List.of(respuesta));
