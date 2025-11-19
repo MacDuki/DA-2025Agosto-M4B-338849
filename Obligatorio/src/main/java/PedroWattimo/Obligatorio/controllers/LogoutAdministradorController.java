@@ -2,7 +2,6 @@ package PedroWattimo.Obligatorio.controllers;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +19,7 @@ public class LogoutAdministradorController {
     private final Fachada fachada = Fachada.getInstancia();
 
     @PostMapping
-    public ResponseEntity<List<Respuesta>> logoutAdmin(HttpSession session) {
+    public List<Respuesta> logoutAdmin(HttpSession session) {
 
         SesionAdmin sesionDominio = (SesionAdmin) session.getAttribute("sesionAdmin");
 
@@ -36,6 +35,6 @@ public class LogoutAdministradorController {
 
         LogoutResultadoDto resultado = new LogoutResultadoDto("Sesión cerrada exitosamente");
         Respuesta respuesta = new Respuesta("logoutExitoso", resultado);
-        return ResponseEntity.ok(List.of(respuesta));
+        return List.of(respuesta);
     }
 }

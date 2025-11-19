@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,81 +54,52 @@ public class AsignarBonificacionesController implements Observador {
     }
 
     @GetMapping("/bonificaciones")
-    public ResponseEntity<List<BonificacionDto>> listarBonificaciones() {
-        try {
-            // Convertir objetos de dominio a DTOs
-            List<Bonificacion> bonificaciones = fachada.listarBonificaciones();
-            List<BonificacionDto> dtos = new ArrayList<>();
-            for (Bonificacion b : bonificaciones) {
-                dtos.add(new BonificacionDto(b.getNombre(), b.getPorcentaje()));
-            }
-            return ResponseEntity.ok(dtos);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    public List<BonificacionDto> listarBonificaciones() {
+        List<Bonificacion> bonificaciones = fachada.listarBonificaciones();
+        List<BonificacionDto> dtos = new ArrayList<>();
+        for (Bonificacion b : bonificaciones) {
+            dtos.add(new BonificacionDto(b.getNombre(), b.getPorcentaje()));
         }
+        return dtos;
     }
 
     @GetMapping("/puestos")
-    public ResponseEntity<List<PuestoDto>> listarPuestos() {
-        try {
-
-            List<Puesto> puestos = fachada.listarPuestos();
-            List<PuestoDto> dtos = new ArrayList<>();
-            for (int i = 0; i < puestos.size(); i++) {
-                Puesto p = puestos.get(i);
-                dtos.add(new PuestoDto((long) i, p.getNombre(), p.getDireccion()));
-            }
-            return ResponseEntity.ok(dtos);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    public List<PuestoDto> listarPuestos() {
+        List<Puesto> puestos = fachada.listarPuestos();
+        List<PuestoDto> dtos = new ArrayList<>();
+        for (int i = 0; i < puestos.size(); i++) {
+            Puesto p = puestos.get(i);
+            dtos.add(new PuestoDto((long) i, p.getNombre(), p.getDireccion()));
         }
+        return dtos;
     }
 
     @GetMapping("/propietario")
-    public ResponseEntity<Respuesta> buscarPropietario(@RequestParam String cedula) {
-        try {
+    public Respuesta buscarPropietario(@RequestParam String cedula) throws OblException {
+        Propietario propietario = fachada.buscarPropietarioPorCedula(cedula);
 
-            Propietario propietario = fachada.buscarPropietarioPorCedula(cedula);
-
-            List<BonificacionAsignadaDto> bonificaciones = new ArrayList<>();
-            for (AsignacionBonificacion ab : propietario.getAsignaciones()) {
-                String nombreBonif = ab.getBonificacion() != null ? ab.getBonificacion().getNombre() : null;
-                String nombrePuesto = ab.getPuesto() != null ? ab.getPuesto().getNombre() : null;
-                bonificaciones.add(new BonificacionAsignadaDto(nombreBonif, nombrePuesto, ab.getFechaHora()));
-            }
-
-            PropietarioConBonificacionesDto dto = new PropietarioConBonificacionesDto(
-                    propietario.getNombreCompleto(),
-                    propietario.getEstadoActual() != null ? propietario.getEstadoActual().nombre() : "HABILITADO",
-                    bonificaciones);
-
-            return ResponseEntity.ok(new Respuesta("ok", dto));
-
-        } catch (OblException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new Respuesta("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new Respuesta("error", "Error inesperado: " + e.getMessage()));
+        List<BonificacionAsignadaDto> bonificaciones = new ArrayList<>();
+        for (AsignacionBonificacion ab : propietario.getAsignaciones()) {
+            String nombreBonif = ab.getBonificacion() != null ? ab.getBonificacion().getNombre() : null;
+            String nombrePuesto = ab.getPuesto() != null ? ab.getPuesto().getNombre() : null;
+            bonificaciones.add(new BonificacionAsignadaDto(nombreBonif, nombrePuesto, ab.getFechaHora()));
         }
+
+        PropietarioConBonificacionesDto dto = new PropietarioConBonificacionesDto(
+                propietario.getNombreCompleto(),
+                propietario.getEstadoActual() != null ? propietario.getEstadoActual().nombre() : "HABILITADO",
+                bonificaciones);
+
+        return new Respuesta("ok", dto);
     }
 
     @PostMapping
-    public ResponseEntity<Respuesta> asignarBonificacion(@RequestBody AsignarBonificacionRequest request) {
-        try {
-            fachada.asignarBonificacion(
-                    request.getCedula(),
-                    request.getNombreBonificacion(),
-                    request.getNombrePuesto());
+    public Respuesta asignarBonificacion(@RequestBody AsignarBonificacionRequest request) throws OblException {
+        fachada.asignarBonificacion(
+                request.getCedula(),
+                request.getNombreBonificacion(),
+                request.getNombrePuesto());
 
-            return ResponseEntity.ok(new Respuesta("ok", "Bonificación asignada exitosamente"));
-
-        } catch (OblException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new Respuesta("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new Respuesta("error", "Error inesperado: " + e.getMessage()));
-        }
+        return new Respuesta("ok", "Bonificación asignada exitosamente");
     }
 }

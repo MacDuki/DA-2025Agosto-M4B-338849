@@ -2,7 +2,6 @@ package PedroWattimo.Obligatorio.controllers;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +21,7 @@ public class LoginAdminController {
     private final Fachada fachada = Fachada.getInstancia();
 
     @PostMapping
-    public ResponseEntity<List<Respuesta>> loginAdmin(
+    public List<Respuesta> loginAdmin(
             @RequestParam int cedula,
             @RequestParam String password,
             HttpSession session) throws OblException {
@@ -37,6 +36,6 @@ public class LoginAdminController {
         session.setAttribute("sesionAdmin", sesionDominio);
 
         Respuesta respuesta = new Respuesta("adminLoginExitoso", dto);
-        return ResponseEntity.ok(List.of(respuesta));
+        return List.of(respuesta);
     }
 }

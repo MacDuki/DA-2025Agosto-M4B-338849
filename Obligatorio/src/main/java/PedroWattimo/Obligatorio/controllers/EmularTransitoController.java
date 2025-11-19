@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,84 +58,60 @@ public class EmularTransitoController implements Observador {
     }
 
     @GetMapping("/puestos")
-    public ResponseEntity<List<PuestoDto>> listarPuestos() {
-        try {
-            // Convertir objetos de dominio a DTOs
-            List<Puesto> puestos = fachada.listarPuestos();
-            List<PuestoDto> dtos = new ArrayList<>();
-            for (int i = 0; i < puestos.size(); i++) {
-                Puesto p = puestos.get(i);
-                dtos.add(new PuestoDto((long) i, p.getNombre(), p.getDireccion()));
-            }
-            return ResponseEntity.ok(dtos);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    public List<PuestoDto> listarPuestos() {
+        List<Puesto> puestos = fachada.listarPuestos();
+        List<PuestoDto> dtos = new ArrayList<>();
+        for (int i = 0; i < puestos.size(); i++) {
+            Puesto p = puestos.get(i);
+            dtos.add(new PuestoDto((long) i, p.getNombre(), p.getDireccion()));
         }
+        return dtos;
     }
 
     @GetMapping("/puestos/{id}/tarifas")
-    public ResponseEntity<List<TarifaDto>> obtenerTarifasPuesto(@PathVariable Long id) {
-        try {
-            // Convertir objetos de dominio a DTOs
-            Puesto puesto = fachada.buscarPuestoPorId(id);
-            List<Tarifa> tarifas = puesto.getTablaTarifas();
-            List<TarifaDto> dtos = new ArrayList<>();
+    public List<TarifaDto> obtenerTarifasPuesto(@PathVariable Long id) throws OblException {
+        Puesto puesto = fachada.buscarPuestoPorId(id);
+        List<Tarifa> tarifas = puesto.getTablaTarifas();
+        List<TarifaDto> dtos = new ArrayList<>();
 
-            for (Tarifa t : tarifas) {
-                String categoria = t.getCategoria() != null ? t.getCategoria().getNombre() : "Desconocida";
-                dtos.add(new TarifaDto(categoria, t.getMonto()));
-            }
-
-            return ResponseEntity.ok(dtos);
-        } catch (OblException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        for (Tarifa t : tarifas) {
+            String categoria = t.getCategoria() != null ? t.getCategoria().getNombre() : "Desconocida";
+            dtos.add(new TarifaDto(categoria, t.getMonto()));
         }
+
+        return dtos;
     }
 
     @PostMapping
-    public ResponseEntity<Respuesta> emularTransito(@RequestBody EmularTransitoRequest request) {
-        try {
-            LocalDateTime fechaHora = LocalDateTime.parse(request.getFechaHora(), DateTimeFormatter.ISO_DATE_TIME);
+    public Respuesta emularTransito(@RequestBody EmularTransitoRequest request)
+            throws OblException, TarifaNoDefinidaException {
+        LocalDateTime fechaHora = LocalDateTime.parse(request.getFechaHora(), DateTimeFormatter.ISO_DATE_TIME);
 
-            Transito transito = fachada.emularTransito(
-                    request.getPuestoId(),
-                    request.getMatricula(),
-                    fechaHora);
+        Transito transito = fachada.emularTransito(
+                request.getPuestoId(),
+                request.getMatricula(),
+                fechaHora);
 
-            // Convertir Transito a EmularTransitoResultado DTO
-            Propietario prop = transito.vehiculo().getPropietario();
-            String nombrePropietario = prop.getNombreCompleto();
-            String estadoPropietario = prop.getEstadoActual() != null ? prop.getEstadoActual().nombre() : "HABILITADO";
-            String categoria = transito.categoriaVehiculo();
-            String nombreBonificacion = transito.nombreBonificacion();
-            double montoBase = transito.costoConTarifa();
-            double montoBonificacion = transito.montoBonificacion();
-            double montoAPagar = transito.totalPagado();
-            int saldoActual = prop.getSaldoActual();
+        Propietario prop = transito.vehiculo().getPropietario();
+        String nombrePropietario = prop.getNombreCompleto();
+        String estadoPropietario = prop.getEstadoActual() != null ? prop.getEstadoActual().nombre() : "HABILITADO";
+        String categoria = transito.categoriaVehiculo();
+        String nombreBonificacion = transito.nombreBonificacion();
+        double montoBase = transito.costoConTarifa();
+        double montoBonificacion = transito.montoBonificacion();
+        double montoAPagar = transito.totalPagado();
+        int saldoActual = prop.getSaldoActual();
 
-            EmularTransitoResultado resultado = new EmularTransitoResultado(
-                    nombrePropietario,
-                    estadoPropietario,
-                    categoria,
-                    nombreBonificacion,
-                    montoBase,
-                    montoBonificacion,
-                    montoAPagar,
-                    saldoActual);
+        EmularTransitoResultado resultado = new EmularTransitoResultado(
+                nombrePropietario,
+                estadoPropietario,
+                categoria,
+                nombreBonificacion,
+                montoBase,
+                montoBonificacion,
+                montoAPagar,
+                saldoActual);
 
-            return ResponseEntity.ok(new Respuesta("ok", resultado));
-
-        } catch (TarifaNoDefinidaException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new Respuesta("error", e.getMessage()));
-        } catch (OblException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new Respuesta("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new Respuesta("error", "Error inesperado: " + e.getMessage()));
-        }
+        return new Respuesta("ok", resultado);
     }
 }

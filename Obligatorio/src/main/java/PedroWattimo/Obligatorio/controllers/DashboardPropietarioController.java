@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,7 +56,7 @@ public class DashboardPropietarioController implements Observador {
     }
 
     @PostMapping
-    public ResponseEntity<List<Respuesta>> obtenerDashboard(HttpSession session) throws OblException {
+    public List<Respuesta> obtenerDashboard(HttpSession session) throws OblException {
         PropietarioAutenticadoDTO propietario = (PropietarioAutenticadoDTO) session.getAttribute("propietario");
 
         if (propietario == null) {
@@ -115,11 +114,11 @@ public class DashboardPropietarioController implements Observador {
         dto.setVersion(fachada.versionDashboardDePropietario(propietario.getCedula()));
 
         Respuesta respuesta = new Respuesta("dashboard", dto);
-        return ResponseEntity.ok(List.of(respuesta));
+        return List.of(respuesta);
     }
 
     @PostMapping("/notificaciones/borrar")
-    public ResponseEntity<List<Respuesta>> borrarNotificaciones(HttpSession session) throws OblException {
+    public List<Respuesta> borrarNotificaciones(HttpSession session) throws OblException {
         PropietarioAutenticadoDTO propietario = (PropietarioAutenticadoDTO) session.getAttribute("propietario");
 
         if (propietario == null) {
@@ -142,6 +141,6 @@ public class DashboardPropietarioController implements Observador {
         Respuesta notifSSE = new Respuesta("dashboard_actualizado", notificacion);
         conexionNavegador.enviarJSON(List.of(notifSSE));
 
-        return ResponseEntity.ok(List.of(respuesta));
+        return List.of(respuesta);
     }
 }
