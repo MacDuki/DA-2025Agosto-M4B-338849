@@ -52,11 +52,10 @@ public class SistemaVehiculosYCategorias {
      * Valida que no exista una categoría con el mismo nombre.
      */
     public Categoria agregarCategoria(String nombre) throws OblException {
-        if (nombre == null || nombre.isBlank()) {
-            throw new OblException("El nombre de la categoría no puede estar vacío");
-        }
+        // Validar datos de creación (delegado al experto)
+        Categoria.validarDatosCreacion(nombre);
 
-        // Validar que no exista
+        // Validar unicidad (responsabilidad del sistema)
         Categoria existente = buscarCategoriaPorNombre(nombre);
         if (existente != null) {
             throw new OblException("Ya existe una categoría con el nombre: " + nombre);
@@ -73,18 +72,10 @@ public class SistemaVehiculosYCategorias {
      */
     public Vehiculo registrarVehiculo(int cedulaPropietario, String matricula, String modelo,
             String color, String nombreCategoria) throws OblException {
-        // Validaciones
-        if (matricula == null || matricula.isBlank()) {
-            throw new OblException("La matrícula no puede estar vacía");
-        }
-        if (modelo == null || modelo.isBlank()) {
-            throw new OblException("El modelo no puede estar vacío");
-        }
-        if (nombreCategoria == null || nombreCategoria.isBlank()) {
-            throw new OblException("La categoría no puede estar vacía");
-        }
+        // Validar datos de creación (delegado al experto)
+        Vehiculo.validarDatosCreacion(matricula, modelo, nombreCategoria);
 
-        // Validar que no exista el vehículo
+        // Validar unicidad (responsabilidad del sistema)
         Vehiculo existente = buscarVehiculoPorMatricula(matricula);
         if (existente != null) {
             throw new OblException("Ya existe un vehículo con la matrícula: " + matricula);

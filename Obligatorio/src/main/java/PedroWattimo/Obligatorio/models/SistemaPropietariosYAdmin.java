@@ -190,16 +190,10 @@ public class SistemaPropietariosYAdmin {
     }
 
     public Administrador agregarAdministrador(int cedula, String nombreCompleto, String password) throws OblException {
-        if (cedula <= 0) {
-            throw new OblException("La cédula debe ser mayor a 0");
-        }
-        if (nombreCompleto == null || nombreCompleto.isBlank()) {
-            throw new OblException("El nombre completo no puede estar vacío");
-        }
-        if (password == null || password.isBlank()) {
-            throw new OblException("La contraseña no puede estar vacía");
-        }
+        // Validar datos de creación (delegado al experto)
+        Administrador.validarDatosCreacion(cedula, nombreCompleto, password);
 
+        // Validar unicidad (responsabilidad del sistema)
         for (Administrador admin : administradores) {
             if (admin.getCedula() == cedula) {
                 throw new OblException("Ya existe un administrador con la cédula: " + cedula);
@@ -212,16 +206,10 @@ public class SistemaPropietariosYAdmin {
     }
 
     public Propietario registrarPropietario(int cedula, String nombreCompleto, String password) throws OblException {
-        if (cedula <= 0) {
-            throw new OblException("La cédula debe ser mayor a 0");
-        }
-        if (nombreCompleto == null || nombreCompleto.isBlank()) {
-            throw new OblException("El nombre completo no puede estar vacío");
-        }
-        if (password == null || password.isBlank()) {
-            throw new OblException("La contraseña no puede estar vacía");
-        }
+        // Validar datos de creación (delegado al experto)
+        Propietario.validarDatosCreacion(cedula, nombreCompleto, password);
 
+        // Validar unicidad (responsabilidad del sistema)
         Propietario existente = buscarPorCedula(cedula);
         if (existente != null) {
             throw new OblException("Ya existe un propietario con la cédula: " + cedula);

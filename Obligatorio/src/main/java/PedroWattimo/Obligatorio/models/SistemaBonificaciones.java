@@ -26,11 +26,6 @@ public class SistemaBonificaciones {
         return List.copyOf(asignaciones);
     }
 
-    /**
-     * Busca la bonificación vigente asignada a un propietario para un puesto
-     * específico.
-     * Delega en el Propietario la búsqueda de su asignación.
-     */
     public Optional<Bonificacion> bonificacionVigente(Propietario p, Puesto puesto) {
         if (p == null || puesto == null)
             return Optional.empty();
@@ -39,25 +34,17 @@ public class SistemaBonificaciones {
         return asignacion.map(AsignacionBonificacion::bonificacion);
     }
 
-    /**
-     * Lista todas las bonificaciones definidas en el sistema.
-     */
     public List<Bonificacion> listarBonificaciones() {
         return List.copyOf(bonificaciones);
     }
 
-    /**
-     * Busca una bonificación por nombre usando la fábrica.
-     */
     public Bonificacion buscarPorNombre(String nombre) throws OblException {
         if (nombre == null || nombre.isBlank()) {
             throw new OblException("El nombre de la bonificación no puede estar vacío");
         }
 
-        // Usar la fábrica para crear/obtener la bonificación
         Bonificacion bonificacion = FabricaBonificaciones.crear(nombre);
 
-        // Verificar que existe en el sistema
         boolean existe = bonificaciones.stream()
                 .anyMatch(b -> nombre.equalsIgnoreCase(b.getNombre()));
 
@@ -74,26 +61,13 @@ public class SistemaBonificaciones {
      */
     public void asignarBonificacionAPropietario(Propietario propietario, Bonificacion bonificacion, Puesto puesto)
             throws OblException {
-        // Validaciones obligatorias
-        if (bonificacion == null) {
-            throw new OblException("Debe especificar una bonificación");
-        }
-        if (puesto == null) {
-            throw new OblException("Debe especificar un puesto");
-        }
+        // Validar que propietario no sea nulo
         if (propietario == null) {
             throw new OblException("no existe el propietario");
         }
 
-        // Validar estado del propietario
-        if (propietario.getEstadoActual() != null && !propietario.getEstadoActual().permiteIngresar()) {
-            throw new OblException("El propietario esta deshabilitado. No se pueden asignar bonificaciones");
-        }
-
-        // Validar que no tenga bonificación ya asignada para ese puesto
-        if (propietario.tieneBonificacionPara(puesto)) {
-            throw new OblException("Ya tiene una bonificación asignada para ese puesto");
-        }
+        // Validar reglas de asignación (delegado al experto)
+        propietario.validarAsignacionBonificacion(bonificacion, puesto);
 
         // Delegar al propietario la asignación (Patrón Experto)
         propietario.asignarBonificacion(bonificacion, puesto);

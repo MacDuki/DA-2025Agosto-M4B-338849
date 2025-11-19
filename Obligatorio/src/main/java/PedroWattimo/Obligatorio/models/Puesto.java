@@ -14,6 +14,22 @@ public class Puesto {
         this.tablaTarifas = new ArrayList<>();
     }
 
+    /**
+     * Valida los datos para crear un puesto.
+     * Patrón Experto: el Puesto conoce sus reglas de validación.
+     */
+    public static void validarDatosCreacion(String nombre, String direccion)
+            throws PedroWattimo.Obligatorio.models.exceptions.OblException {
+        if (nombre == null || nombre.isBlank()) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException(
+                    "El nombre del puesto no puede estar vacío");
+        }
+        if (direccion == null || direccion.isBlank()) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException(
+                    "La dirección del puesto no puede estar vacía");
+        }
+    }
+
     public Puesto(String nombre, String direccion) {
         this();
         this.nombre = nombre;
@@ -36,6 +52,37 @@ public class Puesto {
     // Método interno para agregar tarifas (uso package-private para SeedData)
     List<Tarifa> obtenerTablaTarifasInterna() {
         return tablaTarifas;
+    }
+
+    /**
+     * Verifica si ya existe una tarifa para una categoría específica.
+     * Patrón Experto: el Puesto conoce sus tarifas.
+     */
+    public boolean tieneTarifaPara(Categoria categoria) {
+        if (categoria == null || tablaTarifas == null) {
+            return false;
+        }
+        return tablaTarifas.stream()
+                .anyMatch(t -> t.getCategoria() != null && t.getCategoria().equals(categoria));
+    }
+
+    /**
+     * Agrega una tarifa al puesto.
+     * Patrón Experto: el Puesto gestiona sus propias tarifas.
+     */
+    public void agregarTarifa(Tarifa tarifa) throws PedroWattimo.Obligatorio.models.exceptions.OblException {
+        if (tarifa == null) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException("La tarifa no puede ser nula");
+        }
+        if (tarifa.getCategoria() == null) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException("La tarifa debe tener una categoría");
+        }
+        if (tieneTarifaPara(tarifa.getCategoria())) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException(
+                    "Ya existe una tarifa para la categoría " + tarifa.getCategoria().getNombre() + " en el puesto "
+                            + nombre);
+        }
+        tablaTarifas.add(tarifa);
     }
 
     /**

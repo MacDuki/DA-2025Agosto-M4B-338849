@@ -14,6 +14,24 @@ public class Propietario extends Usuario {
     private List<AsignacionBonificacion> asignaciones;
     private List<Notificacion> notificaciones;
 
+    /**
+     * Valida los datos para crear un propietario.
+     * Patrón Experto: el Propietario conoce sus reglas de validación.
+     */
+    public static void validarDatosCreacion(int cedula, String nombreCompleto, String password)
+            throws PedroWattimo.Obligatorio.models.exceptions.OblException {
+        if (cedula <= 0) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException("La cédula debe ser mayor a 0");
+        }
+        if (nombreCompleto == null || nombreCompleto.isBlank()) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException(
+                    "El nombre completo no puede estar vacío");
+        }
+        if (password == null || password.isBlank()) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException("La contraseña no puede estar vacía");
+        }
+    }
+
     public Propietario(int cedula, String nombreCompleto, String contraseña) {
         super(cedula, nombreCompleto, contraseña);
         this.vehiculos = new ArrayList<>();
@@ -176,6 +194,28 @@ public class Propietario extends Usuario {
             return false;
         return this.asignaciones.stream()
                 .anyMatch(ab -> ab.activaPara(puesto, this));
+    }
+
+    /**
+     * Valida si se puede asignar una bonificación al propietario.
+     * Patrón Experto: el Propietario conoce sus propias restricciones.
+     */
+    public void validarAsignacionBonificacion(Bonificacion bonificacion, Puesto puesto)
+            throws PedroWattimo.Obligatorio.models.exceptions.OblException {
+        if (bonificacion == null) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException("Debe especificar una bonificación");
+        }
+        if (puesto == null) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException("Debe especificar un puesto");
+        }
+        if (this.estadoActual != null && !this.estadoActual.permiteIngresar()) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException(
+                    "El propietario esta deshabilitado. No se pueden asignar bonificaciones");
+        }
+        if (this.tieneBonificacionPara(puesto)) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException(
+                    "Ya tiene una bonificación asignada para ese puesto");
+        }
     }
 
     public void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) {

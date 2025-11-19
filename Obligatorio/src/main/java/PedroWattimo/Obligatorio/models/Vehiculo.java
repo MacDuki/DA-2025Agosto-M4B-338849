@@ -10,6 +10,23 @@ public class Vehiculo {
     public Vehiculo() {
     }
 
+    /**
+     * Valida los datos para crear un vehículo.
+     * Patrón Experto: el Vehículo conoce sus reglas de validación.
+     */
+    public static void validarDatosCreacion(String matricula, String modelo, String nombreCategoria)
+            throws PedroWattimo.Obligatorio.models.exceptions.OblException {
+        if (matricula == null || matricula.isBlank()) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException("La matrícula no puede estar vacía");
+        }
+        if (modelo == null || modelo.isBlank()) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException("El modelo no puede estar vacío");
+        }
+        if (nombreCategoria == null || nombreCategoria.isBlank()) {
+            throw new PedroWattimo.Obligatorio.models.exceptions.OblException("La categoría no puede estar vacía");
+        }
+    }
+
     public Vehiculo(String matricula, String modelo, String color, Categoria categoria, Propietario propietario) {
         this.matricula = matricula;
         this.modelo = modelo;
