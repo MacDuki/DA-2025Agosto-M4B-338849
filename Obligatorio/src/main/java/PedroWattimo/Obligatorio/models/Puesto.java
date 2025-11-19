@@ -28,8 +28,6 @@ public class Puesto {
         return direccion;
     }
 
-    // Encapsulamiento: retornar copias inmutables para prevenir modificaciones
-    // externas
     public List<Tarifa> getTablaTarifas() {
         return tablaTarifas == null ? List.of() : List.copyOf(tablaTarifas);
     }
@@ -41,8 +39,7 @@ public class Puesto {
     }
 
     /**
-     * Patrón Experto: el Puesto sabe encontrar la tarifa para una categoría
-     * específica.
+     * 
      * Lanza TarifaNoDefinidaException si no existe tarifa para la categoría.
      */
     public Tarifa tarifaPara(Categoria cat) throws TarifaNoDefinidaException {

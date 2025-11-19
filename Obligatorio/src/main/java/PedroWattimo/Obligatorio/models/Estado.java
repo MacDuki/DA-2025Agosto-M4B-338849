@@ -26,24 +26,12 @@ public abstract class Estado {
         return nombre;
     }
 
-    /**
-     * Patrón Experto: el Estado sabe si permite transitar.
-     */
     public abstract boolean permiteTransitar();
 
-    /**
-     * Patrón Experto: el Estado sabe si permite aplicar bonificaciones.
-     */
     public abstract boolean permiteBonificaciones();
 
-    /**
-     * Patrón Experto: el Estado sabe si permite registrar notificaciones.
-     */
     public abstract boolean permiteNotificaciones();
 
-    /**
-     * Patrón Experto: el Estado sabe si permite ingresar al sistema.
-     */
     public abstract boolean permiteIngresar();
 
     @Override

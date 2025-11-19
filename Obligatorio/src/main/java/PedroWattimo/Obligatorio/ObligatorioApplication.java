@@ -9,7 +9,7 @@ import PedroWattimo.Obligatorio.models.SeedData;
 public class ObligatorioApplication {
 
 	public static void main(String[] args) {
-		SeedData.initialize();
+		SeedData.cargar();
 
 		SpringApplication.run(ObligatorioApplication.class, args);
 	}

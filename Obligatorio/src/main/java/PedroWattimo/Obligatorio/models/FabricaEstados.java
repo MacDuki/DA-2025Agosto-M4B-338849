@@ -3,7 +3,7 @@ package PedroWattimo.Obligatorio.models;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 /**
- * Fábrica para crear instancias de estados de propietarios.
+ * 
  * Patrón Factory Method: centraliza la creación de estados por nombre.
  */
 public class FabricaEstados {

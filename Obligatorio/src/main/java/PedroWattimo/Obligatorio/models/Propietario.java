@@ -14,19 +14,12 @@ public class Propietario extends Usuario {
     private List<AsignacionBonificacion> asignaciones;
     private List<Notificacion> notificaciones;
 
-    /**
-     * Constructor sencillo: define identidad y credenciales.
-     * Estado por defecto: HABILITADO. Saldos en 0.
-     */
     public Propietario(int cedula, String nombreCompleto, String contraseña) {
         super(cedula, nombreCompleto, contraseña);
-        // Inicialización de colecciones
         this.vehiculos = new ArrayList<>();
         this.transitos = new ArrayList<>();
         this.asignaciones = new ArrayList<>();
         this.notificaciones = new ArrayList<>();
-
-        // Datos específicos de Propietario
         this.saldoActual = 0;
         this.saldoMinimoAlerta = 0;
         this.estadoActual = FabricaEstados.crearHabilitado();
@@ -66,29 +59,22 @@ public class Propietario extends Usuario {
         return notificaciones == null ? List.of() : List.copyOf(notificaciones);
     }
 
-    /** Cambia el estado actual del propietario. */
     public Propietario cambiarEstado(Estado nuevoEstado) {
         this.estadoActual = (nuevoEstado == null) ? FabricaEstados.crearHabilitado() : nuevoEstado;
         return this;
     }
 
-    /** Define el umbral de saldo mínimo para alertas (no negativo). */
     public Propietario ajustarSaldoMinimoAlerta(int nuevoMinimo) {
         this.saldoMinimoAlerta = Math.max(0, nuevoMinimo);
         return this;
     }
 
-    /** Acredita saldo positivo. Ignora montos nulos/negativos. */
     public Propietario acreditarSaldo(int monto) {
         if (monto > 0)
             this.saldoActual += monto;
         return this;
     }
 
-    /**
-     * Debita saldo si hay fondos suficientes. Retorna true si se realizó.
-     * No permite saldos negativos.
-     */
     public boolean debitarSaldo(int monto) {
         if (monto <= 0)
             return false;
@@ -98,9 +84,6 @@ public class Propietario extends Usuario {
         return true;
     }
 
-    /**
-     * Registra un vehículo nuevo asociado a este propietario.
-     */
     public Vehiculo registrarVehiculo(String matricula, String modelo, String color, Categoria categoria) {
         Vehiculo v = new Vehiculo(matricula, modelo, color, categoria, this);
         if (this.vehiculos == null)
@@ -109,14 +92,10 @@ public class Propietario extends Usuario {
         return v;
     }
 
-    /**
-     * Agrega un vehículo ya construido y asegura la asociación con este
-     * propietario.
-     */
     public Propietario agregarVehiculo(Vehiculo v) {
         if (v == null)
             return this;
-        // Si el vehículo no referencia este propietario, crear uno nuevo consistente
+
         if (v.getPropietario() != this) {
             v = new Vehiculo(v.getMatricula(), v.getModelo(), v.getColor(), v.getCategoria(), this);
         }
@@ -126,42 +105,22 @@ public class Propietario extends Usuario {
         return this;
     }
 
-    // ---------------------------------------------
-    // Lógica de dominio (Principio Experto)
-    // ---------------------------------------------
-
-    /**
-     * Indica si el propietario puede ingresar al sistema según su estado actual.
-     * solo el estado SUSPENDIDO impide el ingreso.
-     */
     public boolean puedeIngresar() {
         if (this.estadoActual == null)
-            return true; // Por defecto habilitado
+            return true;
         return this.estadoActual.permiteIngresar();
     }
 
-    /**
-     * Patrón Experto: el Propietario sabe si puede transitar según su estado.
-     * Delega en el Estado la decisión.
-     */
     public boolean puedeTransitar() {
         if (this.estadoActual == null)
-            return true; // Por defecto habilitado
+            return true;
         return this.estadoActual.permiteTransitar();
     }
 
-    /**
-     * Patrón Experto: el Propietario sabe si tiene saldo insuficiente para un
-     * monto.
-     */
     public boolean saldoInsuficientePara(double monto) {
         return this.saldoActual < monto;
     }
 
-    /**
-     * Patrón Experto: el Propietario debita un monto de su saldo.
-     * No permite saldo negativo.
-     */
     public void debitar(double monto) {
         if (monto <= 0)
             return;
@@ -170,19 +129,12 @@ public class Propietario extends Usuario {
             this.saldoActual = 0;
     }
 
-    /**
-     * Patrón Experto: el Propietario acredita un monto a su saldo.
-     */
     public void acreditar(double monto) {
         if (monto > 0) {
             this.saldoActual += (int) Math.round(monto);
         }
     }
 
-    /**
-     * Patrón Experto: el Propietario busca su bonificación asignada para un puesto
-     * específico.
-     */
     public Optional<AsignacionBonificacion> bonificacionAsignadaPara(Puesto p) {
         if (p == null || this.asignaciones == null)
             return Optional.empty();
@@ -191,16 +143,10 @@ public class Propietario extends Usuario {
                 .findFirst();
     }
 
-    /**
-     * Patrón Experto: el Propietario sabe si debe alertar sobre su saldo.
-     */
     public boolean debeAlertarSaldo() {
         return this.saldoActual < this.saldoMinimoAlerta;
     }
 
-    /**
-     * Patrón Experto: el Propietario registra una notificación para sí mismo.
-     */
     public void registrarNotificacion(String mensaje, LocalDateTime fh) {
         if (mensaje == null || fh == null)
             return;
@@ -210,11 +156,6 @@ public class Propietario extends Usuario {
         this.notificaciones.add(notif);
     }
 
-    /**
-     * Patrón Experto: el Propietario registra una notificación específica de cambio
-     * de estado.
-     * Construye el mensaje con el formato exacto requerido.
-     */
     public void registrarNotificacionCambioEstado(Estado estadoActual, LocalDateTime fechaHora) {
         if (estadoActual == null || fechaHora == null)
             return;
@@ -222,9 +163,6 @@ public class Propietario extends Usuario {
         registrarNotificacion(mensaje, fechaHora);
     }
 
-    /**
-     * Patrón Experto: el Propietario registra un tránsito en su historial.
-     */
     public void registrarTransito(Transito transito) {
         if (transito == null)
             return;
@@ -233,10 +171,6 @@ public class Propietario extends Usuario {
         this.transitos.add(transito);
     }
 
-    /**
-     * Patrón Experto: el Propietario verifica si tiene una bonificación asignada
-     * para un puesto específico.
-     */
     public boolean tieneBonificacionPara(Puesto puesto) {
         if (puesto == null || this.asignaciones == null)
             return false;
@@ -244,10 +178,6 @@ public class Propietario extends Usuario {
                 .anyMatch(ab -> ab.activaPara(puesto, this));
     }
 
-    /**
-     * Patrón Experto: el Propietario asigna una bonificación validando su estado.
-     * Solo se permite asignar si el propietario no está deshabilitado.
-     */
     public void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) {
         if (bonificacion == null || puesto == null)
             return;
@@ -260,11 +190,6 @@ public class Propietario extends Usuario {
         this.asignaciones.add(ab);
     }
 
-    /**
-     * Patrón Experto: el Propietario registra una asignación de bonificación
-     * para un puesto y fecha-hora dados (mantenido para compatibilidad).
-     */
-    /* Compatibilidad con seedData */
     public AsignacionBonificacion asignarBonificacion(Bonificacion bonificacion, Puesto puesto,
             LocalDateTime fechaHora) {
         if (bonificacion == null || puesto == null || fechaHora == null)
@@ -276,10 +201,6 @@ public class Propietario extends Usuario {
         return ab;
     }
 
-    /**
-     * Patrón Experto: el Propietario busca un vehículo por matrícula entre sus
-     * vehículos.
-     */
     public Vehiculo buscarVehiculoPorMatricula(String matricula) {
         if (matricula == null || this.vehiculos == null)
             return null;

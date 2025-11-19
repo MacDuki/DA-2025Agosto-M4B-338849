@@ -12,13 +12,6 @@ import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
 import observador.Observable;
 
-/**
- * SistemaTransitos: se mantiene con responsabilidades de orquestación del CU
- * Emular Tránsito, sin absorber cálculos que pertenecen a entidades. Se ajusta
- * para utilizar el nuevo SistemaPropietarios (que maneja notificaciones) y
- * SistemaPuestosYTarifas.
- * Observable: notifica cuando se registran nuevos tránsitos
- */
 public class SistemaTransitos extends Observable {
 
     public enum Eventos {
@@ -48,10 +41,6 @@ public class SistemaTransitos extends Observable {
 
     public List<Transito> getTransitos() {
         return List.copyOf(transitos);
-    }
-
-    List<Transito> obtenerTransitosInternos() {
-        return transitos;
     }
 
     public List<Transito> transitosDe(Vehiculo veh, Puesto puesto, LocalDate fecha) {

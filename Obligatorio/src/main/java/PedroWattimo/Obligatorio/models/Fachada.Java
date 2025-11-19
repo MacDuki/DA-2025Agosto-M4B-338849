@@ -44,6 +44,8 @@ public class Fachada extends Observable {
         this.sistemaBonificaciones.setSistemaPropietarios(this.sistemaPropietariosYAdmin);
         this.sistemaBonificaciones.setSistemaPuestos(this.sistemaPuestosYTarifas);
         this.sistemaPropietariosYAdmin.setSistemaEstados(this.sistemaEstados);
+        this.sistemaVehiculosYCategorias.setSistemaPropietarios(this.sistemaPropietariosYAdmin);
+        this.sistemaPuestosYTarifas.setSistemaCategorias(this.sistemaVehiculosYCategorias);
     }
 
     public static Fachada getInstancia() {
@@ -81,39 +83,101 @@ public class Fachada extends Observable {
         }
     }
 
-    List<Administrador> obtenerAdministradoresInternos() {
-        return sistemaPropietariosYAdmin.obtenerAdministradoresInternos();
+    // --------------------------------------------------------------
+    // CU: Agregar Categoría
+    // --------------------------------------------------------------
+
+    /**
+     * Agrega una nueva categoría al sistema.
+     * Patrón Experto: delega en el subsistema correspondiente.
+     */
+    public Categoria agregarCategoria(String nombre) throws OblException {
+        return sistemaVehiculosYCategorias.agregarCategoria(nombre);
     }
 
-    List<Categoria> obtenerCategoriasInternos() {
-        return sistemaVehiculosYCategorias.obtenerCategoriasInternas();
+    // --------------------------------------------------------------
+    // CU: Agregar Puesto
+    // --------------------------------------------------------------
+
+    /**
+     * Agrega un nuevo puesto de peaje al sistema.
+     * Patrón Experto: delega en el subsistema correspondiente.
+     */
+    public Puesto agregarPuesto(String nombre, String direccion) throws OblException {
+        return sistemaPuestosYTarifas.agregarPuesto(nombre, direccion);
     }
 
-    List<Puesto> obtenerPuestosInternos() {
-        return sistemaPuestosYTarifas.obtenerPuestosInternos();
+    // --------------------------------------------------------------
+    // CU: Agregar Tarifa a Puesto
+    // --------------------------------------------------------------
+
+    /**
+     * Agrega una tarifa a un puesto específico.
+     * Patrón Experto: delega en el subsistema correspondiente.
+     */
+    public void agregarTarifaAPuesto(String nombrePuesto, double monto, String nombreCategoria) throws OblException {
+        sistemaPuestosYTarifas.agregarTarifaAPuesto(nombrePuesto, monto, nombreCategoria);
     }
 
-    List<Propietario> obtenerPropietariosInternos() {
-        return sistemaPropietariosYAdmin.obtenerPropietariosInternos();
+    // --------------------------------------------------------------
+    // CU: Agregar Administrador
+    // --------------------------------------------------------------
+
+    /**
+     * Agrega un nuevo administrador al sistema.
+     * Patrón Experto: delega en el subsistema correspondiente.
+     */
+    public Administrador agregarAdministrador(int cedula, String nombreCompleto, String password) throws OblException {
+        return sistemaPropietariosYAdmin.agregarAdministrador(cedula, nombreCompleto, password);
     }
 
-    List<Vehiculo> obtenerVehiculosInternos() {
-        return sistemaVehiculosYCategorias.obtenerVehiculosInternos();
+    // --------------------------------------------------------------
+    // CU: Registrar Propietario
+    // --------------------------------------------------------------
+
+    /**
+     * Registra un nuevo propietario en el sistema.
+     * Patrón Experto: delega en el subsistema correspondiente.
+     */
+    public Propietario registrarPropietario(int cedula, String nombreCompleto, String password) throws OblException {
+        return sistemaPropietariosYAdmin.registrarPropietario(cedula, nombreCompleto, password);
     }
 
-    List<Bonificacion> obtenerBonificacionesInternas() {
-        return sistemaBonificaciones.obtenerBonificacionesInternas();
+    // --------------------------------------------------------------
+    // CU: Registrar Vehículo
+    // --------------------------------------------------------------
+
+    /**
+     * Registra un vehículo para un propietario.
+     * Patrón Experto: delega en el subsistema correspondiente.
+     */
+    public Vehiculo registrarVehiculo(int cedulaPropietario, String matricula, String modelo, String color,
+            String nombreCategoria) throws OblException {
+        return sistemaVehiculosYCategorias.registrarVehiculo(cedulaPropietario, matricula, modelo, color,
+                nombreCategoria);
     }
 
-    List<AsignacionBonificacion> obtenerAsignacionesBonificacionesInternas() {
-        return sistemaBonificaciones.obtenerAsignacionesInternas();
+    // --------------------------------------------------------------
+    // CU: Agregar Bonificación
+    // --------------------------------------------------------------
+
+    /**
+     * Agrega una nueva bonificación al sistema.
+     * Patrón Experto: delega en el subsistema correspondiente.
+     */
+    public void agregarBonificacion(Bonificacion bonificacion) throws OblException {
+        sistemaBonificaciones.agregarBonificacion(bonificacion);
     }
 
-    List<Categoria> obtenerCategorias() {
+    // --------------------------------------------------------------
+    // Métodos auxiliares para consultas
+    // --------------------------------------------------------------
+
+    public List<Categoria> obtenerCategorias() {
         return sistemaVehiculosYCategorias.getCategorias();
     }
 
-    Propietario buscarPropietarioPorCedula(int cedula) {
+    public Propietario buscarPropietarioPorCedula(int cedula) {
         return sistemaPropietariosYAdmin.buscarPorCedula(cedula);
     }
 

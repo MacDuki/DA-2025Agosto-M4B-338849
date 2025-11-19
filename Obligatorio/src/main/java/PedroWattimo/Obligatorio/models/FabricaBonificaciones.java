@@ -3,7 +3,7 @@ package PedroWattimo.Obligatorio.models;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 /**
- * Fábrica para crear instancias de bonificaciones.
+ * 
  * Patrón Factory Method: centraliza la creación de bonificaciones por nombre.
  */
 public class FabricaBonificaciones {

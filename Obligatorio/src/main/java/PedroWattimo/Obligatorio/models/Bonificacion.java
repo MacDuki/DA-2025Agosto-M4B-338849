@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  */
 public abstract class Bonificacion {
     protected String nombre;
-    protected double porcentaje; // opcional, según el tipo
+    protected double porcentaje;
 
     protected Bonificacion() {
     }

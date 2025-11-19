@@ -19,23 +19,12 @@ public class SistemaBonificaciones extends Observable {
     protected SistemaBonificaciones() {
     }
 
-    // Encapsulamiento: retornar copias inmutables para prevenir modificaciones
-    // externas
     public List<Bonificacion> getBonificaciones() {
         return List.copyOf(bonificaciones);
     }
 
     public List<AsignacionBonificacion> getAsignaciones() {
         return List.copyOf(asignaciones);
-    }
-
-    // Métodos internos para acceso directo (package-private para uso de SeedData)
-    List<Bonificacion> obtenerBonificacionesInternas() {
-        return bonificaciones;
-    }
-
-    List<AsignacionBonificacion> obtenerAsignacionesInternas() {
-        return asignaciones;
     }
 
     /**
@@ -148,5 +137,31 @@ public class SistemaBonificaciones extends Observable {
             dtos.add(new PedroWattimo.Obligatorio.dtos.BonificacionDto(b.getNombre(), b.getPorcentaje()));
         }
         return dtos;
+    }
+
+    // ---- Casos de uso: Alta de entidades ----
+
+    /**
+     * Agrega una nueva bonificación al sistema.
+     * Valida que no exista una bonificación con el mismo nombre.
+     */
+    public void agregarBonificacion(Bonificacion bonificacion) throws OblException {
+        if (bonificacion == null) {
+            throw new OblException("La bonificación no puede ser nula");
+        }
+
+        String nombre = bonificacion.getNombre();
+        if (nombre == null || nombre.isBlank()) {
+            throw new OblException("El nombre de la bonificación no puede estar vacío");
+        }
+
+        // Validar que no exista
+        for (Bonificacion b : bonificaciones) {
+            if (nombre.equalsIgnoreCase(b.getNombre())) {
+                throw new OblException("Ya existe una bonificación con el nombre: " + nombre);
+            }
+        }
+
+        bonificaciones.add(bonificacion);
     }
 }
