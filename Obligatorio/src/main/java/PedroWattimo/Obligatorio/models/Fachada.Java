@@ -11,18 +11,17 @@ import observador.Observable;
 
 public class Fachada extends Observable {
 
-    private static Fachada instancia;
+    private static final Fachada instancia = new Fachada();
 
     // Sistemas como atributos privados. Nunca gets ni sets de estos atributos.
     // Nueva topología refactorizada
-    private SistemaPropietariosYAdmin sistemaPropietariosYAdmin; // absorbe auth + propietarios + estados +
-                                                                 // notificaciones
-    private SistemaVehiculosYCategorias sistemaVehiculosYCategorias; // vehiculos + categorias
-    private SistemaPuestosYTarifas sistemaPuestosYTarifas; // puestos + tarifas
+    private SistemaPropietariosYAdmin sistemaPropietariosYAdmin;
+    private SistemaVehiculosYCategorias sistemaVehiculosYCategorias;
+    private SistemaPuestosYTarifas sistemaPuestosYTarifas;
     private SistemaTransitos sistemaTransitos;
     private SistemaBonificaciones sistemaBonificaciones;
-    private SistemaEstados sistemaEstados; // gestión de estados
-    private SistemaAcceso sistemaAcceso; // gestión de sesiones y login/logout
+    private SistemaEstados sistemaEstados;
+    private SistemaAcceso sistemaAcceso;
 
     private Fachada() {
         // Instanciación de sub-sistemas
@@ -33,22 +32,9 @@ public class Fachada extends Observable {
         this.sistemaBonificaciones = new SistemaBonificaciones();
         this.sistemaEstados = new SistemaEstados();
         this.sistemaAcceso = new SistemaAcceso();
-
-        // Inyectar referencia de Fachada en subsistemas para que puedan:
-        // 1) Notificar eventos
-        // 2) Comunicarse entre sí a través de la Fachada
-        this.sistemaTransitos.setFachada(this);
-        this.sistemaBonificaciones.setFachada(this);
-        this.sistemaPropietariosYAdmin.setFachada(this);
-        this.sistemaAcceso.setFachada(this);
-        this.sistemaVehiculosYCategorias.setFachada(this);
-        this.sistemaPuestosYTarifas.setFachada(this);
     }
 
     public static Fachada getInstancia() {
-        if (instancia == null) {
-            instancia = new Fachada();
-        }
         return instancia;
     }
 

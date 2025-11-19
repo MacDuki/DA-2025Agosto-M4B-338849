@@ -30,7 +30,6 @@ public class SistemaPropietariosYAdmin {
     private final List<Administrador> administradores = new ArrayList<>();
 
     private final Map<Integer, Long> dashboardVersion = new ConcurrentHashMap<>();
-    private Fachada fachada;
 
     // -------- Accesos Encapsulados --------
     public List<Propietario> getPropietarios() {
@@ -91,9 +90,7 @@ public class SistemaPropietariosYAdmin {
         dashboardVersion.merge(propietario.getCedula(), 1L, Long::sum);
 
         // Notificar a través de la Fachada
-        if (fachada != null) {
-            fachada.avisar(Eventos.NOTIFICACION_REGISTRADA);
-        }
+        Fachada.getInstancia().avisar(Eventos.NOTIFICACION_REGISTRADA);
     }
 
     public Propietario autenticarPropietario(int cedula, String password) throws OblException {
@@ -215,9 +212,7 @@ public class SistemaPropietariosYAdmin {
         dashboardVersion.merge(p.getCedula(), 1L, Long::sum);
 
         // Notificar a través de la Fachada
-        if (fachada != null) {
-            fachada.avisar(Eventos.NOTIFICACIONES_BORRADAS);
-        }
+        Fachada.getInstancia().avisar(Eventos.NOTIFICACIONES_BORRADAS);
         return borradas;
     }
 
@@ -247,18 +242,12 @@ public class SistemaPropietariosYAdmin {
         dashboardVersion.merge(propietario.getCedula(), 1L, Long::sum);
 
         // Notificar a través de la Fachada
-        if (fachada != null) {
-            fachada.avisar(Eventos.CAMBIO_ESTADO);
-        }
-    }
-
-    void setFachada(Fachada fachada) {
-        this.fachada = fachada;
+        Fachada.getInstancia().avisar(Eventos.CAMBIO_ESTADO);
     }
 
     public void cambiarEstadoPropietario(String cedulaPropietario, String nombreNuevoEstado) throws OblException {
         Propietario propietario = buscarPorCedula(cedulaPropietario);
-        Estado nuevoEstado = fachada.buscarEstadoPorNombreInterno(nombreNuevoEstado);
+        Estado nuevoEstado = Fachada.getInstancia().buscarEstadoPorNombreInterno(nombreNuevoEstado);
         cambiarEstadoDePropietario(propietario, nuevoEstado);
     }
 

@@ -107,13 +107,6 @@ public class SistemaPuestosYTarifas {
         return nuevoPuesto;
     }
 
-    // Referencia a Fachada para resolver categorías
-    private Fachada fachada;
-
-    void setFachada(Fachada fachada) {
-        this.fachada = fachada;
-    }
-
     /**
      * Agrega una tarifa a un puesto específico.
      * Orquesta la resolución de objetos y delega al puesto.
@@ -128,7 +121,7 @@ public class SistemaPuestosYTarifas {
         Puesto puesto = obtenerPorNombre(nombrePuesto);
 
         // Resolver categoría a través de Fachada
-        Categoria categoria = fachada.buscarCategoriaPorNombreInterno(nombreCategoria);
+        Categoria categoria = Fachada.getInstancia().buscarCategoriaPorNombreInterno(nombreCategoria);
         if (categoria == null) {
             throw new OblException("No existe la categoría: " + nombreCategoria);
         }

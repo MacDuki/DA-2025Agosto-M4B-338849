@@ -67,13 +67,6 @@ public class SistemaVehiculosYCategorias {
         return nuevaCategoria;
     }
 
-    // Referencia a Fachada para resolver propietarios
-    private Fachada fachada;
-
-    void setFachada(Fachada fachada) {
-        this.fachada = fachada;
-    }
-
     /**
      * Registra un vehículo para un propietario.
      * Orquesta la resolución de objetos y delega al propietario (experto).
@@ -98,7 +91,7 @@ public class SistemaVehiculosYCategorias {
         }
 
         // Resolver propietario a través de Fachada
-        Propietario propietario = fachada.buscarPropietarioPorCedula(cedulaPropietario);
+        Propietario propietario = Fachada.getInstancia().buscarPropietarioPorCedula(cedulaPropietario);
         if (propietario == null) {
             throw new OblException("No existe el propietario con cédula: " + cedulaPropietario);
         }

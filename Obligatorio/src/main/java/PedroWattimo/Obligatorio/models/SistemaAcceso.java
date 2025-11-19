@@ -10,18 +10,12 @@ public class SistemaAcceso {
     private ArrayList<SesionPropietario> sesionesPropietarios = new ArrayList<>();
     private ArrayList<SesionAdmin> sesionesAdmin = new ArrayList<>();
 
-    private Fachada fachada;
-
     protected SistemaAcceso() {
 
     }
 
-    void setFachada(Fachada fachada) {
-        this.fachada = fachada;
-    }
-
     public SesionPropietario loginPropietario(int cedula, String password) throws OblException {
-        Propietario prop = fachada.autenticarYValidarPropietarioInterno(cedula, password);
+        Propietario prop = Fachada.getInstancia().autenticarYValidarPropietarioInterno(cedula, password);
 
         SesionPropietario s = new SesionPropietario(LocalDateTime.now(), prop);
         sesionesPropietarios.add(s);
@@ -29,7 +23,7 @@ public class SistemaAcceso {
     }
 
     public SesionAdmin loginAdmin(int cedula, String password) throws OblException {
-        Administrador admin = fachada.autenticarYValidarAdminInterno(cedula, password);
+        Administrador admin = Fachada.getInstancia().autenticarYValidarAdminInterno(cedula, password);
 
         SesionAdmin s = new SesionAdmin(LocalDateTime.now(), admin);
         sesionesAdmin.add(s);
@@ -41,7 +35,7 @@ public class SistemaAcceso {
     }
 
     public void logoutAdmin(SesionAdmin sesion) {
-        fachada.desloguearAdminInterno(sesion.getAdministrador());
+        Fachada.getInstancia().desloguearAdminInterno(sesion.getAdministrador());
         sesionesAdmin.remove(sesion);
     }
 

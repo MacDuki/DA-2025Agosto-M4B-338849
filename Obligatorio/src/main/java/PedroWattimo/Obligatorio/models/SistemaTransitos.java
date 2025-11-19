@@ -19,13 +19,7 @@ public class SistemaTransitos {
 
     private final List<Transito> transitos = new ArrayList<>();
 
-    private Fachada fachada;
-
     protected SistemaTransitos() {
-    }
-
-    void setFachada(Fachada fachada) {
-        this.fachada = fachada;
     }
 
     public List<Transito> getTransitos() {
@@ -56,8 +50,8 @@ public class SistemaTransitos {
     public EmularTransitoResultado emularTransito(Long puestoId, String matricula, LocalDateTime fechaHora)
             throws OblException, TarifaNoDefinidaException {
 
-        Puesto puesto = fachada.obtenerPuestoPorId(puestoId);
-        Propietario prop = fachada.buscarPropietarioPorMatriculaInterno(matricula);
+        Puesto puesto = Fachada.getInstancia().obtenerPuestoPorId(puestoId);
+        Propietario prop = Fachada.getInstancia().buscarPropietarioPorMatriculaInterno(matricula);
 
         Estado estado = prop.getEstadoActual();
         if (estado != null && !estado.permiteTransitar()) {
@@ -76,7 +70,7 @@ public class SistemaTransitos {
         double montoBonif = 0.0;
         Bonificacion bonifAplicada = null;
         if (estado == null || estado.permiteBonificaciones()) {
-            Optional<Bonificacion> bonifOpt = fachada.obtenerBonificacionVigenteInterno(prop, puesto);
+            Optional<Bonificacion> bonifOpt = Fachada.getInstancia().obtenerBonificacionVigenteInterno(prop, puesto);
             if (bonifOpt.isPresent()) {
                 bonifAplicada = bonifOpt.get();
                 montoBonif = bonifAplicada.calcularDescuento(prop, veh, puesto, tarifa, fechaHora, this);
@@ -96,18 +90,16 @@ public class SistemaTransitos {
         if (estado == null || estado.permiteNotificaciones()) {
             String mensajeTransito = String.format("[%s] Pasaste por el puesto %s con el vehículo %s",
                     fechaHora.toString(), puesto.getNombre(), veh.getMatricula());
-            fachada.registrarNotificacionInterno(prop, mensajeTransito, fechaHora);
+            Fachada.getInstancia().registrarNotificacionInterno(prop, mensajeTransito, fechaHora);
             if (prop.debeAlertarSaldo()) {
                 String mensajeSaldo = String.format("[%s] Tu saldo actual es $%d. Te recomendamos hacer una recarga",
                         fechaHora.toString(), prop.getSaldoActual());
-                fachada.registrarNotificacionInterno(prop, mensajeSaldo, fechaHora);
+                Fachada.getInstancia().registrarNotificacionInterno(prop, mensajeSaldo, fechaHora);
             }
         }
 
         // Notificar a través de la Fachada
-        if (fachada != null) {
-            fachada.avisar(Eventos.TRANSITO_REGISTRADO);
-        }
+        Fachada.getInstancia().avisar(Eventos.TRANSITO_REGISTRADO);
 
         return new EmularTransitoResultado(
                 prop.getNombreCompleto(),

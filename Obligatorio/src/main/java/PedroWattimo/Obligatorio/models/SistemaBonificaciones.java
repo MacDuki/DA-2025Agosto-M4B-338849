@@ -14,7 +14,6 @@ public class SistemaBonificaciones {
 
     private List<Bonificacion> bonificaciones = new ArrayList<Bonificacion>();
     private List<AsignacionBonificacion> asignaciones = new ArrayList<AsignacionBonificacion>();
-    private Fachada fachada;
 
     protected SistemaBonificaciones() {
     }
@@ -101,13 +100,7 @@ public class SistemaBonificaciones {
 
         // Notifica a las vistas que se asignó una nueva bonificación a través de la
         // Fachada
-        if (fachada != null) {
-            fachada.avisar(Eventos.BONIFICACION_ASIGNADA);
-        }
-    }
-
-    void setFachada(Fachada fachada) {
-        this.fachada = fachada;
+        Fachada.getInstancia().avisar(Eventos.BONIFICACION_ASIGNADA);
     }
 
     /**
@@ -117,9 +110,9 @@ public class SistemaBonificaciones {
      */
     public void asignarBonificacion(String cedula, String nombreBonificacion, String nombrePuesto)
             throws OblException {
-        Propietario propietario = fachada.buscarPropietarioPorCedula(cedula);
+        Propietario propietario = Fachada.getInstancia().buscarPropietarioPorCedula(cedula);
         Bonificacion bonificacion = buscarPorNombre(nombreBonificacion);
-        Puesto puesto = fachada.buscarPuestoPorNombreInterno(nombrePuesto);
+        Puesto puesto = Fachada.getInstancia().buscarPuestoPorNombreInterno(nombrePuesto);
         asignarBonificacionAPropietario(propietario, bonificacion, puesto);
     }
 
