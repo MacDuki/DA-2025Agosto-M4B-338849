@@ -74,14 +74,26 @@
       }
 
       function procesarErrorSubmit(status, text) {
+        let mensaje = text;
+
+        // Intentar parsear el JSON para extraer el mensaje de error
+        try {
+          const json = JSON.parse(text);
+          if (Array.isArray(json) && json.length > 0 && json[0].parametro) {
+            mensaje = json[0].parametro;
+          }
+        } catch (e) {
+          // Si no es JSON válido, usar el texto tal cual
+        }
+
         if (status === 401) {
-          showError("Acceso denegado");
+          showError(mensaje || "Acceso denegado");
         } else if (status === 409) {
-          showError("Ud. Ya está logueado");
+          showError(mensaje || "Ud. Ya está logueado");
         } else if (status === 0) {
           showError("Error de conexión con el servidor.");
         } else {
-          showError("Error inesperado. Código " + status);
+          showError(mensaje || "Error inesperado. Código " + status);
         }
       }
 

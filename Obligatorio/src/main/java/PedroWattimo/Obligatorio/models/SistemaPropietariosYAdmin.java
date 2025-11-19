@@ -215,13 +215,6 @@ public class SistemaPropietariosYAdmin extends Observable {
         return borradas;
     }
 
-    public long versionDashboardDePropietario(int cedula) throws OblException {
-        Propietario p = findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(cedula);
-        if (p == null)
-            throw new OblException("El propietario no existe");
-        return dashboardVersion.getOrDefault(p.getCedula(), 0L);
-    }
-
     public void cambiarEstadoDePropietario(Propietario propietario, Estado nuevoEstado) throws OblException {
         if (propietario == null || nuevoEstado == null) {
             throw new OblException("Propietario y estado no pueden ser nulos");

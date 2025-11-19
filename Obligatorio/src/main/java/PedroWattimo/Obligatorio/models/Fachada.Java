@@ -24,8 +24,6 @@ public class Fachada extends Observable {
     private SistemaEstados sistemaEstados; // gestión de estados
     private SistemaAcceso sistemaAcceso; // gestión de sesiones y login/logout
 
-    // Sin estado adicional: toda versión/estado vive en los subsistemas
-
     private Fachada() {
         // Instanciación de sub-sistemas
         this.sistemaPropietariosYAdmin = new SistemaPropietariosYAdmin();
