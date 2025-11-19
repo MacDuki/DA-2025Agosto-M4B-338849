@@ -84,15 +84,6 @@ public class CambiarEstadoPropietarioController implements Observador {
     @PostMapping
     public ResponseEntity<Respuesta> cambiarEstado(@RequestBody CambiarEstadoRequest request) {
         try {
-            if (request.getCedula() == null || request.getCedula().isBlank()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new Respuesta("error", "La cédula es obligatoria"));
-            }
-            if (request.getNuevoEstado() == null || request.getNuevoEstado().isBlank()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new Respuesta("error", "El nuevo estado es obligatorio"));
-            }
-
             fachada.cambiarEstadoPropietario(request.getCedula(), request.getNuevoEstado());
             return ResponseEntity.ok(new Respuesta("ok", "Estado cambiado exitosamente"));
 

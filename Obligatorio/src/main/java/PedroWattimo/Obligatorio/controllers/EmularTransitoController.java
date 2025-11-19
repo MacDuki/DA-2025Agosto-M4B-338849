@@ -2,7 +2,6 @@ package PedroWattimo.Obligatorio.controllers;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import org.springframework.context.annotation.Scope;
@@ -98,27 +97,7 @@ public class EmularTransitoController implements Observador {
     @PostMapping
     public ResponseEntity<Respuesta> emularTransito(@RequestBody EmularTransitoRequest request) {
         try {
-
-            if (request.getPuestoId() == null) {
-                return ResponseEntity.badRequest()
-                        .body(new Respuesta("error", "El ID del puesto es requerido"));
-            }
-            if (request.getMatricula() == null || request.getMatricula().isBlank()) {
-                return ResponseEntity.badRequest()
-                        .body(new Respuesta("error", "La matrícula es requerida"));
-            }
-            if (request.getFechaHora() == null || request.getFechaHora().isBlank()) {
-                return ResponseEntity.badRequest()
-                        .body(new Respuesta("error", "La fecha/hora es requerida"));
-            }
-
-            LocalDateTime fechaHora;
-            try {
-                fechaHora = LocalDateTime.parse(request.getFechaHora(), DateTimeFormatter.ISO_DATE_TIME);
-            } catch (DateTimeParseException e) {
-                return ResponseEntity.badRequest()
-                        .body(new Respuesta("error", "Formato de fecha/hora inválido. Use ISO-8601"));
-            }
+            LocalDateTime fechaHora = LocalDateTime.parse(request.getFechaHora(), DateTimeFormatter.ISO_DATE_TIME);
 
             EmularTransitoResultado resultado = fachada.emularTransito(
                     request.getPuestoId(),

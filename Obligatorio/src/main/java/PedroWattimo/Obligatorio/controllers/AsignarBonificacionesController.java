@@ -84,13 +84,7 @@ public class AsignarBonificacionesController implements Observador {
     @GetMapping("/propietario")
     public ResponseEntity<Respuesta> buscarPropietario(@RequestParam String cedula) {
         try {
-            if (cedula == null || cedula.isBlank()) {
-                return ResponseEntity.badRequest()
-                        .body(new Respuesta("error", "La cédula es requerida"));
-            }
-
             PropietarioConBonificacionesDto dto = fachada.obtenerPropietarioConBonificaciones(cedula);
-
             return ResponseEntity.ok(new Respuesta("ok", dto));
 
         } catch (OblException e) {
@@ -108,19 +102,6 @@ public class AsignarBonificacionesController implements Observador {
     @PostMapping
     public ResponseEntity<Respuesta> asignarBonificacion(@RequestBody AsignarBonificacionRequest request) {
         try {
-            if (request.getCedula() == null || request.getCedula().isBlank()) {
-                return ResponseEntity.badRequest()
-                        .body(new Respuesta("error", "La cédula es requerida"));
-            }
-            if (request.getNombreBonificacion() == null || request.getNombreBonificacion().isBlank()) {
-                return ResponseEntity.badRequest()
-                        .body(new Respuesta("error", "Debe especificar una bonificación"));
-            }
-            if (request.getNombrePuesto() == null || request.getNombrePuesto().isBlank()) {
-                return ResponseEntity.badRequest()
-                        .body(new Respuesta("error", "Debe especificar un puesto"));
-            }
-
             fachada.asignarBonificacion(
                     request.getCedula(),
                     request.getNombreBonificacion(),
