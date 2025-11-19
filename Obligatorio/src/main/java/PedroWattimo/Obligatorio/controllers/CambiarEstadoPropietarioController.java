@@ -51,9 +51,6 @@ public class CambiarEstadoPropietarioController implements Observador {
         conexionNavegador.enviarJSON(List.of(respuesta));
     }
 
-    /**
-     * Lista todos los estados disponibles.
-     */
     @GetMapping("/estados")
     public ResponseEntity<Respuesta> listarEstados() {
         try {
@@ -70,9 +67,6 @@ public class CambiarEstadoPropietarioController implements Observador {
         }
     }
 
-    /**
-     * Busca un propietario por cédula y devuelve sus datos básicos.
-     */
     @GetMapping("/propietario")
     public ResponseEntity<Respuesta> buscarPropietario(@RequestParam String cedula) {
         try {
@@ -89,9 +83,6 @@ public class CambiarEstadoPropietarioController implements Observador {
         }
     }
 
-    /**
-     * Cambia el estado de un propietario.
-     */
     @PostMapping
     public ResponseEntity<Respuesta> cambiarEstado(@RequestBody CambiarEstadoRequest request) {
         try {

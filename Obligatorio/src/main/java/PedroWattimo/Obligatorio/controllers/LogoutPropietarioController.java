@@ -23,10 +23,6 @@ public class LogoutPropietarioController {
 
     private final Fachada fachada = Fachada.getInstancia();
 
-    /**
-     * 
-     * Cierra la sesión del propietario autenticado.
-     */
     @PostMapping
     public ResponseEntity<List<Respuesta>> logoutPropietario(HttpSession session) {
 

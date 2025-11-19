@@ -31,10 +31,6 @@ import jakarta.servlet.http.HttpSession;
 import observador.Observable;
 import observador.Observador;
 
-/**
- * Controlador para el caso de uso: Dashboard del Propietario.
- * 
- */
 @RestController
 @RequestMapping("/propietarios/dashboard")
 @Scope("session")
@@ -60,10 +56,6 @@ public class DashboardPropietarioController implements Observador {
         conexionNavegador.enviarJSON(List.of(respuesta));
     }
 
-    /**
-     * 
-     * Obtiene los datos del dashboard del propietario autenticado.
-     */
     @PostMapping
     public ResponseEntity<List<Respuesta>> obtenerDashboard(HttpSession session) throws OblException {
         PropietarioAutenticadoDTO propietario = (PropietarioAutenticadoDTO) session.getAttribute("propietario");
@@ -126,10 +118,6 @@ public class DashboardPropietarioController implements Observador {
         return ResponseEntity.ok(List.of(respuesta));
     }
 
-    /**
-     * 
-     * Borra las notificaciones del propietario autenticado.
-     */
     @PostMapping("/notificaciones/borrar")
     public ResponseEntity<List<Respuesta>> borrarNotificaciones(HttpSession session) throws OblException {
         PropietarioAutenticadoDTO propietario = (PropietarioAutenticadoDTO) session.getAttribute("propietario");

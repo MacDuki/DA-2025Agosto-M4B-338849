@@ -55,33 +55,20 @@ public class SistemaBonificaciones {
         return bonificacion;
     }
 
-    /**
-     * Asigna una bonificación a un propietario para un puesto específico.
-     * Valida todas las reglas de negocio.
-     */
     public void asignarBonificacionAPropietario(Propietario propietario, Bonificacion bonificacion, Puesto puesto)
             throws OblException {
-        // Validar que propietario no sea nulo
+
         if (propietario == null) {
             throw new OblException("no existe el propietario");
         }
 
-        // Validar reglas de asignación (delegado al experto)
         propietario.validarAsignacionBonificacion(bonificacion, puesto);
 
-        // Delegar al propietario la asignación (Patrón Experto)
         propietario.asignarBonificacion(bonificacion, puesto);
 
-        // Notifica a las vistas que se asignó una nueva bonificación a través de la
-        // Fachada
         Fachada.getInstancia().avisar(Eventos.BONIFICACION_ASIGNADA);
     }
 
-    /**
-     * Asigna una bonificación resolviendo los objetos por sus identificadores.
-     * Orquesta la resolución de objetos a través de la Fachada y delega la
-     * asignación.
-     */
     public void asignarBonificacion(String cedula, String nombreBonificacion, String nombrePuesto)
             throws OblException {
         Propietario propietario = Fachada.getInstancia().buscarPropietarioPorCedula(cedula);
@@ -90,12 +77,6 @@ public class SistemaBonificaciones {
         asignarBonificacionAPropietario(propietario, bonificacion, puesto);
     }
 
-    // ---- Casos de uso: Alta de entidades ----
-
-    /**
-     * Agrega una nueva bonificación al sistema.
-     * Valida que no exista una bonificación con el mismo nombre.
-     */
     public void agregarBonificacion(Bonificacion bonificacion) throws OblException {
         if (bonificacion == null) {
             throw new OblException("La bonificación no puede ser nula");
@@ -106,7 +87,6 @@ public class SistemaBonificaciones {
             throw new OblException("El nombre de la bonificación no puede estar vacío");
         }
 
-        // Validar que no exista
         for (Bonificacion b : bonificaciones) {
             if (nombre.equalsIgnoreCase(b.getNombre())) {
                 throw new OblException("Ya existe una bonificación con el nombre: " + nombre);

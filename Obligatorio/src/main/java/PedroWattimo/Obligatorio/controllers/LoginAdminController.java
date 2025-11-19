@@ -15,20 +15,12 @@ import PedroWattimo.Obligatorio.models.SesionAdmin;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import jakarta.servlet.http.HttpSession;
 
-/**
- * Controlador para el caso de uso: Login de Administrador.
- * 
- */
 @RestController
 @RequestMapping("/admin/login")
 public class LoginAdminController {
 
     private final Fachada fachada = Fachada.getInstancia();
 
-    /**
-     * 
-     * Autentica un administrador con cédula y contraseña.
-     */
     @PostMapping
     public ResponseEntity<List<Respuesta>> loginAdmin(
             @RequestParam int cedula,

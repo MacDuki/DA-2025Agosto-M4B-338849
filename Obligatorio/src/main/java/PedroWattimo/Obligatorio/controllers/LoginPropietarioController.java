@@ -25,10 +25,6 @@ public class LoginPropietarioController {
 
     private final Fachada fachada = Fachada.getInstancia();
 
-    /**
-     * 
-     * Autentica un propietario con cédula y contraseña.
-     */
     @PostMapping
     public ResponseEntity<List<Respuesta>> loginPropietario(
             @RequestParam int cedula,

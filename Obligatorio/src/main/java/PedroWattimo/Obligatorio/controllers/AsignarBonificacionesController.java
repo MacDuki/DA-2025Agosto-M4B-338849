@@ -55,9 +55,6 @@ public class AsignarBonificacionesController implements Observador {
         conexionNavegador.enviarJSON(List.of(respuesta));
     }
 
-    /**
-     * Lista todas las bonificaciones definidas en el sistema.
-     */
     @GetMapping("/bonificaciones")
     public ResponseEntity<List<BonificacionDto>> listarBonificaciones() {
         try {
@@ -73,13 +70,10 @@ public class AsignarBonificacionesController implements Observador {
         }
     }
 
-    /**
-     * Lista todos los puestos registrados en el sistema.
-     */
     @GetMapping("/puestos")
     public ResponseEntity<List<PuestoDto>> listarPuestos() {
         try {
-            // Convertir objetos de dominio a DTOs
+
             List<Puesto> puestos = fachada.listarPuestos();
             List<PuestoDto> dtos = new ArrayList<>();
             for (int i = 0; i < puestos.size(); i++) {
@@ -92,14 +86,10 @@ public class AsignarBonificacionesController implements Observador {
         }
     }
 
-    /**
-     * Busca un propietario por cédula y devuelve sus datos y bonificaciones
-     * asignadas.
-     */
     @GetMapping("/propietario")
     public ResponseEntity<Respuesta> buscarPropietario(@RequestParam String cedula) {
         try {
-            // Obtener propietario del dominio y convertir a DTO
+
             Propietario propietario = fachada.buscarPropietarioPorCedula(cedula);
 
             List<BonificacionAsignadaDto> bonificaciones = new ArrayList<>();
@@ -125,9 +115,6 @@ public class AsignarBonificacionesController implements Observador {
         }
     }
 
-    /**
-     * Asigna una bonificación a un propietario para un puesto específico.
-     */
     @PostMapping
     public ResponseEntity<Respuesta> asignarBonificacion(@RequestBody AsignarBonificacionRequest request) {
         try {

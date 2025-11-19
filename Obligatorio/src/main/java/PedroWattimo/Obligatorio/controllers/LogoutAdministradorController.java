@@ -13,20 +13,12 @@ import PedroWattimo.Obligatorio.models.Fachada;
 import PedroWattimo.Obligatorio.models.SesionAdmin;
 import jakarta.servlet.http.HttpSession;
 
-/**
- * Controlador para el caso de uso: Logout de Administrador.
- * 
- */
 @RestController
 @RequestMapping("/admin/logout")
 public class LogoutAdministradorController {
 
     private final Fachada fachada = Fachada.getInstancia();
 
-    /**
-     * 
-     * Cierra la sesión del administrador autenticado.
-     */
     @PostMapping
     public ResponseEntity<List<Respuesta>> logoutAdmin(HttpSession session) {
 

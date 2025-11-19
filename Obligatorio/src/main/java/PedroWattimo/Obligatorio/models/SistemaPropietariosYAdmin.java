@@ -24,7 +24,6 @@ public class SistemaPropietariosYAdmin {
 
     private final Map<Integer, Long> dashboardVersion = new ConcurrentHashMap<>();
 
-    // -------- Accesos Encapsulados --------
     public List<Propietario> getPropietarios() {
         return List.copyOf(propietarios);
     }
@@ -83,10 +82,9 @@ public class SistemaPropietariosYAdmin {
         if (propietario == null || mensaje == null || fechaHora == null)
             return;
         propietario.registrarNotificacion(mensaje, fechaHora);
-        // Incrementar versión del dashboard e notificar cambios
+
         dashboardVersion.merge(propietario.getCedula(), 1L, Long::sum);
 
-        // Notificar a través de la Fachada
         Fachada.getInstancia().avisar(Eventos.NOTIFICACION_REGISTRADA);
     }
 
@@ -151,7 +149,6 @@ public class SistemaPropietariosYAdmin {
         int borradas = p.borrarNotificaciones();
         dashboardVersion.merge(p.getCedula(), 1L, Long::sum);
 
-        // Notificar a través de la Fachada
         Fachada.getInstancia().avisar(Eventos.NOTIFICACIONES_BORRADAS);
         return borradas;
     }
@@ -179,7 +176,6 @@ public class SistemaPropietariosYAdmin {
 
         dashboardVersion.merge(propietario.getCedula(), 1L, Long::sum);
 
-        // Notificar a través de la Fachada
         Fachada.getInstancia().avisar(Eventos.CAMBIO_ESTADO);
     }
 
@@ -190,10 +186,9 @@ public class SistemaPropietariosYAdmin {
     }
 
     public Administrador agregarAdministrador(int cedula, String nombreCompleto, String password) throws OblException {
-        // Validar datos de creación (delegado al experto)
+
         Administrador.validarDatosCreacion(cedula, nombreCompleto, password);
 
-        // Validar unicidad (responsabilidad del sistema)
         for (Administrador admin : administradores) {
             if (admin.getCedula() == cedula) {
                 throw new OblException("Ya existe un administrador con la cédula: " + cedula);
@@ -206,10 +201,9 @@ public class SistemaPropietariosYAdmin {
     }
 
     public Propietario registrarPropietario(int cedula, String nombreCompleto, String password) throws OblException {
-        // Validar datos de creación (delegado al experto)
+
         Propietario.validarDatosCreacion(cedula, nombreCompleto, password);
 
-        // Validar unicidad (responsabilidad del sistema)
         Propietario existente = buscarPorCedula(cedula);
         if (existente != null) {
             throw new OblException("Ya existe un propietario con la cédula: " + cedula);

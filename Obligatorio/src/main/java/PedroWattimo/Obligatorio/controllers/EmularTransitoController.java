@@ -32,9 +32,6 @@ import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
 import observador.Observable;
 import observador.Observador;
 
-/**
- * Controlador para el caso de uso: Emular Tránsito.
- */
 @RestController
 @RequestMapping("/admin/emular-transito")
 @Scope("session")
@@ -62,10 +59,6 @@ public class EmularTransitoController implements Observador {
         conexionNavegador.enviarJSON(List.of(respuesta));
     }
 
-    /**
-     * 
-     * Lista todos los puestos registrados en el sistema.
-     */
     @GetMapping("/puestos")
     public ResponseEntity<List<PuestoDto>> listarPuestos() {
         try {
@@ -82,10 +75,6 @@ public class EmularTransitoController implements Observador {
         }
     }
 
-    /**
-     * 
-     * Obtiene las tarifas de un puesto específico.
-     */
     @GetMapping("/puestos/{id}/tarifas")
     public ResponseEntity<List<TarifaDto>> obtenerTarifasPuesto(@PathVariable Long id) {
         try {
@@ -107,10 +96,6 @@ public class EmularTransitoController implements Observador {
         }
     }
 
-    /**
-     * 
-     * Emula un tránsito de un vehículo por un puesto.
-     */
     @PostMapping
     public ResponseEntity<Respuesta> emularTransito(@RequestBody EmularTransitoRequest request) {
         try {
