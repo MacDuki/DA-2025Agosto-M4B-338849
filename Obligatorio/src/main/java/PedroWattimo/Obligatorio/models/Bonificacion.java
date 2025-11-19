@@ -3,9 +3,8 @@ package PedroWattimo.Obligatorio.models;
 import java.time.LocalDateTime;
 
 /**
- * Clase abstracta que representa una bonificación en el sistema de peajes.
- * Patrón Strategy: cada tipo de bonificación implementa su propia lógica de
- * descuento.
+ * Patrón Strategy: cada tipo de bonificación implementa su propia \
+ * lógica de descuento.
  */
 public abstract class Bonificacion {
     protected String nombre;

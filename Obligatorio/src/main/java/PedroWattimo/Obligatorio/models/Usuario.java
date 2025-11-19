@@ -29,9 +29,6 @@ public abstract class Usuario {
         return contraseña;
     }
 
-    /**
-     * Verifica si la contraseña ingresada coincide con el hash almacenado.
-     */
     public boolean passwordCorrecta(String pwd) {
         if (pwd == null || pwd.isBlank() || this.contraseña == null || this.contraseña.isBlank()) {
             return false;

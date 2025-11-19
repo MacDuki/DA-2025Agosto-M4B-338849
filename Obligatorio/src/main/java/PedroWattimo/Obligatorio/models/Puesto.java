@@ -14,10 +14,6 @@ public class Puesto {
         this.tablaTarifas = new ArrayList<>();
     }
 
-    /**
-     * Valida los datos para crear un puesto.
-     * Patrón Experto: el Puesto conoce sus reglas de validación.
-     */
     public static void validarDatosCreacion(String nombre, String direccion)
             throws PedroWattimo.Obligatorio.models.exceptions.OblException {
         if (nombre == null || nombre.isBlank()) {
@@ -48,16 +44,6 @@ public class Puesto {
         return tablaTarifas == null ? List.of() : List.copyOf(tablaTarifas);
     }
 
-    // Patrón Experto: el Puesto conoce sus propias tarifas
-    // Método interno para agregar tarifas (uso package-private para SeedData)
-    List<Tarifa> obtenerTablaTarifasInterna() {
-        return tablaTarifas;
-    }
-
-    /**
-     * Verifica si ya existe una tarifa para una categoría específica.
-     * Patrón Experto: el Puesto conoce sus tarifas.
-     */
     public boolean tieneTarifaPara(Categoria categoria) {
         if (categoria == null || tablaTarifas == null) {
             return false;
@@ -66,10 +52,6 @@ public class Puesto {
                 .anyMatch(t -> t.getCategoria() != null && t.getCategoria().equals(categoria));
     }
 
-    /**
-     * Agrega una tarifa al puesto.
-     * Patrón Experto: el Puesto gestiona sus propias tarifas.
-     */
     public void agregarTarifa(Tarifa tarifa) throws PedroWattimo.Obligatorio.models.exceptions.OblException {
         if (tarifa == null) {
             throw new PedroWattimo.Obligatorio.models.exceptions.OblException("La tarifa no puede ser nula");
@@ -85,10 +67,6 @@ public class Puesto {
         tablaTarifas.add(tarifa);
     }
 
-    /**
-     * 
-     * Lanza TarifaNoDefinidaException si no existe tarifa para la categoría.
-     */
     public Tarifa tarifaPara(Categoria cat) throws TarifaNoDefinidaException {
         if (cat == null) {
             throw new TarifaNoDefinidaException("La categoría no puede ser nula");

@@ -14,10 +14,6 @@ public class Propietario extends Usuario {
     private List<AsignacionBonificacion> asignaciones;
     private List<Notificacion> notificaciones;
 
-    /**
-     * Valida los datos para crear un propietario.
-     * Patrón Experto: el Propietario conoce sus reglas de validación.
-     */
     public static void validarDatosCreacion(int cedula, String nombreCompleto, String password)
             throws PedroWattimo.Obligatorio.models.exceptions.OblException {
         if (cedula <= 0) {
@@ -196,10 +192,6 @@ public class Propietario extends Usuario {
                 .anyMatch(ab -> ab.activaPara(puesto, this));
     }
 
-    /**
-     * Valida si se puede asignar una bonificación al propietario.
-     * Patrón Experto: el Propietario conoce sus propias restricciones.
-     */
     public void validarAsignacionBonificacion(Bonificacion bonificacion, Puesto puesto)
             throws PedroWattimo.Obligatorio.models.exceptions.OblException {
         if (bonificacion == null) {
@@ -290,10 +282,6 @@ public class Propietario extends Usuario {
         return this.estadoActual != null ? this.estadoActual.nombre() : FabricaEstados.crearHabilitado().nombre();
     }
 
-    /**
-     * Patrón Experto: calcula el total gastado por un vehículo específico
-     * a partir de los tránsitos del propietario.
-     */
     public double totalGastadoPor(Vehiculo v) {
         if (v == null || this.transitos == null)
             return 0.0;
@@ -303,10 +291,6 @@ public class Propietario extends Usuario {
                 .sum();
     }
 
-    /**
-     * Patrón Experto: calcula la cantidad de tránsitos de un vehículo específico
-     * a partir de los tránsitos del propietario.
-     */
     public int cantidadTransitosDe(Vehiculo v) {
         if (v == null || this.transitos == null)
             return 0;

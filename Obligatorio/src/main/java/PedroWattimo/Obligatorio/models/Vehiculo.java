@@ -10,10 +10,6 @@ public class Vehiculo {
     public Vehiculo() {
     }
 
-    /**
-     * Valida los datos para crear un vehículo.
-     * Patrón Experto: el Vehículo conoce sus reglas de validación.
-     */
     public static void validarDatosCreacion(String matricula, String modelo, String nombreCategoria)
             throws PedroWattimo.Obligatorio.models.exceptions.OblException {
         if (matricula == null || matricula.isBlank()) {
@@ -55,9 +51,6 @@ public class Vehiculo {
         return color;
     }
 
-    /**
-     * Patrón Experto: el Vehiculo sabe si pertenece a una categoría específica.
-     */
     public boolean esDeCategoria(Categoria c) {
         if (c == null || this.categoria == null)
             return false;

@@ -1,8 +1,6 @@
 package PedroWattimo.Obligatorio.models;
 
-/**
- * Clase abstracta que representa un estado de propietario en el sistema de
- * peajes.
+/***
  * Patrón State: cada tipo de estado implementa su propia lógica de permisos.
  */
 public abstract class Estado {

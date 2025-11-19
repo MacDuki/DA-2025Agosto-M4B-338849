@@ -7,10 +7,6 @@ public class Administrador extends Usuario {
         super();
     }
 
-    /**
-     * Valida los datos para crear un administrador.
-     * Patrón Experto: el Administrador conoce sus reglas de validación.
-     */
     public static void validarDatosCreacion(int cedula, String nombreCompleto, String password)
             throws PedroWattimo.Obligatorio.models.exceptions.OblException {
         if (cedula <= 0) {
