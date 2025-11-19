@@ -3,8 +3,6 @@ package PedroWattimo.Obligatorio.models;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.dtos.EmularTransitoResultado;
-import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
 import observador.Observable;
@@ -152,7 +150,7 @@ public class Fachada extends Observable {
     // Métodos auxiliares para consultas
     // --------------------------------------------------------------
 
-    public List<Categoria> obtenerCategorias() {
+    public List<Categoria> listarCategorias() {
         return sistemaVehiculosYCategorias.getCategorias();
     }
 
@@ -199,10 +197,6 @@ public class Fachada extends Observable {
     // --------------------------------------------------------------
     // CU: Dashboard del propietario
     // --------------------------------------------------------------
-    public PropietarioDashboardDto dashboardDePropietario(int cedula) throws OblException {
-        return this.sistemaPropietariosYAdmin.dashboardDePropietario(cedula);
-    }
-
     public int borrarNotificacionesDePropietario(int cedula) throws OblException {
         return this.sistemaPropietariosYAdmin.borrarNotificacionesDePropietario(cedula);
     }
@@ -216,28 +210,28 @@ public class Fachada extends Observable {
     // --------------------------------------------------------------
     /**
      * CU: Emular tránsito.
-     * Fachada como único punto de entrada: delega en SistemaTransitos con una sola
-     * línea.
+     * Fachada como único punto de entrada: delega en SistemaTransitos.
+     * Retorna el tránsito registrado.
      */
-    public EmularTransitoResultado emularTransito(Long puestoId, String matricula, LocalDateTime fechaHora)
+    public Transito emularTransito(Long puestoId, String matricula, LocalDateTime fechaHora)
             throws OblException, TarifaNoDefinidaException {
         return sistemaTransitos.emularTransito(puestoId, matricula, fechaHora);
     }
 
     /**
-     * Obtiene la lista de puestos.
+     * Lista todos los puestos del sistema.
      * Delegado en SistemaPuestos.
      */
-    public List<Puesto> obtenerPuestos() {
-        return sistemaPuestosYTarifas.getPuestos();
+    public List<Puesto> listarPuestos() {
+        return sistemaPuestosYTarifas.listarPuestos();
     }
 
     /**
-     * Obtiene un puesto por su ID.
+     * Busca un puesto por su ID.
      * Delegado en SistemaPuestos.
      */
-    public Puesto obtenerPuestoPorId(Long id) throws OblException {
-        return sistemaPuestosYTarifas.obtenerPorId(id);
+    public Puesto buscarPuestoPorId(Long id) throws OblException {
+        return sistemaPuestosYTarifas.buscarPorId(id);
     }
 
     // --------------------------------------------------------------
@@ -288,61 +282,6 @@ public class Fachada extends Observable {
     }
 
     // --------------------------------------------------------------
-    // Métodos para transformación de datos (Patrón Experto)
-    // --------------------------------------------------------------
-
-    /**
-     * Obtiene un propietario con sus bonificaciones asignadas.
-     * Fachada solo orquesta: delega al sistema correspondiente.
-     */
-    public PedroWattimo.Obligatorio.dtos.PropietarioConBonificacionesDto obtenerPropietarioConBonificaciones(
-            String cedula) throws OblException {
-        return sistemaPropietariosYAdmin.obtenerPropietarioConBonificaciones(cedula);
-    }
-
-    /**
-     * Obtiene las tarifas de un puesto como DTOs.
-     * Fachada solo orquesta: delega al sistema correspondiente.
-     */
-    public java.util.List<PedroWattimo.Obligatorio.dtos.TarifaDto> obtenerTarifasDePuesto(Long puestoId)
-            throws OblException {
-        return sistemaPuestosYTarifas.obtenerTarifasDePuesto(puestoId);
-    }
-
-    /**
-     * Lista todos los puestos como DTOs.
-     * Fachada solo orquesta: delega al sistema correspondiente.
-     */
-    public java.util.List<PedroWattimo.Obligatorio.dtos.PuestoDto> listarPuestosDto() {
-        return sistemaPuestosYTarifas.listarPuestosDto();
-    }
-
-    /**
-     * Lista todos los estados como DTOs.
-     * Fachada solo orquesta: delega al sistema correspondiente.
-     */
-    public java.util.List<PedroWattimo.Obligatorio.dtos.EstadoDto> listarEstadosDto() {
-        return sistemaEstados.listarEstadosDto();
-    }
-
-    /**
-     * Busca un propietario y devuelve un resumen como DTO.
-     * Fachada solo orquesta: delega al sistema correspondiente.
-     */
-    public PedroWattimo.Obligatorio.dtos.PropietarioResumenDto buscarPropietarioResumenDto(String cedula)
-            throws OblException {
-        return sistemaPropietariosYAdmin.buscarPropietarioResumenDto(cedula);
-    }
-
-    /**
-     * Lista todas las bonificaciones como DTOs.
-     * Fachada solo orquesta: delega al sistema correspondiente.
-     */
-    public java.util.List<PedroWattimo.Obligatorio.dtos.BonificacionDto> listarBonificacionesDto() {
-        return sistemaBonificaciones.listarBonificacionesDto();
-    }
-
-    // --------------------------------------------------------------
     // Métodos internos para comunicación entre subsistemas
     // Solo incluyen métodos que NO tienen equivalente público
     // --------------------------------------------------------------
@@ -377,7 +316,7 @@ public class Fachada extends Observable {
      * Usado por subsistemas para resolver dependencias a través de la Fachada.
      */
     Puesto buscarPuestoPorNombreInterno(String nombrePuesto) throws OblException {
-        return sistemaPuestosYTarifas.obtenerPorNombre(nombrePuesto);
+        return sistemaPuestosYTarifas.buscarPorNombre(nombrePuesto);
     }
 
     /**

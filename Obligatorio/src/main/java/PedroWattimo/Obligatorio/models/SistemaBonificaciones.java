@@ -116,18 +116,6 @@ public class SistemaBonificaciones {
         asignarBonificacionAPropietario(propietario, bonificacion, puesto);
     }
 
-    /**
-     * Lista todas las bonificaciones como DTOs.
-     * Patrón Experto: el sistema que conoce las bonificaciones transforma a DTO.
-     */
-    public List<PedroWattimo.Obligatorio.dtos.BonificacionDto> listarBonificacionesDto() {
-        List<PedroWattimo.Obligatorio.dtos.BonificacionDto> dtos = new ArrayList<>();
-        for (Bonificacion b : bonificaciones) {
-            dtos.add(new PedroWattimo.Obligatorio.dtos.BonificacionDto(b.getNombre(), b.getPorcentaje()));
-        }
-        return dtos;
-    }
-
     // ---- Casos de uso: Alta de entidades ----
 
     /**

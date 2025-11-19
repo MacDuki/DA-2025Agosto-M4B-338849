@@ -25,11 +25,4 @@ public class SistemaEstados {
         return FabricaEstados.crear(nombreEstado);
     }
 
-    public List<PedroWattimo.Obligatorio.dtos.EstadoDto> listarEstadosDto() {
-        List<PedroWattimo.Obligatorio.dtos.EstadoDto> estadoDtos = new ArrayList<>();
-        for (Estado estado : estados) {
-            estadoDtos.add(new PedroWattimo.Obligatorio.dtos.EstadoDto(estado.nombre()));
-        }
-        return estadoDtos;
-    }
 }

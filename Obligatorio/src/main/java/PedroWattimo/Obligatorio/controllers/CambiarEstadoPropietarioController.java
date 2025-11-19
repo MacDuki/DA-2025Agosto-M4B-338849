@@ -1,5 +1,6 @@
 package PedroWattimo.Obligatorio.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.annotation.Scope;
@@ -18,7 +19,9 @@ import PedroWattimo.Obligatorio.dtos.EstadoDto;
 import PedroWattimo.Obligatorio.dtos.NotificacionSSEDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
 import PedroWattimo.Obligatorio.models.ConexionNavegador;
+import PedroWattimo.Obligatorio.models.Estado;
 import PedroWattimo.Obligatorio.models.Fachada;
+import PedroWattimo.Obligatorio.models.Propietario;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import observador.Observable;
 import observador.Observador;
@@ -54,8 +57,12 @@ public class CambiarEstadoPropietarioController implements Observador {
     @GetMapping("/estados")
     public ResponseEntity<Respuesta> listarEstados() {
         try {
-
-            List<EstadoDto> estadoDtos = fachada.listarEstadosDto();
+            // Convertir objetos de dominio a DTOs
+            List<Estado> estados = fachada.listarEstados();
+            List<EstadoDto> estadoDtos = new ArrayList<>();
+            for (Estado estado : estados) {
+                estadoDtos.add(new EstadoDto(estado.nombre()));
+            }
             return ResponseEntity.ok(new Respuesta("ok", estadoDtos));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -69,8 +76,12 @@ public class CambiarEstadoPropietarioController implements Observador {
     @GetMapping("/propietario")
     public ResponseEntity<Respuesta> buscarPropietario(@RequestParam String cedula) {
         try {
-
-            PropietarioResumenDto dto = fachada.buscarPropietarioResumenDto(cedula);
+            // Obtener propietario del dominio y convertir a DTO
+            Propietario propietario = fachada.buscarPropietarioPorCedula(cedula);
+            PropietarioResumenDto dto = new PropietarioResumenDto(
+                    propietario.getNombreCompleto(),
+                    propietario.getEstadoActual() != null ? propietario.getEstadoActual().nombre() : "HABILITADO",
+                    propietario.getSaldoActual());
             return ResponseEntity.ok(new Respuesta("ok", dto));
         } catch (OblException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

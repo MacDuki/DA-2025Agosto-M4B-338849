@@ -2,17 +2,10 @@ package PedroWattimo.Obligatorio.models;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import PedroWattimo.Obligatorio.dtos.BonificacionAsignadaDto;
-import PedroWattimo.Obligatorio.dtos.NotificacionDto;
-import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
-import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
-import PedroWattimo.Obligatorio.dtos.TransitoDto;
-import PedroWattimo.Obligatorio.dtos.VehiculoResumenDto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 public class SistemaPropietariosYAdmin {
@@ -65,8 +58,12 @@ public class SistemaPropietariosYAdmin {
         }
     }
 
-    public Propietario findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(int cedula) {
-        return buscarPorCedula(cedula);
+    private Propietario buscarPorCedulaCompleto(int cedula) throws OblException {
+        Propietario p = buscarPorCedula(cedula);
+        if (p == null) {
+            throw new OblException("El propietario no existe");
+        }
+        return p;
     }
 
     public Propietario propietarioPorMatricula(String matricula) throws OblException {
@@ -149,65 +146,8 @@ public class SistemaPropietariosYAdmin {
         }
     }
 
-    public PropietarioDashboardDto dashboardDePropietario(int cedula) throws OblException {
-        Propietario p = findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(cedula);
-        if (p == null)
-            throw new OblException("El propietario no existe");
-
-        PropietarioDashboardDto dto = new PropietarioDashboardDto();
-        dto.setPropietario(new PropietarioResumenDto(p.getNombreCompleto(),
-                p.getEstadoActual() != null ? p.getEstadoActual().nombre() : FabricaEstados.crearHabilitado().nombre(),
-                p.getSaldoActual()));
-
-        List<BonificacionAsignadaDto> bonos = new ArrayList<>();
-        for (AsignacionBonificacion ab : p.bonificacionesAsignadas()) {
-            String nombre = ab.getBonificacion() != null ? ab.getBonificacion().getNombre() : null;
-            String puesto = ab.getPuesto() != null ? ab.getPuesto().getNombre() : null;
-            bonos.add(new BonificacionAsignadaDto(nombre, puesto, ab.getFechaHora()));
-        }
-        dto.setBonificaciones(bonos);
-
-        List<VehiculoResumenDto> vehs = new ArrayList<>();
-        for (Vehiculo v : p.vehiculos()) {
-            vehs.add(new VehiculoResumenDto(
-                    v.getMatricula(), v.getModelo(), v.getColor(),
-                    p.cantidadTransitosDe(v), p.totalGastadoPor(v)));
-        }
-        dto.setVehiculos(vehs);
-
-        List<Transito> trans = new ArrayList<>(p.transitosOrdenadosDesc());
-        trans.sort(Comparator.comparing(Transito::fechaHora).reversed());
-        List<TransitoDto> transDtos = new ArrayList<>();
-        for (Transito t : trans) {
-            transDtos.add(new TransitoDto(
-                    t.puesto() != null ? t.puesto().getNombre() : null,
-                    t.vehiculo() != null ? t.vehiculo().getMatricula() : null,
-                    t.categoriaVehiculo(),
-                    t.costoConTarifa(),
-                    t.nombreBonificacion(),
-                    t.montoBonificacion(),
-                    t.totalPagado(),
-                    t.fechaHora()));
-        }
-        dto.setTransitos(transDtos);
-
-        List<Notificacion> notifs = new ArrayList<>(p.notificacionesOrdenadasDesc());
-        notifs.sort(Comparator.comparing(Notificacion::getFechaHora).reversed());
-        List<NotificacionDto> notifDtos = new ArrayList<>();
-        for (Notificacion n : notifs) {
-            notifDtos.add(new NotificacionDto(n.getFechaHora(), n.getMensaje()));
-        }
-        dto.setNotificaciones(notifDtos);
-
-        long ver = dashboardVersion.getOrDefault(p.getCedula(), 0L);
-        dto.setVersion(ver);
-        return dto;
-    }
-
     public int borrarNotificacionesDePropietario(int cedula) throws OblException {
-        Propietario p = findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(cedula);
-        if (p == null)
-            throw new OblException("El propietario no existe");
+        Propietario p = buscarPorCedulaCompleto(cedula);
         int borradas = p.borrarNotificaciones();
         dashboardVersion.merge(p.getCedula(), 1L, Long::sum);
 
@@ -217,9 +157,7 @@ public class SistemaPropietariosYAdmin {
     }
 
     public long versionDashboardDePropietario(int cedula) throws OblException {
-        Propietario p = findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(cedula);
-        if (p == null)
-            throw new OblException("El propietario no existe");
+        Propietario p = buscarPorCedulaCompleto(cedula);
         return dashboardVersion.getOrDefault(p.getCedula(), 0L);
     }
 
@@ -249,33 +187,6 @@ public class SistemaPropietariosYAdmin {
         Propietario propietario = buscarPorCedula(cedulaPropietario);
         Estado nuevoEstado = Fachada.getInstancia().buscarEstadoPorNombreInterno(nombreNuevoEstado);
         cambiarEstadoDePropietario(propietario, nuevoEstado);
-    }
-
-    public PedroWattimo.Obligatorio.dtos.PropietarioConBonificacionesDto obtenerPropietarioConBonificaciones(
-            String cedula) throws OblException {
-        Propietario propietario = buscarPorCedula(cedula);
-
-        List<BonificacionAsignadaDto> bonificaciones = new ArrayList<>();
-        for (AsignacionBonificacion ab : propietario.getAsignaciones()) {
-            String nombreBonif = ab.getBonificacion() != null ? ab.getBonificacion().getNombre() : null;
-            String nombrePuesto = ab.getPuesto() != null ? ab.getPuesto().getNombre() : null;
-            bonificaciones.add(new BonificacionAsignadaDto(nombreBonif, nombrePuesto, ab.getFechaHora()));
-        }
-
-        return new PedroWattimo.Obligatorio.dtos.PropietarioConBonificacionesDto(
-                propietario.getNombreCompleto(),
-                propietario.getEstadoActual() != null ? propietario.getEstadoActual().nombre()
-                        : FabricaEstados.crearHabilitado().nombre(),
-                bonificaciones);
-    }
-
-    public PropietarioResumenDto buscarPropietarioResumenDto(String cedula) throws OblException {
-        Propietario propietario = buscarPorCedula(cedula);
-        return new PropietarioResumenDto(
-                propietario.getNombreCompleto(),
-                propietario.getEstadoActual() != null ? propietario.getEstadoActual().nombre()
-                        : FabricaEstados.crearHabilitado().nombre(),
-                propietario.getSaldoActual());
     }
 
     public Administrador agregarAdministrador(int cedula, String nombreCompleto, String password) throws OblException {

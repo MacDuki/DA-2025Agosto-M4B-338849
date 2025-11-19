@@ -1,5 +1,6 @@
 package PedroWattimo.Obligatorio.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.annotation.Scope;
@@ -14,12 +15,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import PedroWattimo.Obligatorio.Respuesta;
 import PedroWattimo.Obligatorio.dtos.AsignarBonificacionRequest;
+import PedroWattimo.Obligatorio.dtos.BonificacionAsignadaDto;
 import PedroWattimo.Obligatorio.dtos.BonificacionDto;
 import PedroWattimo.Obligatorio.dtos.NotificacionSSEDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioConBonificacionesDto;
 import PedroWattimo.Obligatorio.dtos.PuestoDto;
+import PedroWattimo.Obligatorio.models.AsignacionBonificacion;
+import PedroWattimo.Obligatorio.models.Bonificacion;
 import PedroWattimo.Obligatorio.models.ConexionNavegador;
 import PedroWattimo.Obligatorio.models.Fachada;
+import PedroWattimo.Obligatorio.models.Propietario;
+import PedroWattimo.Obligatorio.models.Puesto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import observador.Observable;
 import observador.Observador;
@@ -55,8 +61,12 @@ public class AsignarBonificacionesController implements Observador {
     @GetMapping("/bonificaciones")
     public ResponseEntity<List<BonificacionDto>> listarBonificaciones() {
         try {
-
-            List<BonificacionDto> dtos = fachada.listarBonificacionesDto();
+            // Convertir objetos de dominio a DTOs
+            List<Bonificacion> bonificaciones = fachada.listarBonificaciones();
+            List<BonificacionDto> dtos = new ArrayList<>();
+            for (Bonificacion b : bonificaciones) {
+                dtos.add(new BonificacionDto(b.getNombre(), b.getPorcentaje()));
+            }
             return ResponseEntity.ok(dtos);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -69,8 +79,13 @@ public class AsignarBonificacionesController implements Observador {
     @GetMapping("/puestos")
     public ResponseEntity<List<PuestoDto>> listarPuestos() {
         try {
-
-            List<PuestoDto> dtos = fachada.listarPuestosDto();
+            // Convertir objetos de dominio a DTOs
+            List<Puesto> puestos = fachada.listarPuestos();
+            List<PuestoDto> dtos = new ArrayList<>();
+            for (int i = 0; i < puestos.size(); i++) {
+                Puesto p = puestos.get(i);
+                dtos.add(new PuestoDto((long) i, p.getNombre(), p.getDireccion()));
+            }
             return ResponseEntity.ok(dtos);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -84,7 +99,21 @@ public class AsignarBonificacionesController implements Observador {
     @GetMapping("/propietario")
     public ResponseEntity<Respuesta> buscarPropietario(@RequestParam String cedula) {
         try {
-            PropietarioConBonificacionesDto dto = fachada.obtenerPropietarioConBonificaciones(cedula);
+            // Obtener propietario del dominio y convertir a DTO
+            Propietario propietario = fachada.buscarPropietarioPorCedula(cedula);
+
+            List<BonificacionAsignadaDto> bonificaciones = new ArrayList<>();
+            for (AsignacionBonificacion ab : propietario.getAsignaciones()) {
+                String nombreBonif = ab.getBonificacion() != null ? ab.getBonificacion().getNombre() : null;
+                String nombrePuesto = ab.getPuesto() != null ? ab.getPuesto().getNombre() : null;
+                bonificaciones.add(new BonificacionAsignadaDto(nombreBonif, nombrePuesto, ab.getFechaHora()));
+            }
+
+            PropietarioConBonificacionesDto dto = new PropietarioConBonificacionesDto(
+                    propietario.getNombreCompleto(),
+                    propietario.getEstadoActual() != null ? propietario.getEstadoActual().nombre() : "HABILITADO",
+                    bonificaciones);
+
             return ResponseEntity.ok(new Respuesta("ok", dto));
 
         } catch (OblException e) {

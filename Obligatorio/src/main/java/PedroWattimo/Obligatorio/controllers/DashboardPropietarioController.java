@@ -1,5 +1,6 @@
 package PedroWattimo.Obligatorio.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.annotation.Scope;
@@ -9,12 +10,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import PedroWattimo.Obligatorio.Respuesta;
+import PedroWattimo.Obligatorio.dtos.BonificacionAsignadaDto;
+import PedroWattimo.Obligatorio.dtos.NotificacionDto;
 import PedroWattimo.Obligatorio.dtos.NotificacionSSEDto;
 import PedroWattimo.Obligatorio.dtos.NotificacionesBorradasDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioAutenticadoDTO;
 import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
+import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
+import PedroWattimo.Obligatorio.dtos.TransitoDto;
+import PedroWattimo.Obligatorio.dtos.VehiculoResumenDto;
+import PedroWattimo.Obligatorio.models.AsignacionBonificacion;
 import PedroWattimo.Obligatorio.models.ConexionNavegador;
 import PedroWattimo.Obligatorio.models.Fachada;
+import PedroWattimo.Obligatorio.models.Notificacion;
+import PedroWattimo.Obligatorio.models.Propietario;
+import PedroWattimo.Obligatorio.models.Transito;
+import PedroWattimo.Obligatorio.models.Vehiculo;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import jakarta.servlet.http.HttpSession;
 import observador.Observable;
@@ -61,7 +72,55 @@ public class DashboardPropietarioController implements Observador {
             throw new OblException("No hay sesión activa. Por favor, inicie sesión.");
         }
 
-        PropietarioDashboardDto dto = fachada.dashboardDePropietario(propietario.getCedula());
+        Propietario p = fachada.buscarPropietarioPorCedula(propietario.getCedula());
+        if (p == null) {
+            throw new OblException("El propietario no existe");
+        }
+
+        // Convertir a DTO en el controlador
+        PropietarioDashboardDto dto = new PropietarioDashboardDto();
+        dto.setPropietario(new PropietarioResumenDto(
+                p.getNombreCompleto(),
+                p.getEstadoActual() != null ? p.getEstadoActual().nombre() : "HABILITADO",
+                p.getSaldoActual()));
+
+        List<BonificacionAsignadaDto> bonos = new ArrayList<>();
+        for (AsignacionBonificacion ab : p.bonificacionesAsignadas()) {
+            String nombre = ab.getBonificacion() != null ? ab.getBonificacion().getNombre() : null;
+            String puesto = ab.getPuesto() != null ? ab.getPuesto().getNombre() : null;
+            bonos.add(new BonificacionAsignadaDto(nombre, puesto, ab.getFechaHora()));
+        }
+        dto.setBonificaciones(bonos);
+
+        List<VehiculoResumenDto> vehs = new ArrayList<>();
+        for (Vehiculo v : p.vehiculos()) {
+            vehs.add(new VehiculoResumenDto(
+                    v.getMatricula(), v.getModelo(), v.getColor(),
+                    p.cantidadTransitosDe(v), p.totalGastadoPor(v)));
+        }
+        dto.setVehiculos(vehs);
+
+        List<TransitoDto> transDtos = new ArrayList<>();
+        for (Transito t : p.transitosOrdenadosDesc()) {
+            transDtos.add(new TransitoDto(
+                    t.puesto() != null ? t.puesto().getNombre() : null,
+                    t.vehiculo() != null ? t.vehiculo().getMatricula() : null,
+                    t.categoriaVehiculo(),
+                    t.costoConTarifa(),
+                    t.nombreBonificacion(),
+                    t.montoBonificacion(),
+                    t.totalPagado(),
+                    t.fechaHora()));
+        }
+        dto.setTransitos(transDtos);
+
+        List<NotificacionDto> notifDtos = new ArrayList<>();
+        for (Notificacion n : p.notificacionesOrdenadasDesc()) {
+            notifDtos.add(new NotificacionDto(n.getFechaHora(), n.getMensaje()));
+        }
+        dto.setNotificaciones(notifDtos);
+
+        dto.setVersion(fachada.versionDashboardDePropietario(propietario.getCedula()));
 
         Respuesta respuesta = new Respuesta("dashboard", dto);
         return ResponseEntity.ok(List.of(respuesta));

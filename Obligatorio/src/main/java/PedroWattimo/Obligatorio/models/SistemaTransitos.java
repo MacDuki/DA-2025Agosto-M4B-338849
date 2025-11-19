@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import PedroWattimo.Obligatorio.dtos.EmularTransitoResultado;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
 
@@ -47,10 +46,10 @@ public class SistemaTransitos {
         return t;
     }
 
-    public EmularTransitoResultado emularTransito(Long puestoId, String matricula, LocalDateTime fechaHora)
+    public Transito emularTransito(Long puestoId, String matricula, LocalDateTime fechaHora)
             throws OblException, TarifaNoDefinidaException {
 
-        Puesto puesto = Fachada.getInstancia().obtenerPuestoPorId(puestoId);
+        Puesto puesto = Fachada.getInstancia().buscarPuestoPorId(puestoId);
         Propietario prop = Fachada.getInstancia().buscarPropietarioPorMatriculaInterno(matricula);
 
         Estado estado = prop.getEstadoActual();
@@ -85,7 +84,7 @@ public class SistemaTransitos {
         }
         prop.debitar(montoAPagar);
 
-        registrarTransito(puesto, veh, tarifa, montoBonif, montoAPagar, fechaHora, bonifAplicada);
+        Transito transito = registrarTransito(puesto, veh, tarifa, montoBonif, montoAPagar, fechaHora, bonifAplicada);
 
         if (estado == null || estado.permiteNotificaciones()) {
             String mensajeTransito = String.format("[%s] Pasaste por el puesto %s con el vehículo %s",
@@ -101,15 +100,7 @@ public class SistemaTransitos {
         // Notificar a través de la Fachada
         Fachada.getInstancia().avisar(Eventos.TRANSITO_REGISTRADO);
 
-        return new EmularTransitoResultado(
-                prop.getNombreCompleto(),
-                estado != null ? estado.nombre() : FabricaEstados.crearHabilitado().nombre(),
-                cat != null ? cat.getNombre() : "Desconocida",
-                bonifAplicada != null ? bonifAplicada.getNombre() : null,
-                montoBase,
-                montoBonif,
-                montoAPagar,
-                prop.getSaldoActual());
+        return transito;
     }
 
 }
