@@ -39,10 +39,6 @@ public class SistemaBonificaciones {
     }
 
     public Bonificacion buscarPorNombre(String nombre) throws OblException {
-        if (nombre == null || nombre.isBlank()) {
-            throw new OblException("El nombre de la bonificación no puede estar vacío");
-        }
-
         Bonificacion bonificacion = FabricaBonificaciones.crear(nombre);
 
         boolean existe = bonificaciones.stream()
@@ -57,15 +53,8 @@ public class SistemaBonificaciones {
 
     public void asignarBonificacionAPropietario(Propietario propietario, Bonificacion bonificacion, Puesto puesto)
             throws OblException {
-
-        if (propietario == null) {
-            throw new OblException("no existe el propietario");
-        }
-
         propietario.validarAsignacionBonificacion(bonificacion, puesto);
-
         propietario.asignarBonificacion(bonificacion, puesto);
-
         Fachada.getInstancia().avisar(Eventos.BONIFICACION_ASIGNADA);
     }
 
@@ -83,10 +72,6 @@ public class SistemaBonificaciones {
         }
 
         String nombre = bonificacion.getNombre();
-        if (nombre == null || nombre.isBlank()) {
-            throw new OblException("El nombre de la bonificación no puede estar vacío");
-        }
-
         for (Bonificacion b : bonificaciones) {
             if (nombre.equalsIgnoreCase(b.getNombre())) {
                 throw new OblException("Ya existe una bonificación con el nombre: " + nombre);

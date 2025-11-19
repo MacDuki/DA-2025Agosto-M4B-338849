@@ -3,12 +3,27 @@ package PedroWattimo.Obligatorio.models;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import PedroWattimo.Obligatorio.models.exceptions.OblException;
+
 public abstract class Usuario {
     protected int cedula;
     protected String nombreCompleto;
     protected String contraseña;
 
     public Usuario() {
+    }
+
+    public static void validarDatosCreacionBase(int cedula, String nombreCompleto, String password)
+            throws OblException {
+        if (cedula <= 0) {
+            throw new OblException("La cédula debe ser mayor a 0");
+        }
+        if (nombreCompleto == null || nombreCompleto.isBlank()) {
+            throw new OblException("El nombre completo no puede estar vacío");
+        }
+        if (password == null || password.isBlank()) {
+            throw new OblException("La contraseña no puede estar vacía");
+        }
     }
 
     public Usuario(int cedula, String nombreCompleto, String contraseñaPlana) {

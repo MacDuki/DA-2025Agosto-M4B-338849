@@ -16,16 +16,7 @@ public class Propietario extends Usuario {
 
     public static void validarDatosCreacion(int cedula, String nombreCompleto, String password)
             throws PedroWattimo.Obligatorio.models.exceptions.OblException {
-        if (cedula <= 0) {
-            throw new PedroWattimo.Obligatorio.models.exceptions.OblException("La cédula debe ser mayor a 0");
-        }
-        if (nombreCompleto == null || nombreCompleto.isBlank()) {
-            throw new PedroWattimo.Obligatorio.models.exceptions.OblException(
-                    "El nombre completo no puede estar vacío");
-        }
-        if (password == null || password.isBlank()) {
-            throw new PedroWattimo.Obligatorio.models.exceptions.OblException("La contraseña no puede estar vacía");
-        }
+        Usuario.validarDatosCreacionBase(cedula, nombreCompleto, password);
     }
 
     public Propietario(int cedula, String nombreCompleto, String contraseña) {

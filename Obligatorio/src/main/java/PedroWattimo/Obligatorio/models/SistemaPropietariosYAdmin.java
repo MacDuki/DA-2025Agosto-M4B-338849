@@ -89,19 +89,10 @@ public class SistemaPropietariosYAdmin {
     }
 
     public Propietario autenticarPropietario(int cedula, String password) throws OblException {
-        if (password == null || password.isBlank()) {
-            throw new OblException("Acceso denegado");
-        }
-
         Propietario dueño = buscarPorCedula(cedula);
-        if (dueño == null) {
+        if (dueño == null || !dueño.passwordCorrecta(password)) {
             throw new OblException("Acceso denegado");
         }
-
-        if (!dueño.passwordCorrecta(password)) {
-            throw new OblException("Acceso denegado");
-        }
-
         return dueño;
     }
 
@@ -114,10 +105,6 @@ public class SistemaPropietariosYAdmin {
     }
 
     public Administrador autenticarYValidarAdmin(int cedula, String password) throws OblException {
-        if (password == null || password.isBlank()) {
-            throw new OblException("Acceso denegado");
-        }
-
         Administrador admin = null;
         for (Administrador a : this.administradores) {
             if (a != null && a.getCedula() == cedula) {
@@ -186,7 +173,6 @@ public class SistemaPropietariosYAdmin {
     }
 
     public Administrador agregarAdministrador(int cedula, String nombreCompleto, String password) throws OblException {
-
         Administrador.validarDatosCreacion(cedula, nombreCompleto, password);
 
         for (Administrador admin : administradores) {
@@ -201,7 +187,6 @@ public class SistemaPropietariosYAdmin {
     }
 
     public Propietario registrarPropietario(int cedula, String nombreCompleto, String password) throws OblException {
-
         Propietario.validarDatosCreacion(cedula, nombreCompleto, password);
 
         Propietario existente = buscarPorCedula(cedula);

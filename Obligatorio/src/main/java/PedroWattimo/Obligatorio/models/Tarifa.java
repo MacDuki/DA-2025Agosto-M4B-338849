@@ -1,10 +1,21 @@
 package PedroWattimo.Obligatorio.models;
 
+import PedroWattimo.Obligatorio.models.exceptions.OblException;
+
 public class Tarifa {
     private double monto;
     private Categoria categoria;
 
     public Tarifa() {
+    }
+
+    public static void validarDatosCreacion(double monto, Categoria categoria) throws OblException {
+        if (monto <= 0) {
+            throw new OblException("El monto de la tarifa debe ser mayor a 0");
+        }
+        if (categoria == null) {
+            throw new OblException("La tarifa debe tener una categoría");
+        }
     }
 
     public Tarifa(double monto, Categoria categoria) {

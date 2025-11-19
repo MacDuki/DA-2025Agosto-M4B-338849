@@ -41,7 +41,6 @@ public class SistemaPuestosYTarifas {
     }
 
     public Puesto agregarPuesto(String nombre, String direccion) throws OblException {
-
         Puesto.validarDatosCreacion(nombre, direccion);
 
         try {
@@ -57,11 +56,6 @@ public class SistemaPuestosYTarifas {
     }
 
     public void agregarTarifaAPuesto(String nombrePuesto, double monto, String nombreCategoria) throws OblException {
-
-        if (monto <= 0) {
-            throw new OblException("El monto de la tarifa debe ser mayor a 0");
-        }
-
         Puesto puesto = buscarPorNombre(nombrePuesto);
 
         Categoria categoria = Fachada.getInstancia().buscarCategoriaPorNombreInterno(nombreCategoria);
@@ -69,6 +63,7 @@ public class SistemaPuestosYTarifas {
             throw new OblException("No existe la categoría: " + nombreCategoria);
         }
 
+        Tarifa.validarDatosCreacion(monto, categoria);
         Tarifa nuevaTarifa = new Tarifa(monto, categoria);
         puesto.agregarTarifa(nuevaTarifa);
     }

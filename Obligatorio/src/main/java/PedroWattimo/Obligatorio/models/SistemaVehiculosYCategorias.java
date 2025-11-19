@@ -39,7 +39,6 @@ public class SistemaVehiculosYCategorias {
     }
 
     public Categoria agregarCategoria(String nombre) throws OblException {
-
         Categoria.validarDatosCreacion(nombre);
 
         Categoria existente = buscarCategoriaPorNombre(nombre);
@@ -54,7 +53,6 @@ public class SistemaVehiculosYCategorias {
 
     public Vehiculo registrarVehiculo(int cedulaPropietario, String matricula, String modelo,
             String color, String nombreCategoria) throws OblException {
-
         Vehiculo.validarDatosCreacion(matricula, modelo, nombreCategoria);
 
         Vehiculo existente = buscarVehiculoPorMatricula(matricula);
