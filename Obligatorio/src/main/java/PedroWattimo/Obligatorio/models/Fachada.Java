@@ -34,16 +34,15 @@ public class Fachada extends Observable {
         this.sistemaEstados = new SistemaEstados();
         this.sistemaAcceso = new SistemaAcceso();
 
-        // Inyecciones según nueva arquitectura
-        this.sistemaTransitos.setSistemaPropietariosYAdmin(this.sistemaPropietariosYAdmin);
-        this.sistemaTransitos.setSistemaPuestosYTarifas(this.sistemaPuestosYTarifas);
-        this.sistemaTransitos.setSistemaBonificaciones(this.sistemaBonificaciones);
-        this.sistemaAcceso.setSistemaPropietariosYAdmin(this.sistemaPropietariosYAdmin);
-        this.sistemaBonificaciones.setSistemaPropietarios(this.sistemaPropietariosYAdmin);
-        this.sistemaBonificaciones.setSistemaPuestos(this.sistemaPuestosYTarifas);
-        this.sistemaPropietariosYAdmin.setSistemaEstados(this.sistemaEstados);
-        this.sistemaVehiculosYCategorias.setSistemaPropietarios(this.sistemaPropietariosYAdmin);
-        this.sistemaPuestosYTarifas.setSistemaCategorias(this.sistemaVehiculosYCategorias);
+        // Inyectar referencia de Fachada en subsistemas para que puedan:
+        // 1) Notificar eventos
+        // 2) Comunicarse entre sí a través de la Fachada
+        this.sistemaTransitos.setFachada(this);
+        this.sistemaBonificaciones.setFachada(this);
+        this.sistemaPropietariosYAdmin.setFachada(this);
+        this.sistemaAcceso.setFachada(this);
+        this.sistemaVehiculosYCategorias.setFachada(this);
+        this.sistemaPuestosYTarifas.setFachada(this);
     }
 
     public static Fachada getInstancia() {
@@ -54,30 +53,26 @@ public class Fachada extends Observable {
     }
 
     // --------------------------------------------------------------
-    // Gestión de Observadores: suscribir observadores a los sistemas observables
+    // Gestión de Observadores: suscribir observadores a la Fachada
     // --------------------------------------------------------------
 
     /**
-     * Registra un observador en los sistemas de dominio que notifican cambios.
+     * Registra un observador en la Fachada que notifica cambios del sistema.
      * Esto permite que los controladores/vistas reaccionen a cambios en el modelo.
      */
     public void registrarObservador(observador.Observador observador) {
         if (observador != null) {
-            this.sistemaPropietariosYAdmin.agregarObservador(observador);
-            this.sistemaTransitos.agregarObservador(observador);
-            this.sistemaBonificaciones.agregarObservador(observador);
+            this.agregarObservador(observador);
         }
     }
 
     /**
-     * Remueve un observador de los sistemas de dominio.
+     * Remueve un observador de la Fachada.
      * Útil al cerrar sesión o destruir componentes de UI.
      */
     public void removerObservador(observador.Observador observador) {
         if (observador != null) {
-            this.sistemaPropietariosYAdmin.eliminarObservador(observador);
-            this.sistemaTransitos.eliminarObservador(observador);
-            this.sistemaBonificaciones.eliminarObservador(observador);
+            this.eliminarObservador(observador);
         }
     }
 
@@ -271,13 +266,6 @@ public class Fachada extends Observable {
     }
 
     /**
-     * Lista todos los puestos del sistema.
-     */
-    public List<Puesto> listarPuestos() {
-        return sistemaPuestosYTarifas.listarPuestos();
-    }
-
-    /**
      * Busca un propietario por cédula.
      * Lanza OblException si no existe.
      */
@@ -366,6 +354,84 @@ public class Fachada extends Observable {
      */
     public java.util.List<PedroWattimo.Obligatorio.dtos.BonificacionDto> listarBonificacionesDto() {
         return sistemaBonificaciones.listarBonificacionesDto();
+    }
+
+    // --------------------------------------------------------------
+    // Métodos internos para comunicación entre subsistemas
+    // Solo incluyen métodos que NO tienen equivalente público
+    // --------------------------------------------------------------
+
+    /**
+     * Método interno: Busca propietario por matrícula de vehículo.
+     * Usado por subsistemas para resolver dependencias a través de la Fachada.
+     */
+    Propietario buscarPropietarioPorMatriculaInterno(String matricula) throws OblException {
+        return sistemaPropietariosYAdmin.propietarioPorMatricula(matricula);
+    }
+
+    /**
+     * Método interno: Obtiene bonificación vigente para un propietario en un
+     * puesto.
+     * Usado por subsistemas para resolver dependencias a través de la Fachada.
+     */
+    java.util.Optional<Bonificacion> obtenerBonificacionVigenteInterno(Propietario propietario, Puesto puesto) {
+        return sistemaBonificaciones.bonificacionVigente(propietario, puesto);
+    }
+
+    /**
+     * Método interno: Registra una notificación para un propietario.
+     * Usado por subsistemas para resolver dependencias a través de la Fachada.
+     */
+    void registrarNotificacionInterno(Propietario propietario, String mensaje, LocalDateTime fechaHora) {
+        sistemaPropietariosYAdmin.registrarNotificacion(propietario, mensaje, fechaHora);
+    }
+
+    /**
+     * Método interno: Busca puesto por nombre.
+     * Usado por subsistemas para resolver dependencias a través de la Fachada.
+     */
+    Puesto buscarPuestoPorNombreInterno(String nombrePuesto) throws OblException {
+        return sistemaPuestosYTarifas.obtenerPorNombre(nombrePuesto);
+    }
+
+    /**
+     * Método interno: Busca estado por nombre.
+     * Usado por subsistemas para resolver dependencias a través de la Fachada.
+     */
+    Estado buscarEstadoPorNombreInterno(String nombreEstado) throws OblException {
+        return sistemaEstados.buscarPorNombre(nombreEstado);
+    }
+
+    /**
+     * Método interno: Autentica y valida propietario.
+     * Usado por subsistemas para resolver dependencias a través de la Fachada.
+     */
+    Propietario autenticarYValidarPropietarioInterno(int cedula, String password) throws OblException {
+        return sistemaPropietariosYAdmin.autenticarYValidarPropietario(cedula, password);
+    }
+
+    /**
+     * Método interno: Autentica y valida administrador.
+     * Usado por subsistemas para resolver dependencias a través de la Fachada.
+     */
+    Administrador autenticarYValidarAdminInterno(int cedula, String password) throws OblException {
+        return sistemaPropietariosYAdmin.autenticarYValidarAdmin(cedula, password);
+    }
+
+    /**
+     * Método interno: Desloguea un administrador.
+     * Usado por subsistemas para resolver dependencias a través de la Fachada.
+     */
+    void desloguearAdminInterno(Administrador admin) {
+        sistemaPropietariosYAdmin.desloguearAdmin(admin);
+    }
+
+    /**
+     * Método interno: Busca categoría por nombre.
+     * Usado por subsistemas para resolver dependencias a través de la Fachada.
+     */
+    Categoria buscarCategoriaPorNombreInterno(String nombreCategoria) {
+        return sistemaVehiculosYCategorias.buscarCategoriaPorNombre(nombreCategoria);
     }
 
 }

@@ -10,9 +10,8 @@ import java.util.stream.Collectors;
 import PedroWattimo.Obligatorio.dtos.EmularTransitoResultado;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
-import observador.Observable;
 
-public class SistemaTransitos extends Observable {
+public class SistemaTransitos {
 
     public enum Eventos {
         TRANSITO_REGISTRADO
@@ -20,23 +19,13 @@ public class SistemaTransitos extends Observable {
 
     private final List<Transito> transitos = new ArrayList<>();
 
-    private SistemaPropietariosYAdmin sistemaPropietariosYAdmin;
-    private SistemaPuestosYTarifas sistemaPuestosYTarifas;
-    private SistemaBonificaciones sistemaBonificaciones;
+    private Fachada fachada;
 
     protected SistemaTransitos() {
     }
 
-    void setSistemaPropietariosYAdmin(SistemaPropietariosYAdmin sistemaPropietariosYAdmin) {
-        this.sistemaPropietariosYAdmin = sistemaPropietariosYAdmin;
-    }
-
-    void setSistemaPuestosYTarifas(SistemaPuestosYTarifas sistemaPuestosYTarifas) {
-        this.sistemaPuestosYTarifas = sistemaPuestosYTarifas;
-    }
-
-    void setSistemaBonificaciones(SistemaBonificaciones sistemaBonificaciones) {
-        this.sistemaBonificaciones = sistemaBonificaciones;
+    void setFachada(Fachada fachada) {
+        this.fachada = fachada;
     }
 
     public List<Transito> getTransitos() {
@@ -67,8 +56,8 @@ public class SistemaTransitos extends Observable {
     public EmularTransitoResultado emularTransito(Long puestoId, String matricula, LocalDateTime fechaHora)
             throws OblException, TarifaNoDefinidaException {
 
-        Puesto puesto = sistemaPuestosYTarifas.obtenerPorId(puestoId);
-        Propietario prop = sistemaPropietariosYAdmin.propietarioPorMatricula(matricula);
+        Puesto puesto = fachada.obtenerPuestoPorId(puestoId);
+        Propietario prop = fachada.buscarPropietarioPorMatriculaInterno(matricula);
 
         Estado estado = prop.getEstadoActual();
         if (estado != null && !estado.permiteTransitar()) {
@@ -87,7 +76,7 @@ public class SistemaTransitos extends Observable {
         double montoBonif = 0.0;
         Bonificacion bonifAplicada = null;
         if (estado == null || estado.permiteBonificaciones()) {
-            Optional<Bonificacion> bonifOpt = sistemaBonificaciones.bonificacionVigente(prop, puesto);
+            Optional<Bonificacion> bonifOpt = fachada.obtenerBonificacionVigenteInterno(prop, puesto);
             if (bonifOpt.isPresent()) {
                 bonifAplicada = bonifOpt.get();
                 montoBonif = bonifAplicada.calcularDescuento(prop, veh, puesto, tarifa, fechaHora, this);
@@ -107,15 +96,18 @@ public class SistemaTransitos extends Observable {
         if (estado == null || estado.permiteNotificaciones()) {
             String mensajeTransito = String.format("[%s] Pasaste por el puesto %s con el vehículo %s",
                     fechaHora.toString(), puesto.getNombre(), veh.getMatricula());
-            sistemaPropietariosYAdmin.registrarNotificacion(prop, mensajeTransito, fechaHora);
+            fachada.registrarNotificacionInterno(prop, mensajeTransito, fechaHora);
             if (prop.debeAlertarSaldo()) {
                 String mensajeSaldo = String.format("[%s] Tu saldo actual es $%d. Te recomendamos hacer una recarga",
                         fechaHora.toString(), prop.getSaldoActual());
-                sistemaPropietariosYAdmin.registrarNotificacion(prop, mensajeSaldo, fechaHora);
+                fachada.registrarNotificacionInterno(prop, mensajeSaldo, fechaHora);
             }
         }
 
-        avisar(Eventos.TRANSITO_REGISTRADO);
+        // Notificar a través de la Fachada
+        if (fachada != null) {
+            fachada.avisar(Eventos.TRANSITO_REGISTRADO);
+        }
 
         return new EmularTransitoResultado(
                 prop.getNombreCompleto(),

@@ -107,11 +107,11 @@ public class SistemaPuestosYTarifas {
         return nuevoPuesto;
     }
 
-    // Inyección de dependencia para resolver categorías
-    private SistemaVehiculosYCategorias sistemaCategorias;
+    // Referencia a Fachada para resolver categorías
+    private Fachada fachada;
 
-    public void setSistemaCategorias(SistemaVehiculosYCategorias sistema) {
-        this.sistemaCategorias = sistema;
+    void setFachada(Fachada fachada) {
+        this.fachada = fachada;
     }
 
     /**
@@ -127,8 +127,8 @@ public class SistemaPuestosYTarifas {
         // Resolver puesto
         Puesto puesto = obtenerPorNombre(nombrePuesto);
 
-        // Resolver categoría
-        Categoria categoria = sistemaCategorias.buscarCategoriaPorNombre(nombreCategoria);
+        // Resolver categoría a través de Fachada
+        Categoria categoria = fachada.buscarCategoriaPorNombreInterno(nombreCategoria);
         if (categoria == null) {
             throw new OblException("No existe la categoría: " + nombreCategoria);
         }

@@ -67,11 +67,11 @@ public class SistemaVehiculosYCategorias {
         return nuevaCategoria;
     }
 
-    // Inyección de dependencia para resolver propietarios
-    private SistemaPropietariosYAdmin sistemaPropietarios;
+    // Referencia a Fachada para resolver propietarios
+    private Fachada fachada;
 
-    public void setSistemaPropietarios(SistemaPropietariosYAdmin sistema) {
-        this.sistemaPropietarios = sistema;
+    void setFachada(Fachada fachada) {
+        this.fachada = fachada;
     }
 
     /**
@@ -97,8 +97,8 @@ public class SistemaVehiculosYCategorias {
             throw new OblException("Ya existe un vehículo con la matrícula: " + matricula);
         }
 
-        // Resolver propietario
-        Propietario propietario = sistemaPropietarios.buscarPorCedula(cedulaPropietario);
+        // Resolver propietario a través de Fachada
+        Propietario propietario = fachada.buscarPropietarioPorCedula(cedulaPropietario);
         if (propietario == null) {
             throw new OblException("No existe el propietario con cédula: " + cedulaPropietario);
         }

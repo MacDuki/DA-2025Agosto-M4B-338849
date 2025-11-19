@@ -14,9 +14,8 @@ import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
 import PedroWattimo.Obligatorio.dtos.TransitoDto;
 import PedroWattimo.Obligatorio.dtos.VehiculoResumenDto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
-import observador.Observable;
 
-public class SistemaPropietariosYAdmin extends Observable {
+public class SistemaPropietariosYAdmin {
 
     public enum Eventos {
         CAMBIO_ESTADO,
@@ -31,6 +30,7 @@ public class SistemaPropietariosYAdmin extends Observable {
     private final List<Administrador> administradores = new ArrayList<>();
 
     private final Map<Integer, Long> dashboardVersion = new ConcurrentHashMap<>();
+    private Fachada fachada;
 
     // -------- Accesos Encapsulados --------
     public List<Propietario> getPropietarios() {
@@ -90,7 +90,10 @@ public class SistemaPropietariosYAdmin extends Observable {
         // Incrementar versión del dashboard e notificar cambios
         dashboardVersion.merge(propietario.getCedula(), 1L, Long::sum);
 
-        avisar(Eventos.NOTIFICACION_REGISTRADA);
+        // Notificar a través de la Fachada
+        if (fachada != null) {
+            fachada.avisar(Eventos.NOTIFICACION_REGISTRADA);
+        }
     }
 
     public Propietario autenticarPropietario(int cedula, String password) throws OblException {
@@ -211,8 +214,18 @@ public class SistemaPropietariosYAdmin extends Observable {
         int borradas = p.borrarNotificaciones();
         dashboardVersion.merge(p.getCedula(), 1L, Long::sum);
 
-        avisar(Eventos.NOTIFICACIONES_BORRADAS);
+        // Notificar a través de la Fachada
+        if (fachada != null) {
+            fachada.avisar(Eventos.NOTIFICACIONES_BORRADAS);
+        }
         return borradas;
+    }
+
+    public long versionDashboardDePropietario(int cedula) throws OblException {
+        Propietario p = findByCedulaWithVehiculosTransitosBonificacionesNotificaciones(cedula);
+        if (p == null)
+            throw new OblException("El propietario no existe");
+        return dashboardVersion.getOrDefault(p.getCedula(), 0L);
     }
 
     public void cambiarEstadoDePropietario(Propietario propietario, Estado nuevoEstado) throws OblException {
@@ -233,18 +246,19 @@ public class SistemaPropietariosYAdmin extends Observable {
 
         dashboardVersion.merge(propietario.getCedula(), 1L, Long::sum);
 
-        avisar(Eventos.CAMBIO_ESTADO);
+        // Notificar a través de la Fachada
+        if (fachada != null) {
+            fachada.avisar(Eventos.CAMBIO_ESTADO);
+        }
     }
 
-    private SistemaEstados sistemaEstados;
-
-    public void setSistemaEstados(SistemaEstados sistema) {
-        this.sistemaEstados = sistema;
+    void setFachada(Fachada fachada) {
+        this.fachada = fachada;
     }
 
     public void cambiarEstadoPropietario(String cedulaPropietario, String nombreNuevoEstado) throws OblException {
         Propietario propietario = buscarPorCedula(cedulaPropietario);
-        Estado nuevoEstado = sistemaEstados.buscarPorNombre(nombreNuevoEstado);
+        Estado nuevoEstado = fachada.buscarEstadoPorNombreInterno(nombreNuevoEstado);
         cambiarEstadoDePropietario(propietario, nuevoEstado);
     }
 

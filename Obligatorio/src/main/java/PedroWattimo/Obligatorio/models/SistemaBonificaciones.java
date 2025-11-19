@@ -5,9 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
-import observador.Observable;
 
-public class SistemaBonificaciones extends Observable {
+public class SistemaBonificaciones {
 
     public enum Eventos {
         BONIFICACION_ASIGNADA
@@ -15,6 +14,7 @@ public class SistemaBonificaciones extends Observable {
 
     private List<Bonificacion> bonificaciones = new ArrayList<Bonificacion>();
     private List<AsignacionBonificacion> asignaciones = new ArrayList<AsignacionBonificacion>();
+    private Fachada fachada;
 
     protected SistemaBonificaciones() {
     }
@@ -99,31 +99,27 @@ public class SistemaBonificaciones extends Observable {
         // Delegar al propietario la asignación (Patrón Experto)
         propietario.asignarBonificacion(bonificacion, puesto);
 
-        // Notifica a las vistas que se asignó una nueva bonificación
-        avisar(Eventos.BONIFICACION_ASIGNADA);
+        // Notifica a las vistas que se asignó una nueva bonificación a través de la
+        // Fachada
+        if (fachada != null) {
+            fachada.avisar(Eventos.BONIFICACION_ASIGNADA);
+        }
     }
 
-    // Inyección de dependencias para resolver objetos
-    private SistemaPropietariosYAdmin sistemaPropietarios;
-    private SistemaPuestosYTarifas sistemaPuestos;
-
-    public void setSistemaPropietarios(SistemaPropietariosYAdmin sistema) {
-        this.sistemaPropietarios = sistema;
-    }
-
-    public void setSistemaPuestos(SistemaPuestosYTarifas sistema) {
-        this.sistemaPuestos = sistema;
+    void setFachada(Fachada fachada) {
+        this.fachada = fachada;
     }
 
     /**
      * Asigna una bonificación resolviendo los objetos por sus identificadores.
-     * Orquesta la resolución de objetos y delega la asignación.
+     * Orquesta la resolución de objetos a través de la Fachada y delega la
+     * asignación.
      */
     public void asignarBonificacion(String cedula, String nombreBonificacion, String nombrePuesto)
             throws OblException {
-        Propietario propietario = sistemaPropietarios.buscarPorCedula(cedula);
+        Propietario propietario = fachada.buscarPropietarioPorCedula(cedula);
         Bonificacion bonificacion = buscarPorNombre(nombreBonificacion);
-        Puesto puesto = sistemaPuestos.obtenerPorNombre(nombrePuesto);
+        Puesto puesto = fachada.buscarPuestoPorNombreInterno(nombrePuesto);
         asignarBonificacionAPropietario(propietario, bonificacion, puesto);
     }
 
