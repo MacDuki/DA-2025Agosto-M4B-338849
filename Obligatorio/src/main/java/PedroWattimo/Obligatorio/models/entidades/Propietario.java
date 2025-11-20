@@ -80,16 +80,16 @@ public class Propietario extends Usuario {
         return this;
     }
 
-    public boolean debitarSaldo(double monto) {
+    public void debitarSaldo(double monto) throws OblException {
         if (monto <= 0)
-            return false;
+            throw new OblException("El monto a debitar debe ser positivo");
         int montoRedondeado = (int) Math.round(monto);
-        if (this.saldoActual - montoRedondeado < 0)
-            return false;
+        if (this.saldoActual < montoRedondeado) {
+            throw new OblException(String.format("Saldo insuficiente: $%d", this.saldoActual));
+        }
         this.saldoActual -= montoRedondeado;
         if (this.saldoActual < 0)
             this.saldoActual = 0;
-        return true;
     }
 
     public Vehiculo registrarVehiculo(String matricula, String modelo, String color, Categoria categoria) {
@@ -112,8 +112,10 @@ public class Propietario extends Usuario {
         return this.estadoActual.permiteTransitar();
     }
 
-    public boolean saldoInsuficientePara(double monto) {
-        return this.saldoActual < monto;
+    public void validarPuedeTransitar() throws OblException {
+        if (this.estadoActual != null && !this.estadoActual.permiteTransitar()) {
+            throw new OblException("El propietario del vehículo no puede realizar tránsitos en su estado actual");
+        }
     }
 
     public Optional<AsignacionBonificacion> bonificacionAsignadaPara(Puesto p) {
@@ -142,6 +144,24 @@ public class Propietario extends Usuario {
             return;
         String mensaje = "Se ha cambiado tu estado en el sistema. Tu estado actual es " + estadoActual.nombre();
         registrarNotificacion(mensaje, fechaHora);
+    }
+
+    public void notificarTransito(Transito transito) {
+        if (transito == null)
+            return;
+        if (this.estadoActual == null || this.estadoActual.permiteNotificaciones()) {
+            String mensajeTransito = String.format("[%s] Pasaste por el puesto %s con el vehículo %s",
+                    transito.fechaHora().toString(), 
+                    transito.puesto().getNombre(), 
+                    transito.vehiculo().getMatricula());
+            registrarNotificacion(mensajeTransito, transito.fechaHora());
+            
+            if (this.debeAlertarSaldo()) {
+                String mensajeSaldo = String.format("[%s] Tu saldo actual es $%d. Te recomendamos hacer una recarga",
+                        transito.fechaHora().toString(), this.saldoActual);
+                registrarNotificacion(mensajeSaldo, transito.fechaHora());
+            }
+        }
     }
 
     public void registrarTransito(Transito transito) {

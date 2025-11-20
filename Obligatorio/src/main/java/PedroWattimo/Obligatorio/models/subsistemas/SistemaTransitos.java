@@ -60,10 +60,7 @@ public class SistemaTransitos {
         Puesto puesto = Fachada.getInstancia().buscarPuestoPorId(puestoId);
         Propietario prop = Fachada.getInstancia().buscarPropietarioPorMatriculaInterno(matricula);
 
-        Estado estado = prop.getEstadoActual();
-        if (estado != null && !estado.permiteTransitar()) {
-            throw new OblException("El propietario del vehículo no puede realizar tránsitos en su estado actual");
-        }
+        prop.validarPuedeTransitar();
 
         Vehiculo veh = prop.buscarVehiculoPorMatricula(matricula);
         if (veh == null) {
@@ -76,6 +73,7 @@ public class SistemaTransitos {
 
         double montoBonif = 0.0;
         Bonificacion bonifAplicada = null;
+        Estado estado = prop.getEstadoActual();
         if (estado == null || estado.permiteBonificaciones()) {
             Optional<Bonificacion> bonifOpt = Fachada.getInstancia().obtenerBonificacionVigenteInterno(prop, puesto);
             if (bonifOpt.isPresent()) {
@@ -87,23 +85,11 @@ public class SistemaTransitos {
         }
 
         double montoAPagar = montoBase - montoBonif;
-        if (prop.saldoInsuficientePara(montoAPagar)) {
-            throw new OblException(String.format("Saldo insuficiente: $%d", prop.getSaldoActual()));
-        }
         prop.debitarSaldo(montoAPagar);
 
         Transito transito = registrarTransito(puesto, veh, tarifa, montoBonif, montoAPagar, fechaHora, bonifAplicada);
 
-        if (estado == null || estado.permiteNotificaciones()) {
-            String mensajeTransito = String.format("[%s] Pasaste por el puesto %s con el vehículo %s",
-                    fechaHora.toString(), puesto.getNombre(), veh.getMatricula());
-            Fachada.getInstancia().registrarNotificacionInterno(prop, mensajeTransito, fechaHora);
-            if (prop.debeAlertarSaldo()) {
-                String mensajeSaldo = String.format("[%s] Tu saldo actual es $%d. Te recomendamos hacer una recarga",
-                        fechaHora.toString(), prop.getSaldoActual());
-                Fachada.getInstancia().registrarNotificacionInterno(prop, mensajeSaldo, fechaHora);
-            }
-        }
+        prop.notificarTransito(transito);
 
         // Notificar a través de la Fachada
         Fachada.getInstancia().avisar(Eventos.TRANSITO_REGISTRADO);

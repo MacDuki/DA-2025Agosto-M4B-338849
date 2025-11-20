@@ -14,7 +14,7 @@ public class SistemaPuestosYTarifas {
     protected SistemaPuestosYTarifas() {
     }
 
-    public List<Puesto> getPuestos() {
+    public List<Puesto> listarPuestos() {
         return List.copyOf(puestos);
     }
 
@@ -37,10 +37,6 @@ public class SistemaPuestosYTarifas {
                 .filter(p -> nombre.equalsIgnoreCase(p.getNombre()))
                 .findFirst()
                 .orElseThrow(() -> new OblException("Puesto no encontrado: " + nombre));
-    }
-
-    public List<Puesto> listarPuestos() {
-        return getPuestos();
     }
 
     public Puesto agregarPuesto(String nombre, String direccion) throws OblException {

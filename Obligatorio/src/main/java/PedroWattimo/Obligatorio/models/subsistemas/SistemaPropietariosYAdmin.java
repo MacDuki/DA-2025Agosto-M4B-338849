@@ -186,7 +186,7 @@ public class SistemaPropietariosYAdmin {
             throw new OblException("Ya existe un propietario con la cédula: " + cedula);
         } catch (OblException e) {
             if (e.getMessage().equals("El propietario no existe")) {
-                // El propietario no existe, podemos continuar
+
             } else {
                 throw e;
             }
