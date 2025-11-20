@@ -186,7 +186,7 @@ public class Fachada extends Observable {
         sistemaPropietariosYAdmin.desloguearAdmin(admin);
     }
 
-    Categoria buscarCategoriaPorNombreInterno(String nombreCategoria) {
+    Categoria buscarCategoriaPorNombreInterno(String nombreCategoria) throws OblException {
         return sistemaVehiculosYCategorias.buscarCategoriaPorNombre(nombreCategoria);
     }
 

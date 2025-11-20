@@ -15,10 +15,10 @@ import PedroWattimo.Obligatorio.dtos.PropietarioConBonificacionesDto;
 import PedroWattimo.Obligatorio.dtos.PuestoDto;
 import PedroWattimo.Obligatorio.models.entidades.Bonificacion;
 import PedroWattimo.Obligatorio.models.entidades.ConexionNavegador;
-import PedroWattimo.Obligatorio.models.subsistemas.Fachada;
 import PedroWattimo.Obligatorio.models.entidades.Propietario;
 import PedroWattimo.Obligatorio.models.entidades.Puesto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
+import PedroWattimo.Obligatorio.models.subsistemas.Fachada;
 import observador.Observable;
 import observador.Observador;
 

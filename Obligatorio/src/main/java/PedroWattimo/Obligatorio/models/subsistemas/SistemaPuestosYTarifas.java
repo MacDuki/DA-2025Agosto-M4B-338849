@@ -55,9 +55,6 @@ public class SistemaPuestosYTarifas {
         Puesto puesto = buscarPorNombre(nombrePuesto);
 
         Categoria categoria = Fachada.getInstancia().buscarCategoriaPorNombreInterno(nombreCategoria);
-        if (categoria == null) {
-            throw new OblException("No existe la categoría: " + nombreCategoria);
-        }
 
         Tarifa.validarDatosCreacion(monto, categoria);
         Tarifa nuevaTarifa = new Tarifa(monto, categoria);

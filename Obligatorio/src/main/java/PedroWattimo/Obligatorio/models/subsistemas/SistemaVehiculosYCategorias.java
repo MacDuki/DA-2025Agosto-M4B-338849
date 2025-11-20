@@ -23,30 +23,40 @@ public class SistemaVehiculosYCategorias {
         return List.copyOf(categorias);
     }
 
-    public Categoria buscarCategoriaPorNombre(String nombre) {
-        if (nombre == null || nombre.isBlank())
-            return null;
+    public Categoria buscarCategoriaPorNombre(String nombre) throws OblException {
+        if (nombre == null || nombre.isBlank()) {
+            throw new OblException("El nombre de la categoría no puede estar vacío");
+        }
+
         return categorias.stream()
                 .filter(c -> nombre.equalsIgnoreCase(c.getNombre()))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new OblException("No existe la categoría: " + nombre));
     }
 
-    public Vehiculo buscarVehiculoPorMatricula(String matricula) {
-        if (matricula == null || matricula.isBlank())
-            return null;
+    public Vehiculo buscarVehiculoPorMatricula(String matricula) throws OblException {
+        if (matricula == null || matricula.isBlank()) {
+            throw new OblException("La matrícula no puede estar vacía");
+        }
+
         return vehiculos.stream()
                 .filter(v -> matricula.equalsIgnoreCase(v.getMatricula()))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new OblException("No existe un vehículo con la matrícula: " + matricula));
     }
 
     public Categoria agregarCategoria(String nombre) throws OblException {
         Categoria.validarDatosCreacion(nombre);
 
-        Categoria existente = buscarCategoriaPorNombre(nombre);
-        if (existente != null) {
+        try {
+            buscarCategoriaPorNombre(nombre);
+
             throw new OblException("Ya existe una categoría con el nombre: " + nombre);
+        } catch (OblException e) {
+
+            if (!e.getMessage().startsWith("No existe la categoría")) {
+                throw e;
+            }
         }
 
         Categoria nuevaCategoria = new Categoria(nombre);
@@ -58,9 +68,15 @@ public class SistemaVehiculosYCategorias {
             String color, String nombreCategoria) throws OblException {
         Vehiculo.validarDatosCreacion(matricula, modelo, nombreCategoria);
 
-        Vehiculo existente = buscarVehiculoPorMatricula(matricula);
-        if (existente != null) {
+        try {
+            buscarVehiculoPorMatricula(matricula);
+
             throw new OblException("Ya existe un vehículo con la matrícula: " + matricula);
+        } catch (OblException e) {
+
+            if (!e.getMessage().startsWith("No existe un vehículo")) {
+                throw e;
+            }
         }
 
         Propietario propietario = Fachada.getInstancia().buscarPropietarioPorCedula(cedulaPropietario);
@@ -69,9 +85,6 @@ public class SistemaVehiculosYCategorias {
         }
 
         Categoria categoria = buscarCategoriaPorNombre(nombreCategoria);
-        if (categoria == null) {
-            throw new OblException("No existe la categoría: " + nombreCategoria);
-        }
 
         Vehiculo nuevoVehiculo = propietario.registrarVehiculo(matricula, modelo, color, categoria);
         vehiculos.add(nuevoVehiculo);

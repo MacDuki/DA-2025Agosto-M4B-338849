@@ -8,8 +8,16 @@ import PedroWattimo.Obligatorio.models.entidades.Bonificacion;
 import PedroWattimo.Obligatorio.models.entidades.Propietario;
 import PedroWattimo.Obligatorio.models.entidades.Puesto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
-import PedroWattimo.Obligatorio.models.fabricas.FabricaBonificaciones;
 
+/**
+ * FUENTE DE VERDAD: La lista interna 'bonificaciones' es la única fuente de
+ * verdad.
+ * La fábrica (FabricaBonificaciones) se usa únicamente para crear instancias
+ * durante
+ * la inicialización o agregación de bonificaciones, pero todas las búsquedas
+ * retornan
+ * objetos de la lista, nunca nuevas instancias.
+ */
 public class SistemaBonificaciones {
 
     public enum Eventos {
@@ -35,16 +43,14 @@ public class SistemaBonificaciones {
     }
 
     public Bonificacion buscarPorNombre(String nombre) throws OblException {
-        Bonificacion bonificacion = FabricaBonificaciones.crear(nombre);
-
-        boolean existe = bonificaciones.stream()
-                .anyMatch(b -> nombre.equalsIgnoreCase(b.getNombre()));
-
-        if (!existe) {
-            throw new OblException("Bonificación no encontrada: " + nombre);
+        if (nombre == null || nombre.isBlank()) {
+            throw new OblException("El nombre de la bonificación no puede estar vacío");
         }
 
-        return bonificacion;
+        return bonificaciones.stream()
+                .filter(b -> nombre.equalsIgnoreCase(b.getNombre()))
+                .findFirst()
+                .orElseThrow(() -> new OblException("Bonificación no encontrada: " + nombre));
     }
 
     public void asignarBonificacionAPropietario(Propietario propietario, Bonificacion bonificacion, Puesto puesto)
