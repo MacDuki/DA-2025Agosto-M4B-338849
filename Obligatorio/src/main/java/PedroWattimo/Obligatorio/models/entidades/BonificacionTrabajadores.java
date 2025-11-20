@@ -2,8 +2,7 @@ package PedroWattimo.Obligatorio.models.entidades;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-
-import PedroWattimo.Obligatorio.models.subsistemas.SistemaTransitos;
+import java.util.List;
 
 /**
  * Bonificación para trabajadores.
@@ -19,7 +18,7 @@ public class BonificacionTrabajadores extends Bonificacion {
     @Override
     public double calcularDescuento(Propietario prop, Vehiculo veh, Puesto puesto,
             Tarifa tarifa, LocalDateTime fh,
-            SistemaTransitos sistemaTransitos) {
+            List<Transito> transitosPrevios) {
         if (tarifa == null || fh == null) {
             return 0.0;
         }

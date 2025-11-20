@@ -166,14 +166,6 @@ public class Fachada extends Observable {
         return sistemaPropietariosYAdmin.propietarioPorMatricula(matricula);
     }
 
-    java.util.Optional<Bonificacion> obtenerBonificacionVigenteInterno(Propietario propietario, Puesto puesto) {
-        return sistemaBonificaciones.bonificacionVigente(propietario, puesto);
-    }
-
-    void registrarNotificacionInterno(Propietario propietario, String mensaje, LocalDateTime fechaHora) {
-        sistemaPropietariosYAdmin.registrarNotificacion(propietario, mensaje, fechaHora);
-    }
-
     Puesto buscarPuestoPorNombreInterno(String nombrePuesto) throws OblException {
         return sistemaPuestosYTarifas.buscarPorNombre(nombrePuesto);
     }
@@ -196,6 +188,10 @@ public class Fachada extends Observable {
 
     Categoria buscarCategoriaPorNombreInterno(String nombreCategoria) {
         return sistemaVehiculosYCategorias.buscarCategoriaPorNombre(nombreCategoria);
+    }
+
+    public void registrarNotificacionPropietario(Propietario propietario, String mensaje, LocalDateTime fechaHora) {
+        sistemaPropietariosYAdmin.registrarNotificacion(propietario, mensaje, fechaHora);
     }
 
 }

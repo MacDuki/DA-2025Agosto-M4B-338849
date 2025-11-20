@@ -2,7 +2,6 @@ package PedroWattimo.Obligatorio.models.subsistemas;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import PedroWattimo.Obligatorio.models.entidades.AsignacionBonificacion;
 import PedroWattimo.Obligatorio.models.entidades.Bonificacion;
@@ -29,14 +28,6 @@ public class SistemaBonificaciones {
 
     public List<AsignacionBonificacion> getAsignaciones() {
         return List.copyOf(asignaciones);
-    }
-
-    public Optional<Bonificacion> bonificacionVigente(Propietario p, Puesto puesto) {
-        if (p == null || puesto == null)
-            return Optional.empty();
-
-        Optional<AsignacionBonificacion> asignacion = p.bonificacionAsignadaPara(puesto);
-        return asignacion.map(AsignacionBonificacion::getBonificacion);
     }
 
     public List<Bonificacion> listarBonificaciones() {
@@ -72,9 +63,7 @@ public class SistemaBonificaciones {
     }
 
     public void agregarBonificacion(Bonificacion bonificacion) throws OblException {
-        if (bonificacion == null) {
-            throw new OblException("La bonificación no puede ser nula");
-        }
+        Bonificacion.validarNoNula(bonificacion);
 
         String nombre = bonificacion.getNombre();
         for (Bonificacion b : bonificaciones) {

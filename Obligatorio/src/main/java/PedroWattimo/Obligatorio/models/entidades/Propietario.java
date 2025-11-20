@@ -63,6 +63,12 @@ public class Propietario extends Usuario {
         return notificaciones == null ? List.of() : List.copyOf(notificaciones);
     }
 
+    public void validarCambioEstado(Estado nuevoEstado) throws OblException {
+        if (this.estadoActual != null && this.estadoActual.equals(nuevoEstado)) {
+            throw new OblException("El propietario ya esta en estado " + this.estadoActual.nombre());
+        }
+    }
+
     public Propietario cambiarEstado(Estado nuevoEstado) {
         this.estadoActual = (nuevoEstado == null) ? FabricaEstados.crearHabilitado() : nuevoEstado;
         return this;
@@ -106,10 +112,10 @@ public class Propietario extends Usuario {
         return this.estadoActual.permiteIngresar();
     }
 
-    public boolean puedeTransitar() {
-        if (this.estadoActual == null)
-            return true;
-        return this.estadoActual.permiteTransitar();
+    public void validarPuedeIngresar() throws OblException {
+        if (!puedeIngresar()) {
+            throw new OblException("Usuario deshabilitado, no puede ingresar al sistema");
+        }
     }
 
     public void validarPuedeTransitar() throws OblException {
@@ -124,6 +130,40 @@ public class Propietario extends Usuario {
         return this.asignaciones.stream()
                 .filter(ab -> ab.activaPara(p, this))
                 .findFirst();
+    }
+
+    public Object[] calcularBonificacion(Vehiculo veh, Puesto puesto, Tarifa tarifa,
+            LocalDateTime fechaHora, List<Transito> transitosPrevios) {
+        double montoBonif = 0.0;
+        Bonificacion bonifAplicada = null;
+
+        if (this.estadoActual == null || this.estadoActual.permiteBonificaciones()) {
+            Optional<AsignacionBonificacion> asignacionOpt = bonificacionAsignadaPara(puesto);
+            if (asignacionOpt.isPresent()) {
+                bonifAplicada = asignacionOpt.get().getBonificacion();
+                double montoBase = tarifa.getMonto();
+                montoBonif = bonifAplicada.calcularDescuento(this, veh, puesto, tarifa, fechaHora, transitosPrevios);
+
+                montoBonif = Math.min(montoBonif, montoBase);
+                montoBonif = Math.max(montoBonif, 0.0);
+            }
+        }
+
+        return new Object[] { montoBonif, bonifAplicada };
+    }
+
+    public Object[] procesarPagoTransito(Vehiculo veh, Puesto puesto, Tarifa tarifa,
+            LocalDateTime fechaHora, List<Transito> transitosPrevios) throws OblException {
+        double montoBase = tarifa.getMonto();
+
+        Object[] resultadoBonif = calcularBonificacion(veh, puesto, tarifa, fechaHora, transitosPrevios);
+        double montoBonif = (double) resultadoBonif[0];
+        Bonificacion bonifAplicada = (Bonificacion) resultadoBonif[1];
+
+        double montoAPagar = montoBase - montoBonif;
+        debitarSaldo(montoAPagar);
+
+        return new Object[] { montoAPagar, montoBonif, bonifAplicada };
     }
 
     public boolean debeAlertarSaldo() {
@@ -146,30 +186,33 @@ public class Propietario extends Usuario {
         registrarNotificacion(mensaje, fechaHora);
     }
 
-    public void notificarTransito(Transito transito) {
-        if (transito == null)
-            return;
-        if (this.estadoActual == null || this.estadoActual.permiteNotificaciones()) {
-            String mensajeTransito = String.format("[%s] Pasaste por el puesto %s con el vehículo %s",
-                    transito.fechaHora().toString(), 
-                    transito.puesto().getNombre(), 
-                    transito.vehiculo().getMatricula());
-            registrarNotificacion(mensajeTransito, transito.fechaHora());
-            
-            if (this.debeAlertarSaldo()) {
-                String mensajeSaldo = String.format("[%s] Tu saldo actual es $%d. Te recomendamos hacer una recarga",
-                        transito.fechaHora().toString(), this.saldoActual);
-                registrarNotificacion(mensajeSaldo, transito.fechaHora());
-            }
-        }
-    }
-
     public void registrarTransito(Transito transito) {
         if (transito == null)
             return;
         if (this.transitos == null)
             this.transitos = new ArrayList<>();
         this.transitos.add(transito);
+    }
+
+    public List<String> generarNotificacionesTransito(Transito transito) {
+        List<String> notificaciones = new ArrayList<>();
+        if (transito == null)
+            return notificaciones;
+
+        if (this.estadoActual == null || this.estadoActual.permiteNotificaciones()) {
+            String mensajeTransito = String.format("[%s] Pasaste por el puesto %s con el vehículo %s",
+                    transito.fechaHora().toString(),
+                    transito.puesto().getNombre(),
+                    transito.vehiculo().getMatricula());
+            notificaciones.add(mensajeTransito);
+
+            if (this.debeAlertarSaldo()) {
+                String mensajeSaldo = String.format("[%s] Tu saldo actual es $%d. Te recomendamos hacer una recarga",
+                        transito.fechaHora().toString(), this.saldoActual);
+                notificaciones.add(mensajeSaldo);
+            }
+        }
+        return notificaciones;
     }
 
     public boolean tieneBonificacionPara(Puesto puesto) {
@@ -213,13 +256,13 @@ public class Propietario extends Usuario {
         return ab;
     }
 
-    public Vehiculo buscarVehiculoPorMatricula(String matricula) {
+    public Vehiculo buscarVehiculoPorMatricula(String matricula) throws OblException {
         if (matricula == null || this.vehiculos == null)
-            return null;
+            throw new OblException("La matrícula no puede ser nula");
         return this.vehiculos.stream()
                 .filter(v -> matricula.equalsIgnoreCase(v.getMatricula()))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new OblException("El vehículo no pertenece al propietario"));
     }
 
     public List<Notificacion> notificacionesOrdenadasDesc() {

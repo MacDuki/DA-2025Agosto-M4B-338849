@@ -1,8 +1,7 @@
 package PedroWattimo.Obligatorio.models.entidades;
 
 import java.time.LocalDateTime;
-
-import PedroWattimo.Obligatorio.models.subsistemas.SistemaTransitos;
+import java.util.List;
 
 /**
  * Bonificación para propietarios exonerados.
@@ -17,7 +16,7 @@ public class BonificacionExonerados extends Bonificacion {
     @Override
     public double calcularDescuento(Propietario prop, Vehiculo veh, Puesto puesto,
             Tarifa tarifa, LocalDateTime fh,
-            SistemaTransitos sistemaTransitos) {
+            List<Transito> transitosPrevios) {
         // 100% de descuento = toda la tarifa
         return tarifa != null ? tarifa.getMonto() : 0.0;
     }

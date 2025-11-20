@@ -4,12 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import PedroWattimo.Obligatorio.models.entidades.Bonificacion;
 import PedroWattimo.Obligatorio.models.entidades.Categoria;
-import PedroWattimo.Obligatorio.models.entidades.Estado;
 import PedroWattimo.Obligatorio.models.entidades.Propietario;
 import PedroWattimo.Obligatorio.models.entidades.Puesto;
 import PedroWattimo.Obligatorio.models.entidades.Tarifa;
@@ -49,7 +47,12 @@ public class SistemaTransitos {
         Transito t = new Transito(puesto, veh, tarifa, montoBonif, montoPagado, fh, bonifAplicada);
         this.transitos.add(t);
         if (veh != null && veh.getPropietario() != null) {
-            veh.getPropietario().registrarTransito(t);
+            Propietario prop = veh.getPropietario();
+            prop.registrarTransito(t);
+            List<String> mensajes = prop.generarNotificacionesTransito(t);
+            for (String mensaje : mensajes) {
+                Fachada.getInstancia().registrarNotificacionPropietario(prop, mensaje, fh);
+            }
         }
         return t;
     }
@@ -63,35 +66,19 @@ public class SistemaTransitos {
         prop.validarPuedeTransitar();
 
         Vehiculo veh = prop.buscarVehiculoPorMatricula(matricula);
-        if (veh == null) {
-            throw new OblException("El vehículo no pertenece al propietario");
-        }
 
         Categoria cat = veh.getCategoria();
         Tarifa tarifa = puesto.tarifaPara(cat);
-        double montoBase = tarifa.getMonto();
 
-        double montoBonif = 0.0;
-        Bonificacion bonifAplicada = null;
-        Estado estado = prop.getEstadoActual();
-        if (estado == null || estado.permiteBonificaciones()) {
-            Optional<Bonificacion> bonifOpt = Fachada.getInstancia().obtenerBonificacionVigenteInterno(prop, puesto);
-            if (bonifOpt.isPresent()) {
-                bonifAplicada = bonifOpt.get();
-                montoBonif = bonifAplicada.calcularDescuento(prop, veh, puesto, tarifa, fechaHora, this);
-                montoBonif = Math.min(montoBonif, montoBase);
-                montoBonif = Math.max(montoBonif, 0.0);
-            }
-        }
+        List<Transito> transitosPrevios = transitosDe(veh, puesto, fechaHora.toLocalDate());
 
-        double montoAPagar = montoBase - montoBonif;
-        prop.debitarSaldo(montoAPagar);
+        Object[] resultadoPago = prop.procesarPagoTransito(veh, puesto, tarifa, fechaHora, transitosPrevios);
+        double montoAPagar = (double) resultadoPago[0];
+        double montoBonif = (double) resultadoPago[1];
+        Bonificacion bonifAplicada = (Bonificacion) resultadoPago[2];
 
         Transito transito = registrarTransito(puesto, veh, tarifa, montoBonif, montoAPagar, fechaHora, bonifAplicada);
 
-        prop.notificarTransito(transito);
-
-        // Notificar a través de la Fachada
         Fachada.getInstancia().avisar(Eventos.TRANSITO_REGISTRADO);
 
         return transito;

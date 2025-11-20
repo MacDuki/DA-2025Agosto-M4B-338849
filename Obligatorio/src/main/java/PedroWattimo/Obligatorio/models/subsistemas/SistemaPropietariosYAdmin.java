@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import PedroWattimo.Obligatorio.models.entidades.Administrador;
 import PedroWattimo.Obligatorio.models.entidades.Estado;
 import PedroWattimo.Obligatorio.models.entidades.Propietario;
-import PedroWattimo.Obligatorio.models.entidades.Vehiculo;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 public class SistemaPropietariosYAdmin {
@@ -62,9 +61,11 @@ public class SistemaPropietariosYAdmin {
             throw new OblException("La matrícula no puede estar vacía");
         }
         for (Propietario prop : propietarios) {
-            Vehiculo veh = prop.buscarVehiculoPorMatricula(matricula);
-            if (veh != null) {
+            try {
+                prop.buscarVehiculoPorMatricula(matricula);
                 return prop;
+            } catch (OblException e) {
+
             }
         }
         throw new OblException("No existe el vehículo con matrícula: " + matricula);
@@ -90,9 +91,7 @@ public class SistemaPropietariosYAdmin {
 
     public Propietario autenticarYValidarPropietario(int cedula, String password) throws OblException {
         Propietario p = autenticarPropietario(cedula, password);
-        if (!p.puedeIngresar()) {
-            throw new OblException("Usuario deshabilitado, no puede ingresar al sistema");
-        }
+        p.validarPuedeIngresar();
         return p;
     }
 
@@ -142,12 +141,7 @@ public class SistemaPropietariosYAdmin {
             throw new OblException("Propietario y estado no pueden ser nulos");
         }
 
-        Estado estadoActual = propietario.getEstadoActual();
-
-        if (estadoActual != null && estadoActual.equals(nuevoEstado)) {
-            throw new OblException("El propietario ya esta en estado " + estadoActual.nombre());
-        }
-
+        propietario.validarCambioEstado(nuevoEstado);
         propietario.cambiarEstado(nuevoEstado);
 
         LocalDateTime ahora = LocalDateTime.now();

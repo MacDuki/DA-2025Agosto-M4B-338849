@@ -1,8 +1,9 @@
 package PedroWattimo.Obligatorio.models.entidades;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-import PedroWattimo.Obligatorio.models.subsistemas.SistemaTransitos;
+import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 /**
  * Patrón Strategy: cada tipo de bonificación implementa su propia \
@@ -20,6 +21,12 @@ public abstract class Bonificacion {
         this.porcentaje = porcentaje;
     }
 
+    public static void validarNoNula(Bonificacion bonificacion) throws OblException {
+        if (bonificacion == null) {
+            throw new OblException("La bonificación no puede ser nula");
+        }
+    }
+
     public String getNombre() {
         return nombre;
     }
@@ -30,5 +37,5 @@ public abstract class Bonificacion {
 
     public abstract double calcularDescuento(Propietario prop, Vehiculo veh, Puesto puesto,
             Tarifa tarifa, LocalDateTime fh,
-            SistemaTransitos sistemaTransitos);
+            List<Transito> transitosPrevios);
 }
