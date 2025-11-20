@@ -61,6 +61,10 @@
     </div>
 
     <script>
+      // Configurar URLs para observador (no se conecta en login, pero se define para consistencia)
+      var urlIniciarVista = null; // No conectar observador en login
+      var urlCierreVista = null;
+
       const form = document.getElementById("loginForm");
       const errorMsg = document.getElementById("errorMsg");
 

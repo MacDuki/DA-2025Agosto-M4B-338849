@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Asignar Bonificación - Administrador</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/utilesVista.js"></script>
+    <script src="/js/vistaWeb.js"></script>
+    <style>
+      /* Estilos para las tablas generadas */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      table thead th {
+        text-align: left;
+        padding: 0.5rem;
+        color: rgb(203 213 225);
+      }
+      table tbody tr {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      table tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+      table tbody td {
+        padding: 0.5rem;
+      }
+    </style>
   </head>
   <body
     class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white"
@@ -163,6 +188,10 @@
     </main>
 
     <script>
+      // Configurar URLs para observador
+      var urlIniciarVista = "/admin/asignar-bonificacion/vistaConectada";
+      var urlCierreVista = "/admin/asignar-bonificacion/vistaCerrada";
+
       // Estado de la aplicación
       let bonificaciones = [];
       let puestos = [];
@@ -213,28 +242,19 @@
         }, 400);
       });
 
-      // Cargar bonificaciones
-      async function cargarBonificaciones() {
-        try {
-          const response = await fetch(
-            "/admin/asignar-bonificacion/bonificaciones"
-          );
-          if (!response.ok) {
-            throw new Error("Error al cargar bonificaciones");
-          }
-          bonificaciones = await response.json();
-          mostrarBonificaciones();
-          poblarSelectBonificaciones();
-        } catch (error) {
-          console.error("Error:", error);
-          mostrarMensaje(
-            "Error al cargar bonificaciones: " + error.message,
-            "error"
-          );
-        }
+      // Función mostrar_ para recibir bonificaciones
+      function mostrar_bonificacionesCargadas(data) {
+        bonificaciones = data;
+        mostrarBonificaciones();
+        poblarSelectBonificaciones();
       }
 
-      // Mostrar bonificaciones
+      // Cargar bonificaciones
+      function cargarBonificaciones() {
+        submit("/admin/asignar-bonificacion/bonificaciones", "");
+      }
+
+      // Mostrar bonificaciones usando crearTablaDesdeJson
       function mostrarBonificaciones() {
         const container = document.getElementById("bonificacionesContainer");
         if (!bonificaciones || bonificaciones.length === 0) {
@@ -242,39 +262,23 @@
             '<p class="text-slate-400 text-sm">No hay bonificaciones definidas</p>';
           return;
         }
+        const html = crearTablaDesdeJson(bonificaciones);
+        container.innerHTML = html;
+      }
 
-        container.innerHTML = "";
-        bonificaciones.forEach((bonif) => {
-          const div = document.createElement("div");
-          div.className =
-            "bg-slate-800/50 rounded-lg p-3 border border-slate-700";
-          div.innerHTML = `
-            <div class="flex justify-between items-center">
-              <span class="font-medium">${bonif.nombre}</span>
-              <span class="text-yellow-400 text-sm">${bonif.porcentaje}%</span>
-            </div>
-          `;
-          container.appendChild(div);
-        });
+      // Función mostrar_ para recibir puestos
+      function mostrar_puestosCargados(data) {
+        puestos = data;
+        mostrarPuestos();
+        poblarSelectPuestos();
       }
 
       // Cargar puestos
-      async function cargarPuestos() {
-        try {
-          const response = await fetch("/admin/asignar-bonificacion/puestos");
-          if (!response.ok) {
-            throw new Error("Error al cargar puestos");
-          }
-          puestos = await response.json();
-          mostrarPuestos();
-          poblarSelectPuestos();
-        } catch (error) {
-          console.error("Error:", error);
-          mostrarMensaje("Error al cargar puestos: " + error.message, "error");
-        }
+      function cargarPuestos() {
+        submit("/admin/asignar-bonificacion/puestos", "");
       }
 
-      // Mostrar puestos
+      // Mostrar puestos usando crearTablaDesdeJson
       function mostrarPuestos() {
         const container = document.getElementById("puestosContainer");
         if (!puestos || puestos.length === 0) {
@@ -282,18 +286,8 @@
             '<p class="text-slate-400 text-sm">No hay puestos registrados</p>';
           return;
         }
-
-        container.innerHTML = "";
-        puestos.forEach((puesto) => {
-          const div = document.createElement("div");
-          div.className =
-            "bg-slate-800/50 rounded-lg p-3 border border-slate-700";
-          div.innerHTML = `
-            <p class="font-medium">${puesto.nombre}</p>
-            <p class="text-sm text-slate-400">${puesto.direccion}</p>
-          `;
-          container.appendChild(div);
-        });
+        const html = crearTablaDesdeJson(puestos);
+        container.innerHTML = html;
       }
 
       // Poblar select de bonificaciones
@@ -321,49 +315,28 @@
         });
       }
 
+      // Función mostrar_ para recibir datos del propietario
+      function mostrar_propietarioEncontrado(data) {
+        propietarioData = data;
+        mostrarPropietario(propietarioData);
+        document.getElementById("propietarioInfo").classList.remove("hidden");
+        document.getElementById("asignarSection").classList.remove("hidden");
+        mostrarMensaje("✓ Propietario encontrado", "success");
+      }
+
       // Buscar propietario
-      document
-        .getElementById("buscarBtn")
-        .addEventListener("click", async () => {
-          const cedula = document.getElementById("cedulaInput").value.trim();
-
-          if (!cedula) {
-            mostrarMensaje("Debe ingresar una cédula", "error");
-            return;
-          }
-
-          try {
-            const response = await fetch(
-              `/admin/asignar-bonificacion/propietario?cedula=${encodeURIComponent(
-                cedula
-              )}`
-            );
-            const data = await response.json();
-
-            if (!response.ok || data.id === "error") {
-              throw new Error(data.parametro || "Error al buscar propietario");
-            }
-
-            // Guardar datos del propietario
-            propietarioCedula = cedula;
-            propietarioData = data.parametro;
-
-            // Mostrar información del propietario
-            mostrarPropietario(propietarioData);
-            document
-              .getElementById("propietarioInfo")
-              .classList.remove("hidden");
-            document
-              .getElementById("asignarSection")
-              .classList.remove("hidden");
-            mostrarMensaje("✓ Propietario encontrado", "success");
-          } catch (error) {
-            console.error("Error:", error);
-            mostrarMensaje("❌ " + error.message, "error");
-            document.getElementById("propietarioInfo").classList.add("hidden");
-            document.getElementById("asignarSection").classList.add("hidden");
-          }
-        });
+      document.getElementById("buscarBtn").addEventListener("click", () => {
+        const cedula = document.getElementById("cedulaInput").value.trim();
+        if (!cedula) {
+          mostrarMensaje("Debe ingresar una cédula", "error");
+          return;
+        }
+        propietarioCedula = cedula;
+        submit(
+          "/admin/asignar-bonificacion/propietario",
+          `cedula=${encodeURIComponent(cedula)}`
+        );
+      });
 
       // Mostrar información del propietario
       function mostrarPropietario(data) {
@@ -384,7 +357,7 @@
           estadoSpan.className = "ml-2 font-medium text-green-400";
         }
 
-        // Mostrar bonificaciones asignadas
+        // Mostrar bonificaciones asignadas usando crearTablaDesdeJson
         const bonifContainer = document.getElementById(
           "bonificacionesAsignadas"
         );
@@ -392,80 +365,52 @@
           bonifContainer.innerHTML =
             '<p class="text-slate-400 text-sm">No tiene bonificaciones asignadas</p>';
         } else {
-          bonifContainer.innerHTML = "";
-          data.bonificaciones.forEach((bonif) => {
-            const div = document.createElement("div");
-            div.className =
-              "bg-slate-700/50 rounded p-2 border border-slate-600 text-sm";
-            const fecha = bonif.fechaAsignada
-              ? new Date(bonif.fechaAsignada).toLocaleString("es-UY")
-              : "-";
-            div.innerHTML = `
-              <span class="text-yellow-400">${bonif.nombre || "-"}</span>
-              <span class="text-slate-400"> en </span>
-              <span class="text-indigo-400">${bonif.puesto || "-"}</span>
-              <span class="text-slate-500 text-xs block mt-1">${fecha}</span>
-            `;
-            bonifContainer.appendChild(div);
-          });
+          const bonifData = data.bonificaciones.map((b) => ({
+            nombre: b.nombre || "-",
+            puesto: b.puesto || "-",
+            fechaAsignada: b.fechaAsignada
+              ? new Date(b.fechaAsignada).toLocaleString("es-UY")
+              : "-",
+          }));
+          const html = crearTablaDesdeJson(bonifData);
+          bonifContainer.innerHTML = html;
         }
       }
 
+      // Función mostrar_ para bonificación asignada exitosamente
+      function mostrar_bonificacionAsignada(resultado) {
+        mostrarMensaje("✅ Bonificación asignada exitosamente", "success");
+        // Recargar información del propietario
+        setTimeout(() => {
+          document.getElementById("buscarBtn").click();
+        }, 1000);
+        // Limpiar selects
+        document.getElementById("bonificacionSelect").value = "";
+        document.getElementById("puestoSelect").value = "";
+      }
+
       // Asignar bonificación
-      document
-        .getElementById("asignarBtn")
-        .addEventListener("click", async () => {
-          const bonificacion =
-            document.getElementById("bonificacionSelect").value;
-          const puesto = document.getElementById("puestoSelect").value;
+      document.getElementById("asignarBtn").addEventListener("click", () => {
+        const bonificacion =
+          document.getElementById("bonificacionSelect").value;
+        const puesto = document.getElementById("puestoSelect").value;
 
-          if (!bonificacion) {
-            mostrarMensaje("Debe seleccionar una bonificación", "error");
-            return;
-          }
-          if (!puesto) {
-            mostrarMensaje("Debe seleccionar un puesto", "error");
-            return;
-          }
+        if (!bonificacion) {
+          mostrarMensaje("Debe seleccionar una bonificación", "error");
+          return;
+        }
+        if (!puesto) {
+          mostrarMensaje("Debe seleccionar un puesto", "error");
+          return;
+        }
 
-          const request = {
-            cedula: propietarioCedula,
-            nombreBonificacion: bonificacion,
-            nombrePuesto: puesto,
-          };
-
-          try {
-            const response = await fetch("/admin/asignar-bonificacion", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(request),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok || data.id === "error") {
-              throw new Error(
-                data.parametro || "Error al asignar bonificación"
-              );
-            }
-
-            mostrarMensaje("✅ Bonificación asignada exitosamente", "success");
-
-            // Recargar información del propietario
-            setTimeout(() => {
-              document.getElementById("buscarBtn").click();
-            }, 1000);
-
-            // Limpiar selects
-            document.getElementById("bonificacionSelect").value = "";
-            document.getElementById("puestoSelect").value = "";
-          } catch (error) {
-            console.error("Error:", error);
-            mostrarMensaje("❌ " + error.message, "error");
-          }
-        });
+        const datos = `cedula=${encodeURIComponent(
+          propietarioCedula
+        )}&nombreBonificacion=${encodeURIComponent(
+          bonificacion
+        )}&nombrePuesto=${encodeURIComponent(puesto)}`;
+        submit("/admin/asignar-bonificacion", datos);
+      });
 
       // Mostrar mensaje
       function mostrarMensaje(texto, tipo) {

@@ -131,7 +131,9 @@
     </main>
 
     <script>
-      // Configurar URL para SSE antes de cargar vistaWeb.js
+      // Configurar URLs para observador
+      var urlIniciarVista = "/propietarios/dashboard/vistaConectada";
+      var urlCierreVista = "/propietarios/dashboard/vistaCerrada";
       var urlRegistroSSE = "/sse/conectar";
 
       let currentOwner = null;

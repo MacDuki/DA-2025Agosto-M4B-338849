@@ -5,13 +5,11 @@ import java.util.List;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import PedroWattimo.Obligatorio.Respuesta;
-import PedroWattimo.Obligatorio.dtos.AsignarBonificacionRequest;
 import PedroWattimo.Obligatorio.dtos.BonificacionDto;
 import PedroWattimo.Obligatorio.dtos.NotificacionSSEDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioConBonificacionesDto;
@@ -56,35 +54,40 @@ public class AsignarBonificacionesController implements Observador {
                 "Cambio en el sistema detectado");
 
         Respuesta respuesta = new Respuesta("sistema_actualizado", notificacion);
-        conexionNavegador.enviarJSON(List.of(respuesta));
+        conexionNavegador.enviarJSON(Respuesta.lista(respuesta));
     }
 
-    @GetMapping("/bonificaciones")
-    public List<BonificacionDto> listarBonificaciones() {
+    @PostMapping("/bonificaciones")
+    public List<Respuesta> listarBonificaciones() {
         List<Bonificacion> bonificaciones = fachada.listarBonificaciones();
-        return BonificacionDto.desdeLista(bonificaciones);
+        List<BonificacionDto> bonificacionDtos = BonificacionDto.desdeLista(bonificaciones);
+        return Respuesta.lista(new Respuesta("bonificacionesCargadas", bonificacionDtos));
     }
 
-    @GetMapping("/puestos")
-    public List<PuestoDto> listarPuestos() {
+    @PostMapping("/puestos")
+    public List<Respuesta> listarPuestos() {
         List<Puesto> puestos = fachada.listarPuestos();
-        return PuestoDto.desdeLista(puestos);
+        List<PuestoDto> puestoDtos = PuestoDto.desdeLista(puestos);
+        return Respuesta.lista(new Respuesta("puestosCargados", puestoDtos));
     }
 
     @GetMapping("/propietario")
-    public Respuesta buscarPropietario(@RequestParam String cedula) throws OblException {
+    public List<Respuesta> buscarPropietario(@RequestParam String cedula) throws OblException {
         Propietario propietario = fachada.buscarPropietarioPorCedula(cedula);
         PropietarioConBonificacionesDto dto = new PropietarioConBonificacionesDto(propietario);
-        return new Respuesta("ok", dto);
+        return Respuesta.lista(new Respuesta("propietarioEncontrado", dto));
     }
 
     @PostMapping
-    public Respuesta asignarBonificacion(@RequestBody AsignarBonificacionRequest request) throws OblException {
+    public List<Respuesta> asignarBonificacion(
+            @RequestParam String cedula,
+            @RequestParam String nombreBonificacion,
+            @RequestParam String nombrePuesto) throws OblException {
         fachada.asignarBonificacion(
-                request.getCedula(),
-                request.getNombreBonificacion(),
-                request.getNombrePuesto());
+                cedula,
+                nombreBonificacion,
+                nombrePuesto);
 
-        return new Respuesta("ok", "Bonificación asignada exitosamente");
+        return Respuesta.lista(new Respuesta("bonificacionAsignada", "Bonificación asignada exitosamente"));
     }
 }

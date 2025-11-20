@@ -230,7 +230,9 @@
     </main>
 
     <script>
-      // Configurar URL para SSE
+      // Configurar URLs para observador
+      var urlIniciarVista = "/admin/dashboard/vistaConectada";
+      var urlCierreVista = "/admin/dashboard/vistaCerrada";
       var urlRegistroSSE = "/sse/conectar";
 
       let puestos = [];
@@ -274,20 +276,16 @@
         }, 400);
       });
 
+      // Función mostrar_ para recibir puestos
+      function mostrar_puestosCargados(puestosData) {
+        puestos = puestosData;
+        mostrarPuestosEnSelect();
+        mostrarPuestosEnLista();
+      }
+
       // Cargar puestos al iniciar
-      async function cargarPuestos() {
-        try {
-          const response = await fetch("/admin/emular-transito/puestos");
-          if (!response.ok) {
-            throw new Error("Error al cargar puestos");
-          }
-          puestos = await response.json();
-          mostrarPuestosEnSelect();
-          mostrarPuestosEnLista();
-        } catch (error) {
-          console.error("Error:", error);
-          mostrarMensaje("Error al cargar puestos: " + error.message, "error");
-        }
+      function cargarPuestos() {
+        submit("/admin/emular-transito/puestos", "");
       }
 
       // Mostrar puestos en el select
@@ -302,55 +300,42 @@
         });
       }
 
-      // Mostrar puestos en la lista
+      // Mostrar puestos en la lista usando crearTablaDesdeJson
       function mostrarPuestosEnLista() {
         const container = document.getElementById("puestosListContainer");
-        container.innerHTML = "";
-        puestos.forEach((puesto) => {
-          const div = document.createElement("div");
-          div.className =
-            "bg-slate-800/50 rounded-lg p-3 border border-slate-700 flex justify-between items-center";
-          div.innerHTML = `
-            <div>
-              <p class="font-medium">${puesto.nombre}</p>
-              <p class="text-sm text-slate-400">${puesto.direccion}</p>
-            </div>
-            <span class="text-slate-400 text-sm">ID: ${puesto.id}</span>
-          `;
-          container.appendChild(div);
+        if (puestos.length === 0) {
+          container.innerHTML =
+            '<p class="text-slate-400">No hay puestos disponibles</p>';
+          return;
+        }
+        const html = crearTablaDesdeJson(puestos, function (indice, puesto) {
+          console.log("Puesto seleccionado:", puesto);
         });
+        container.innerHTML = html;
+      }
+
+      // Función mostrar_ para recibir tarifas
+      function mostrar_tarifasCargadas(tarifas) {
+        mostrarTarifas(tarifas);
       }
 
       // Cargar tarifas cuando cambia el puesto
       document
         .getElementById("puestoSelect")
-        .addEventListener("change", async (e) => {
+        .addEventListener("change", (e) => {
           const puestoId = e.target.value;
           if (!puestoId) {
             document.getElementById("tarifasContainer").innerHTML =
               '<p class="text-slate-400 text-sm">Seleccione un puesto para ver sus tarifas</p>';
             return;
           }
-
-          try {
-            const response = await fetch(
-              `/admin/emular-transito/puestos/${puestoId}/tarifas`
-            );
-            if (!response.ok) {
-              throw new Error("Error al cargar tarifas");
-            }
-            const tarifas = await response.json();
-            mostrarTarifas(tarifas);
-          } catch (error) {
-            console.error("Error:", error);
-            mostrarMensaje(
-              "Error al cargar tarifas: " + error.message,
-              "error"
-            );
-          }
+          submit(
+            "/admin/emular-transito/puestos/tarifas",
+            `puestoId=${puestoId}`
+          );
         });
 
-      // Mostrar tarifas
+      // Mostrar tarifas usando crearTablaDesdeJson
       function mostrarTarifas(tarifas) {
         const container = document.getElementById("tarifasContainer");
         if (!tarifas || tarifas.length === 0) {
@@ -358,20 +343,8 @@
             '<p class="text-slate-400 text-sm">No hay tarifas definidas</p>';
           return;
         }
-
-        container.innerHTML = "";
-        tarifas.forEach((tarifa) => {
-          const div = document.createElement("div");
-          div.className =
-            "flex justify-between items-center py-2 border-b border-slate-600 last:border-0";
-          div.innerHTML = `
-            <span class="text-slate-300">${tarifa.categoria}</span>
-            <span class="font-semibold text-green-400">$${tarifa.monto.toFixed(
-              2
-            )}</span>
-          `;
-          container.appendChild(div);
-        });
+        const html = crearTablaDesdeJson(tarifas);
+        container.innerHTML = html;
       }
 
       // Establecer fecha/hora actual por defecto
@@ -384,63 +357,50 @@
           .slice(0, 16);
       }
 
+      // Función mostrar_ para resultado de emulación
+      function mostrar_emulacionResultado(resultado) {
+        mostrarResultado(resultado);
+        mostrarMensaje("✅ Tránsito registrado exitosamente", "success");
+      }
+
+      // Función mostrar_ para errores
+      function mostrar_error(mensaje) {
+        mostrarMensaje("❌ " + mensaje, "error");
+        ocultarResultado();
+      }
+
       // Emular tránsito
-      document
-        .getElementById("emularBtn")
-        .addEventListener("click", async () => {
-          const puestoId = document.getElementById("puestoSelect").value;
-          const matricula = document
-            .getElementById("matriculaInput")
-            .value.trim();
-          const fechaHora = document.getElementById("fechaHoraInput").value;
+      document.getElementById("emularBtn").addEventListener("click", () => {
+        const puestoId = document.getElementById("puestoSelect").value;
+        const matricula = document
+          .getElementById("matriculaInput")
+          .value.trim();
+        const fechaHora = document.getElementById("fechaHoraInput").value;
 
-          // Validaciones
-          if (!puestoId) {
-            mostrarMensaje("Debe seleccionar un puesto", "error");
-            return;
-          }
-          if (!matricula) {
-            mostrarMensaje("Debe ingresar una matrícula", "error");
-            return;
-          }
-          if (!fechaHora) {
-            mostrarMensaje("Debe seleccionar fecha y hora", "error");
-            return;
-          }
+        // Validaciones
+        if (!puestoId) {
+          mostrarMensaje("Debe seleccionar un puesto", "error");
+          return;
+        }
+        if (!matricula) {
+          mostrarMensaje("Debe ingresar una matrícula", "error");
+          return;
+        }
+        if (!fechaHora) {
+          mostrarMensaje("Debe seleccionar fecha y hora", "error");
+          return;
+        }
 
-          // Convertir fecha a ISO-8601
-          const fechaISO = new Date(fechaHora).toISOString();
+        // Convertir fecha a ISO-8601
+        const fechaISO = new Date(fechaHora).toISOString();
 
-          const request = {
-            puestoId: parseInt(puestoId),
-            matricula: matricula,
-            fechaHora: fechaISO,
-          };
-
-          try {
-            const response = await fetch("/admin/emular-transito", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(request),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok || data.id === "error") {
-              throw new Error(data.parametro || "Error desconocido");
-            }
-
-            // Mostrar resultado
-            mostrarResultado(data.parametro);
-            mostrarMensaje("✅ Tránsito registrado exitosamente", "success");
-          } catch (error) {
-            console.error("Error:", error);
-            mostrarMensaje("❌ " + error.message, "error");
-            ocultarResultado();
-          }
-        });
+        const datos = `puestoId=${encodeURIComponent(
+          puestoId
+        )}&matricula=${encodeURIComponent(
+          matricula
+        )}&fechaHora=${encodeURIComponent(fechaISO)}`;
+        submit("/admin/emular-transito", datos);
+      });
 
       // Mostrar resultado
       function mostrarResultado(resultado) {

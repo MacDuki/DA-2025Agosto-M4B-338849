@@ -5,13 +5,11 @@ import java.util.List;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import PedroWattimo.Obligatorio.Respuesta;
-import PedroWattimo.Obligatorio.dtos.CambiarEstadoRequest;
 import PedroWattimo.Obligatorio.dtos.EstadoDto;
 import PedroWattimo.Obligatorio.dtos.NotificacionSSEDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
@@ -54,26 +52,28 @@ public class CambiarEstadoPropietarioController implements Observador {
                 "Estado de propietario actualizado");
 
         Respuesta respuesta = new Respuesta("estado_actualizado", notificacion);
-        conexionNavegador.enviarJSON(List.of(respuesta));
+        conexionNavegador.enviarJSON(Respuesta.lista(respuesta));
     }
 
-    @GetMapping("/estados")
-    public Respuesta listarEstados() {
+    @PostMapping("/estados")
+    public List<Respuesta> listarEstados() {
         List<Estado> estados = fachada.listarEstados();
         List<EstadoDto> estadoDtos = EstadoDto.desdeLista(estados);
-        return new Respuesta("ok", estadoDtos);
+        return Respuesta.lista(new Respuesta("estadosCargados", estadoDtos));
     }
 
     @GetMapping("/propietario")
-    public Respuesta buscarPropietario(@RequestParam String cedula) throws OblException {
+    public List<Respuesta> buscarPropietario(@RequestParam String cedula) throws OblException {
         Propietario propietario = fachada.buscarPropietarioPorCedula(cedula);
         PropietarioResumenDto dto = new PropietarioResumenDto(propietario);
-        return new Respuesta("ok", dto);
+        return Respuesta.lista(new Respuesta("propietarioEncontrado", dto));
     }
 
     @PostMapping
-    public Respuesta cambiarEstado(@RequestBody CambiarEstadoRequest request) throws OblException {
-        fachada.cambiarEstadoPropietario(request.getCedula(), request.getNuevoEstado());
-        return new Respuesta("ok", "Estado cambiado exitosamente");
+    public List<Respuesta> cambiarEstado(
+            @RequestParam String cedula,
+            @RequestParam String nuevoEstado) throws OblException {
+        fachada.cambiarEstadoPropietario(cedula, nuevoEstado);
+        return Respuesta.lista(new Respuesta("estadoCambiado", "Estado cambiado exitosamente"));
     }
 }

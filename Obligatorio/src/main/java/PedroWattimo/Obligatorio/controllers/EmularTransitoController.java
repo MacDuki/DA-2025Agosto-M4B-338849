@@ -5,15 +5,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.context.annotation.Scope;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import PedroWattimo.Obligatorio.Respuesta;
-import PedroWattimo.Obligatorio.dtos.EmularTransitoRequest;
 import PedroWattimo.Obligatorio.dtos.EmularTransitoResultado;
 import PedroWattimo.Obligatorio.dtos.NotificacionSSEDto;
 import PedroWattimo.Obligatorio.dtos.PuestoDto;
@@ -60,34 +58,39 @@ public class EmularTransitoController implements Observador {
                 "Cambio en el sistema detectado");
 
         Respuesta respuesta = new Respuesta("sistema_actualizado", notificacion);
-        conexionNavegador.enviarJSON(List.of(respuesta));
+        conexionNavegador.enviarJSON(Respuesta.lista(respuesta));
     }
 
-    @GetMapping("/puestos")
-    public List<PuestoDto> listarPuestos() {
+    @PostMapping("/puestos")
+    public List<Respuesta> listarPuestos() {
         List<Puesto> puestos = fachada.listarPuestos();
-        return PuestoDto.desdeLista(puestos);
+        List<PuestoDto> puestoDtos = PuestoDto.desdeLista(puestos);
+        return Respuesta.lista(new Respuesta("puestosCargados", puestoDtos));
     }
 
-    @GetMapping("/puestos/{id}/tarifas")
-    public List<TarifaDto> obtenerTarifasPuesto(@PathVariable Long id) throws OblException {
+    @PostMapping("/puestos/{id}/tarifas")
+    public List<Respuesta> obtenerTarifasPuesto(@PathVariable Long id) throws OblException {
         Puesto puesto = fachada.buscarPuestoPorId(id);
         List<Tarifa> tarifas = puesto.getTablaTarifas();
-        return TarifaDto.desdeLista(tarifas);
+        List<TarifaDto> tarifaDtos = TarifaDto.desdeLista(tarifas);
+        return Respuesta.lista(new Respuesta("tarifasCargadas", tarifaDtos));
     }
 
     @PostMapping
-    public Respuesta emularTransito(@RequestBody EmularTransitoRequest request)
+    public List<Respuesta> emularTransito(
+            @RequestParam Long puestoId,
+            @RequestParam String matricula,
+            @RequestParam String fechaHora)
             throws OblException, TarifaNoDefinidaException {
-        LocalDateTime fechaHora = LocalDateTime.parse(request.getFechaHora(), DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime fechaHoraObj = LocalDateTime.parse(fechaHora, DateTimeFormatter.ISO_DATE_TIME);
 
         Transito transito = fachada.emularTransito(
-                request.getPuestoId(),
-                request.getMatricula(),
-                fechaHora);
+                puestoId,
+                matricula,
+                fechaHoraObj);
 
         Propietario propietario = transito.vehiculo().getPropietario();
         EmularTransitoResultado resultado = new EmularTransitoResultado(transito, propietario);
-        return new Respuesta("ok", resultado);
+        return Respuesta.lista(new Respuesta("emulacionResultado", resultado));
     }
 }
