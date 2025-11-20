@@ -36,13 +36,13 @@ public class SistemaPropietariosYAdmin {
         return List.copyOf(administradores);
     }
 
-    public Propietario buscarPorCedula(int cedula) {
+    public Propietario buscarPorCedula(int cedula) throws OblException {
         for (Propietario p : propietarios) {
             if (cedula == p.getCedula()) {
                 return p;
             }
         }
-        return null;
+        throw new OblException("El propietario no existe");
     }
 
     public Propietario buscarPorCedula(String cedula) throws OblException {
@@ -51,22 +51,10 @@ public class SistemaPropietariosYAdmin {
         }
         try {
             int cedulaInt = Integer.parseInt(cedula);
-            Propietario prop = buscarPorCedula(cedulaInt);
-            if (prop == null) {
-                throw new OblException("no existe el propietario");
-            }
-            return prop;
+            return buscarPorCedula(cedulaInt);
         } catch (NumberFormatException e) {
             throw new OblException("Cédula inválida");
         }
-    }
-
-    private Propietario buscarPorCedulaCompleto(int cedula) throws OblException {
-        Propietario p = buscarPorCedula(cedula);
-        if (p == null) {
-            throw new OblException("El propietario no existe");
-        }
-        return p;
     }
 
     public Propietario propietarioPorMatricula(String matricula) throws OblException {
@@ -94,7 +82,7 @@ public class SistemaPropietariosYAdmin {
 
     public Propietario autenticarPropietario(int cedula, String password) throws OblException {
         Propietario dueño = buscarPorCedula(cedula);
-        if (dueño == null || !dueño.passwordCorrecta(password)) {
+        if (!dueño.passwordCorrecta(password)) {
             throw new OblException("Acceso denegado");
         }
         return dueño;
@@ -136,7 +124,7 @@ public class SistemaPropietariosYAdmin {
     }
 
     public int borrarNotificacionesDePropietario(int cedula) throws OblException {
-        Propietario p = buscarPorCedulaCompleto(cedula);
+        Propietario p = buscarPorCedula(cedula);
         int borradas = p.borrarNotificaciones();
         dashboardVersion.merge(p.getCedula(), 1L, Long::sum);
 
@@ -145,7 +133,7 @@ public class SistemaPropietariosYAdmin {
     }
 
     public long versionDashboardDePropietario(int cedula) throws OblException {
-        Propietario p = buscarPorCedulaCompleto(cedula);
+        Propietario p = buscarPorCedula(cedula);
         return dashboardVersion.getOrDefault(p.getCedula(), 0L);
     }
 
@@ -193,9 +181,15 @@ public class SistemaPropietariosYAdmin {
     public Propietario registrarPropietario(int cedula, String nombreCompleto, String password) throws OblException {
         Propietario.validarDatosCreacion(cedula, nombreCompleto, password);
 
-        Propietario existente = buscarPorCedula(cedula);
-        if (existente != null) {
+        try {
+            buscarPorCedula(cedula);
             throw new OblException("Ya existe un propietario con la cédula: " + cedula);
+        } catch (OblException e) {
+            if (e.getMessage().equals("El propietario no existe")) {
+                // El propietario no existe, podemos continuar
+            } else {
+                throw e;
+            }
         }
 
         Propietario nuevoPropietario = new Propietario(cedula, nombreCompleto, password);

@@ -80,7 +80,7 @@ public class Fachada extends Observable {
         return sistemaVehiculosYCategorias.getCategorias();
     }
 
-    public Propietario buscarPropietarioPorCedula(int cedula) {
+    public Propietario buscarPropietarioPorCedula(int cedula) throws OblException {
         return sistemaPropietariosYAdmin.buscarPorCedula(cedula);
     }
 
