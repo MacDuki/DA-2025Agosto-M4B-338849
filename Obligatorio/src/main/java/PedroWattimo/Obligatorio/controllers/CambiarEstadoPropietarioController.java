@@ -3,7 +3,6 @@ package PedroWattimo.Obligatorio.controllers;
 import java.util.List;
 
 import org.springframework.context.annotation.Scope;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,7 +61,7 @@ public class CambiarEstadoPropietarioController implements Observador {
         return Respuesta.lista(new Respuesta("estadosCargados", estadoDtos));
     }
 
-    @GetMapping("/propietario")
+    @PostMapping("/propietario")
     public List<Respuesta> buscarPropietario(@RequestParam String cedula) throws OblException {
         Propietario propietario = fachada.buscarPropietarioPorCedula(cedula);
         PropietarioResumenDto dto = new PropietarioResumenDto(propietario);

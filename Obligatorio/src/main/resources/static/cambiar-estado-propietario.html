@@ -311,6 +311,11 @@
         }, 1000);
       }
 
+      // Función mostrar_ para manejar errores de negocio
+      function mostrar_error(mensaje) {
+        mostrarMensaje("❌ " + mensaje, "error");
+      }
+
       // Cambiar estado
       document
         .getElementById("cambiarEstadoBtn")

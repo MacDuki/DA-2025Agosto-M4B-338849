@@ -90,14 +90,32 @@ function submit(endPointUrl, urlEncodedData) {
     });
 }
 function manejarError(status, text, url, data) {
+  // Intentar parsear como JSON - podría ser una respuesta válida del servidor en formato Respuesta
+  try {
+    const json = JSON.parse(text);
+    if (Array.isArray(json) && json.length > 0 && json[0].id) {
+      // Es una respuesta del servidor en formato válido (error de negocio) - procesarlo normalmente
+      // No mostrar en consola como error, es un flujo esperado
+      procesarResultadosSubmit(json);
+      return;
+    }
+  } catch (e) {
+    // No es JSON válido, continuar con manejo de error estándar
+  }
+
+  // Manejo de error estándar (solo para errores técnicos inesperados)
   try {
     //Definir para personalizar el manejo de errores en las paginas
     procesarErrorSubmit(status, text);
   } catch (e) {
-    console.error("url:" + url + "  data: " + data);
-    console.error("Error en submit:" + status, text);
+    // Solo loguear errores técnicos reales
+    console.error("Error técnico en submit");
+    console.error("URL:", url);
+    console.error("Data:", data);
+    console.error("Status:", status);
+    console.error("Response:", text);
     document.body.innerHTML = "";
-    alert("Se produjo un error, detalles en consola");
+    alert("Se produjo un error técnico, detalles en consola");
   }
 }
 

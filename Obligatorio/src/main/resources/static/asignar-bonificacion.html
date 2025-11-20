@@ -389,6 +389,11 @@
         document.getElementById("puestoSelect").value = "";
       }
 
+      // Función mostrar_ para manejar errores de negocio
+      function mostrar_error(mensaje) {
+        mostrarMensaje("❌ " + mensaje, "error");
+      }
+
       // Asignar bonificación
       document.getElementById("asignarBtn").addEventListener("click", () => {
         const bonificacion =

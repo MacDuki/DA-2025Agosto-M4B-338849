@@ -231,8 +231,8 @@
 
     <script>
       // Configurar URLs para observador
-      var urlIniciarVista = "/admin/dashboard/vistaConectada";
-      var urlCierreVista = "/admin/dashboard/vistaCerrada";
+      var urlIniciarVista = "/admin/emular-transito/vistaConectada";
+      var urlCierreVista = "/admin/emular-transito/vistaCerrada";
       var urlRegistroSSE = "/sse/conectar";
 
       let puestos = [];
@@ -329,10 +329,7 @@
               '<p class="text-slate-400 text-sm">Seleccione un puesto para ver sus tarifas</p>';
             return;
           }
-          submit(
-            "/admin/emular-transito/puestos/tarifas",
-            `puestoId=${puestoId}`
-          );
+          submit(`/admin/emular-transito/puestos/${puestoId}/tarifas`, "");
         });
 
       // Mostrar tarifas usando crearTablaDesdeJson
