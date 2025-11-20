@@ -16,26 +16,6 @@ public class Transito {
     private double porcentajeBonificacion;
     private double totalPagado;
 
-    public Transito(LocalDateTime fechaHora,
-            Puesto puesto,
-            Vehiculo vehiculo,
-            double costoBase,
-            double costoConTarifa,
-            String nombreBonificacion,
-            double porcentajeBonificacion) {
-
-        this.fechaHora = fechaHora;
-        this.puesto = puesto;
-        this.vehiculo = vehiculo;
-        this.categoriaVehiculo = vehiculo.getCategoria().getNombre();
-        this.costoBase = costoBase;
-        this.costoConTarifa = costoConTarifa;
-        this.nombreBonificacion = nombreBonificacion;
-        this.porcentajeBonificacion = porcentajeBonificacion < 0 ? 0 : porcentajeBonificacion;
-        this.montoBonificacion = this.costoConTarifa * (this.porcentajeBonificacion / 100.0);
-        this.totalPagado = this.costoConTarifa - this.montoBonificacion;
-    }
-
     public Transito(Puesto puesto, Vehiculo vehiculo, Tarifa tarifa,
             double montoBonificacion, double montoPagado,
             LocalDateTime fechaHora, Bonificacion bonificacionAplicada) {
