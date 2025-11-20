@@ -161,7 +161,9 @@ public class Propietario extends Usuario {
         Bonificacion bonifAplicada = (Bonificacion) resultadoBonif[1];
 
         double montoAPagar = montoBase - montoBonif;
-        debitarSaldo(montoAPagar);
+        if (montoAPagar > 0) {
+            debitarSaldo(montoAPagar);
+        }
 
         return new Object[] { montoAPagar, montoBonif, bonifAplicada };
     }

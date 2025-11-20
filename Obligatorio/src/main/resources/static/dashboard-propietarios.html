@@ -332,6 +332,11 @@
         console.log("Sesión cerrada:", resultado.mensaje);
       }
 
+      // Función mostrar_ para errores del servidor
+      function mostrar_error(mensaje) {
+        alert(mensaje || "Ocurrió un error");
+      }
+
       // Manejo de errores personalizado
       function procesarErrorSubmit(status, text) {
         if (status === 401) {

@@ -101,6 +101,10 @@
         }
       }
 
+      function mostrar_error(mensaje) {
+        showError(mensaje);
+      }
+
       function mostrar_adminLoginExitoso(dto) {
         sessionStorage.setItem("admin", JSON.stringify(dto));
         window.location.href = "/dashboard-admin.html";
