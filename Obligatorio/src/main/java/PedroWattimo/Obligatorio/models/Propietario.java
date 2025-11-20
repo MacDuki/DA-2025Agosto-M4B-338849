@@ -32,10 +32,6 @@ public class Propietario extends Usuario {
         this.estadoActual = FabricaEstados.crearHabilitado();
     }
 
-    public String getcontraseña() {
-        return contraseña;
-    }
-
     public int getSaldoActual() {
         return saldoActual;
     }
@@ -101,19 +97,6 @@ public class Propietario extends Usuario {
             this.vehiculos = new ArrayList<>();
         this.vehiculos.add(v);
         return v;
-    }
-
-    public Propietario agregarVehiculo(Vehiculo v) {
-        if (v == null)
-            return this;
-
-        if (v.getPropietario() != this) {
-            v = new Vehiculo(v.getMatricula(), v.getModelo(), v.getColor(), v.getCategoria(), this);
-        }
-        if (this.vehiculos == null)
-            this.vehiculos = new ArrayList<>();
-        this.vehiculos.add(v);
-        return this;
     }
 
     public boolean puedeIngresar() {

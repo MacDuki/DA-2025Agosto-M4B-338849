@@ -75,17 +75,12 @@ public class Puesto {
             throw new TarifaNoDefinidaException(
                     "No hay tarifas definidas en el puesto " + (nombre != null ? nombre : "desconocido"));
         }
-        for (Tarifa t : tablaTarifas) {
-            if (t.getCategoria() != null &&
-                    (t.getCategoria().equals(cat) ||
-                            (t.getCategoria().getNombre() != null
-                                    && t.getCategoria().getNombre().equals(cat.getNombre())))) {
-                return t;
-            }
-        }
-        throw new TarifaNoDefinidaException(
-                "No existe tarifa para la categoría " + cat.getNombre() +
-                        " en el puesto " + (nombre != null ? nombre : "desconocido"));
+        return tablaTarifas.stream()
+                .filter(t -> t.getCategoria() != null && t.getCategoria().equals(cat))
+                .findFirst()
+                .orElseThrow(() -> new TarifaNoDefinidaException(
+                        "No existe tarifa para la categoría " + cat.getNombre() +
+                                " en el puesto " + (nombre != null ? nombre : "desconocido")));
     }
 
 }

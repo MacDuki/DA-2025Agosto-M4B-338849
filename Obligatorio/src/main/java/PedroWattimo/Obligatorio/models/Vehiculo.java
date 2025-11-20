@@ -51,13 +51,6 @@ public class Vehiculo {
         return color;
     }
 
-    public boolean esDeCategoria(Categoria c) {
-        if (c == null || this.categoria == null)
-            return false;
-        return this.categoria.equals(c) ||
-                (this.categoria.getNombre() != null && this.categoria.getNombre().equals(c.getNombre()));
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)

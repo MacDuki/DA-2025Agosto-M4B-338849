@@ -31,10 +31,6 @@ public class AsignacionBonificacion {
         return this.puesto.equals(puesto) && this.propietario.equals(propietario);
     }
 
-    public Bonificacion bonificacion() {
-        return bonificacion;
-    }
-
     public LocalDateTime getFechaHora() {
         return fechaHora;
     }

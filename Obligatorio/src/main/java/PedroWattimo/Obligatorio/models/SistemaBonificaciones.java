@@ -31,7 +31,7 @@ public class SistemaBonificaciones {
             return Optional.empty();
 
         Optional<AsignacionBonificacion> asignacion = p.bonificacionAsignadaPara(puesto);
-        return asignacion.map(AsignacionBonificacion::bonificacion);
+        return asignacion.map(AsignacionBonificacion::getBonificacion);
     }
 
     public List<Bonificacion> listarBonificaciones() {

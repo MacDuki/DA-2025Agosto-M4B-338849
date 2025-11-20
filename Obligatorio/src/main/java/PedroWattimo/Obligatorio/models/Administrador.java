@@ -17,10 +17,6 @@ public class Administrador extends Usuario {
         this.logueado = false;
     }
 
-    public String getPasswordHash() {
-        return contraseña;
-    }
-
     public boolean estaLogueado() {
         return this.logueado;
     }
