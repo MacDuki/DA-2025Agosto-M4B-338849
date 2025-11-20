@@ -5,13 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import PedroWattimo.Obligatorio.dtos.BonificacionAsignadaDto;
-import PedroWattimo.Obligatorio.dtos.NotificacionDto;
-import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
-import PedroWattimo.Obligatorio.dtos.PropietarioResumenDto;
-import PedroWattimo.Obligatorio.dtos.TransitoDto;
-import PedroWattimo.Obligatorio.dtos.VehiculoResumenDto;
-
 public class Propietario extends Usuario {
     private int saldoActual;
     private int saldoMinimoAlerta;
@@ -292,52 +285,5 @@ public class Propietario extends Usuario {
         return (int) this.transitos.stream()
                 .filter(t -> t.vehiculo() != null && t.vehiculo().equals(v))
                 .count();
-    }
-
-    public PropietarioDashboardDto obtenerDashboardDto() {
-        PropietarioDashboardDto dto = new PropietarioDashboardDto();
-
-        dto.setPropietario(new PropietarioResumenDto(
-                this.getNombreCompleto(),
-                this.getEstadoActual() != null ? this.getEstadoActual().nombre() : "HABILITADO",
-                this.getSaldoActual()));
-
-        List<BonificacionAsignadaDto> bonos = new ArrayList<>();
-        for (AsignacionBonificacion ab : this.bonificacionesAsignadas()) {
-            String nombre = ab.getBonificacion() != null ? ab.getBonificacion().getNombre() : null;
-            String puesto = ab.getPuesto() != null ? ab.getPuesto().getNombre() : null;
-            bonos.add(new BonificacionAsignadaDto(nombre, puesto, ab.getFechaHora()));
-        }
-        dto.setBonificaciones(bonos);
-
-        List<VehiculoResumenDto> vehs = new ArrayList<>();
-        for (Vehiculo v : this.vehiculos()) {
-            vehs.add(new VehiculoResumenDto(
-                    v.getMatricula(), v.getModelo(), v.getColor(),
-                    this.cantidadTransitosDe(v), this.totalGastadoPor(v)));
-        }
-        dto.setVehiculos(vehs);
-
-        List<TransitoDto> transDtos = new ArrayList<>();
-        for (Transito t : this.transitosOrdenadosDesc()) {
-            transDtos.add(new TransitoDto(
-                    t.puesto() != null ? t.puesto().getNombre() : null,
-                    t.vehiculo() != null ? t.vehiculo().getMatricula() : null,
-                    t.categoriaVehiculo(),
-                    t.costoConTarifa(),
-                    t.nombreBonificacion(),
-                    t.montoBonificacion(),
-                    t.totalPagado(),
-                    t.fechaHora()));
-        }
-        dto.setTransitos(transDtos);
-
-        List<NotificacionDto> notifDtos = new ArrayList<>();
-        for (Notificacion n : this.notificacionesOrdenadasDesc()) {
-            notifDtos.add(new NotificacionDto(n.getFechaHora(), n.getMensaje()));
-        }
-        dto.setNotificaciones(notifDtos);
-
-        return dto;
     }
 }

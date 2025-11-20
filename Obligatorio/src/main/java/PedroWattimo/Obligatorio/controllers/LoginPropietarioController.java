@@ -31,13 +31,7 @@ public class LoginPropietarioController {
             HttpSession session) throws OblException {
 
         SesionPropietario sesionDominio = fachada.loginPropietario(cedula, password);
-
-        PropietarioAutenticadoDTO dto = new PropietarioAutenticadoDTO(
-                sesionDominio.getPropietario().getCedula(),
-                sesionDominio.getPropietario().getNombreCompleto(),
-                sesionDominio.getPropietario().getEstadoActual() != null
-                        ? sesionDominio.getPropietario().getEstadoActual().nombre()
-                        : "HABILITADO");
+        PropietarioAutenticadoDTO dto = new PropietarioAutenticadoDTO(sesionDominio);
 
         session.setAttribute("propietario", dto);
         session.setAttribute("sesionPropietario", sesionDominio);

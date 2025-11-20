@@ -27,10 +27,7 @@ public class LoginAdminController {
             HttpSession session) throws OblException {
 
         SesionAdmin sesionDominio = fachada.loginAdmin(cedula, password);
-
-        AdminAutenticadoDto dto = new AdminAutenticadoDto(
-                sesionDominio.getAdministrador().getCedula(),
-                sesionDominio.getAdministrador().getNombreCompleto());
+        AdminAutenticadoDto dto = new AdminAutenticadoDto(sesionDominio);
 
         session.setAttribute("admin", dto);
         session.setAttribute("sesionAdmin", sesionDominio);

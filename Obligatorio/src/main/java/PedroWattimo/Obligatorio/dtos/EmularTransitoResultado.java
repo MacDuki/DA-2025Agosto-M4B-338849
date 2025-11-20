@@ -1,14 +1,16 @@
 package PedroWattimo.Obligatorio.dtos;
 
+import PedroWattimo.Obligatorio.models.Transito;
+
 public class EmularTransitoResultado {
     private String nombrePropietario;
     private String estadoPropietario;
     private String categoriaVehiculo;
-    private String bonificacionNombre; // null si no aplica
-    private double costoTransito; // monto base (tarifa)
-    private double montoBonificacion; // descuento aplicado
-    private double montoPagado; // monto efectivamente pagado
-    private int saldoPost; // saldo del propietario después del débito
+    private String bonificacionNombre;
+    private double costoTransito;
+    private double montoBonificacion;
+    private double montoPagado;
+    private int saldoPost;
 
     public EmularTransitoResultado() {
     }
@@ -25,6 +27,24 @@ public class EmularTransitoResultado {
         this.montoBonificacion = montoBonificacion;
         this.montoPagado = montoPagado;
         this.saldoPost = saldoPost;
+    }
+
+    public EmularTransitoResultado(Transito t) {
+        this.nombrePropietario = t.vehiculo() != null && t.vehiculo().getPropietario() != null
+                ? t.vehiculo().getPropietario().getNombreCompleto()
+                : null;
+        this.estadoPropietario = t.vehiculo() != null && t.vehiculo().getPropietario() != null
+                && t.vehiculo().getPropietario().getEstadoActual() != null
+                        ? t.vehiculo().getPropietario().getEstadoActual().nombre()
+                        : "HABILITADO";
+        this.categoriaVehiculo = t.categoriaVehiculo();
+        this.bonificacionNombre = t.nombreBonificacion();
+        this.costoTransito = t.costoConTarifa();
+        this.montoBonificacion = t.montoBonificacion();
+        this.montoPagado = t.totalPagado();
+        this.saldoPost = t.vehiculo() != null && t.vehiculo().getPropietario() != null
+                ? t.vehiculo().getPropietario().getSaldoActual()
+                : 0;
     }
 
     public String getNombrePropietario() {

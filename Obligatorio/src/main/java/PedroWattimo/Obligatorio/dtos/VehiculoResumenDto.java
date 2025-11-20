@@ -1,5 +1,11 @@
 package PedroWattimo.Obligatorio.dtos;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import PedroWattimo.Obligatorio.models.Propietario;
+import PedroWattimo.Obligatorio.models.Vehiculo;
+
 public class VehiculoResumenDto {
     private String matricula;
     private String modelo;
@@ -17,6 +23,22 @@ public class VehiculoResumenDto {
         this.color = color;
         this.cantidadTransitos = cantidadTransitos;
         this.montoTotalGastado = montoTotalGastado;
+    }
+
+    public VehiculoResumenDto(Vehiculo v, Propietario propietario) {
+        this.matricula = v.getMatricula();
+        this.modelo = v.getModelo();
+        this.color = v.getColor();
+        this.cantidadTransitos = propietario.cantidadTransitosDe(v);
+        this.montoTotalGastado = propietario.totalGastadoPor(v);
+    }
+
+    public static List<VehiculoResumenDto> desdeLista(List<Vehiculo> lista, Propietario propietario) {
+        List<VehiculoResumenDto> ret = new ArrayList<>();
+        for (Vehiculo v : lista) {
+            ret.add(new VehiculoResumenDto(v, propietario));
+        }
+        return ret;
     }
 
     public String getMatricula() {

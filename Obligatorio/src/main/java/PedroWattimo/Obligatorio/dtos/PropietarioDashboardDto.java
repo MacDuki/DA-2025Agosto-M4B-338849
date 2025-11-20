@@ -3,13 +3,26 @@ package PedroWattimo.Obligatorio.dtos;
 import java.util.ArrayList;
 import java.util.List;
 
+import PedroWattimo.Obligatorio.models.Propietario;
+
 public class PropietarioDashboardDto {
     private PropietarioResumenDto propietario;
     private List<BonificacionAsignadaDto> bonificaciones = new ArrayList<>();
     private List<VehiculoResumenDto> vehiculos = new ArrayList<>();
     private List<TransitoDto> transitos = new ArrayList<>();
     private List<NotificacionDto> notificaciones = new ArrayList<>();
-    private long version; // para cache/etag o ping ligero
+    private long version;
+
+    public PropietarioDashboardDto() {
+    }
+
+    public PropietarioDashboardDto(Propietario p) {
+        this.propietario = new PropietarioResumenDto(p);
+        this.bonificaciones = BonificacionAsignadaDto.desdeLista(p.bonificacionesAsignadas());
+        this.vehiculos = VehiculoResumenDto.desdeLista(p.vehiculos(), p);
+        this.transitos = TransitoDto.desdeLista(p.transitosOrdenadosDesc());
+        this.notificaciones = NotificacionDto.desdeLista(p.notificacionesOrdenadasDesc());
+    }
 
     public PropietarioResumenDto getPropietario() {
         return propietario;

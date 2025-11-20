@@ -30,13 +30,20 @@ public class DashboardPropietarioController implements Observador {
 
     public DashboardPropietarioController(ConexionNavegador conexionNavegador) {
         this.conexionNavegador = conexionNavegador;
+    }
 
-        fachada.registrarObservador(this);
+    @PostMapping("/vistaConectada")
+    public void vistaConectada() {
+        fachada.agregarObservador(this);
+    }
+
+    @PostMapping("/vistaCerrada")
+    public void vistaCerrada() {
+        fachada.eliminarObservador(this);
     }
 
     @Override
     public void actualizar(Observable origen, Object evento) {
-
         NotificacionSSEDto notificacion = new NotificacionSSEDto(
                 "dashboard_actualizado",
                 "Hay cambios en tu dashboard");
@@ -58,7 +65,7 @@ public class DashboardPropietarioController implements Observador {
             throw new OblException("El propietario no existe");
         }
 
-        PropietarioDashboardDto dto = p.obtenerDashboardDto();
+        PropietarioDashboardDto dto = new PropietarioDashboardDto(p);
         dto.setVersion(fachada.versionDashboardDePropietario(propietario.getCedula()));
 
         Respuesta respuesta = new Respuesta("dashboard", dto);

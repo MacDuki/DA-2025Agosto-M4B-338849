@@ -36,18 +36,6 @@ public class Fachada extends Observable {
         return instancia;
     }
 
-    public void registrarObservador(observador.Observador observador) {
-        if (observador != null) {
-            this.agregarObservador(observador);
-        }
-    }
-
-    public void removerObservador(observador.Observador observador) {
-        if (observador != null) {
-            this.eliminarObservador(observador);
-        }
-    }
-
     public Categoria agregarCategoria(String nombre) throws OblException {
         return sistemaVehiculosYCategorias.agregarCategoria(nombre);
     }

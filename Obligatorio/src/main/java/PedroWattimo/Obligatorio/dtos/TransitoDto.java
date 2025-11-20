@@ -1,6 +1,10 @@
 package PedroWattimo.Obligatorio.dtos;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import PedroWattimo.Obligatorio.models.Transito;
 
 public class TransitoDto {
     private String puesto;
@@ -25,6 +29,25 @@ public class TransitoDto {
         this.montoBonificacion = montoBonificacion;
         this.montoPagado = montoPagado;
         this.fechaHora = fechaHora;
+    }
+
+    public TransitoDto(Transito t) {
+        this.puesto = t.puesto() != null ? t.puesto().getNombre() : null;
+        this.matricula = t.vehiculo() != null ? t.vehiculo().getMatricula() : null;
+        this.categoria = t.categoriaVehiculo();
+        this.montoTarifa = t.costoConTarifa();
+        this.nombreBonificacion = t.nombreBonificacion();
+        this.montoBonificacion = t.montoBonificacion();
+        this.montoPagado = t.totalPagado();
+        this.fechaHora = t.fechaHora();
+    }
+
+    public static List<TransitoDto> desdeLista(List<Transito> lista) {
+        List<TransitoDto> ret = new ArrayList<>();
+        for (Transito t : lista) {
+            ret.add(new TransitoDto(t));
+        }
+        return ret;
     }
 
     public String getPuesto() {

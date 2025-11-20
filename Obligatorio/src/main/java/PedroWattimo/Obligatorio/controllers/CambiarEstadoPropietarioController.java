@@ -1,6 +1,5 @@
 package PedroWattimo.Obligatorio.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.annotation.Scope;
@@ -34,7 +33,16 @@ public class CambiarEstadoPropietarioController implements Observador {
 
     public CambiarEstadoPropietarioController(ConexionNavegador conexionNavegador) {
         this.conexionNavegador = conexionNavegador;
-        fachada.registrarObservador(this);
+    }
+
+    @PostMapping("/vistaConectada")
+    public void vistaConectada() {
+        fachada.agregarObservador(this);
+    }
+
+    @PostMapping("/vistaCerrada")
+    public void vistaCerrada() {
+        fachada.eliminarObservador(this);
     }
 
     @Override
@@ -52,20 +60,14 @@ public class CambiarEstadoPropietarioController implements Observador {
     @GetMapping("/estados")
     public Respuesta listarEstados() {
         List<Estado> estados = fachada.listarEstados();
-        List<EstadoDto> estadoDtos = new ArrayList<>();
-        for (Estado estado : estados) {
-            estadoDtos.add(new EstadoDto(estado.nombre()));
-        }
+        List<EstadoDto> estadoDtos = EstadoDto.desdeLista(estados);
         return new Respuesta("ok", estadoDtos);
     }
 
     @GetMapping("/propietario")
     public Respuesta buscarPropietario(@RequestParam String cedula) throws OblException {
         Propietario propietario = fachada.buscarPropietarioPorCedula(cedula);
-        PropietarioResumenDto dto = new PropietarioResumenDto(
-                propietario.getNombreCompleto(),
-                propietario.getEstadoActual() != null ? propietario.getEstadoActual().nombre() : "HABILITADO",
-                propietario.getSaldoActual());
+        PropietarioResumenDto dto = new PropietarioResumenDto(propietario);
         return new Respuesta("ok", dto);
     }
 

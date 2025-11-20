@@ -1,6 +1,10 @@
 package PedroWattimo.Obligatorio.dtos;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import PedroWattimo.Obligatorio.models.AsignacionBonificacion;
 
 public class BonificacionAsignadaDto {
     private String nombre;
@@ -14,6 +18,20 @@ public class BonificacionAsignadaDto {
         this.nombre = nombre;
         this.puesto = puesto;
         this.fechaAsignada = fechaAsignada;
+    }
+
+    public BonificacionAsignadaDto(AsignacionBonificacion ab) {
+        this.nombre = ab.getBonificacion() != null ? ab.getBonificacion().getNombre() : null;
+        this.puesto = ab.getPuesto() != null ? ab.getPuesto().getNombre() : null;
+        this.fechaAsignada = ab.getFechaHora();
+    }
+
+    public static List<BonificacionAsignadaDto> desdeLista(List<AsignacionBonificacion> lista) {
+        List<BonificacionAsignadaDto> ret = new ArrayList<>();
+        for (AsignacionBonificacion ab : lista) {
+            ret.add(new BonificacionAsignadaDto(ab));
+        }
+        return ret;
     }
 
     public String getNombre() {
