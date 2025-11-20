@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import PedroWattimo.Obligatorio.Respuesta;
 import PedroWattimo.Obligatorio.dtos.AdminAutenticadoDto;
-import PedroWattimo.Obligatorio.models.Fachada;
-import PedroWattimo.Obligatorio.models.SesionAdmin;
+import PedroWattimo.Obligatorio.models.subsistemas.Fachada;
+import PedroWattimo.Obligatorio.models.sesiones.SesionAdmin;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import jakarta.servlet.http.HttpSession;
 

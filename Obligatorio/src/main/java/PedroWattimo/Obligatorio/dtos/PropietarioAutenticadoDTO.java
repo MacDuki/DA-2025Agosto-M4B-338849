@@ -1,6 +1,6 @@
 package PedroWattimo.Obligatorio.dtos;
 
-import PedroWattimo.Obligatorio.models.SesionPropietario;
+import PedroWattimo.Obligatorio.models.sesiones.SesionPropietario;
 
 public class PropietarioAutenticadoDTO {
     private int cedula;

@@ -3,8 +3,8 @@ package PedroWattimo.Obligatorio.dtos;
 import java.util.ArrayList;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.models.Propietario;
-import PedroWattimo.Obligatorio.models.Vehiculo;
+import PedroWattimo.Obligatorio.models.entidades.Propietario;
+import PedroWattimo.Obligatorio.models.entidades.Vehiculo;
 
 public class VehiculoResumenDto {
     private String matricula;

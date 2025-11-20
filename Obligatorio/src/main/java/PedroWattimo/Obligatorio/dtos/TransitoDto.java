@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.models.Transito;
+import PedroWattimo.Obligatorio.models.entidades.Transito;
 
 public class TransitoDto {
     private String puesto;

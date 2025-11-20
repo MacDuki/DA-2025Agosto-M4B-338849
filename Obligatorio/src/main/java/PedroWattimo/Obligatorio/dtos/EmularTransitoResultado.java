@@ -1,7 +1,7 @@
 package PedroWattimo.Obligatorio.dtos;
 
-import PedroWattimo.Obligatorio.models.Propietario;
-import PedroWattimo.Obligatorio.models.Transito;
+import PedroWattimo.Obligatorio.models.entidades.Propietario;
+import PedroWattimo.Obligatorio.models.entidades.Transito;
 
 public class EmularTransitoResultado {
     private String nombrePropietario;

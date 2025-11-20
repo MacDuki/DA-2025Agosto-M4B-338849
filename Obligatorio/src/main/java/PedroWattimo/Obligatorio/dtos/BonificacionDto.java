@@ -3,7 +3,7 @@ package PedroWattimo.Obligatorio.dtos;
 import java.util.ArrayList;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.models.Bonificacion;
+import PedroWattimo.Obligatorio.models.entidades.Bonificacion;
 
 public class BonificacionDto {
     private String nombre;

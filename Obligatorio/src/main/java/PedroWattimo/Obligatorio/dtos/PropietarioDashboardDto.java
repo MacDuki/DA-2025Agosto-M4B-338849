@@ -3,7 +3,7 @@ package PedroWattimo.Obligatorio.dtos;
 import java.util.ArrayList;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.models.Propietario;
+import PedroWattimo.Obligatorio.models.entidades.Propietario;
 
 public class PropietarioDashboardDto {
     private PropietarioResumenDto propietario;

@@ -3,7 +3,7 @@ package PedroWattimo.Obligatorio;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import PedroWattimo.Obligatorio.models.SeedData;
+import PedroWattimo.Obligatorio.models.subsistemas.SeedData;
 
 @SpringBootApplication
 public class ObligatorioApplication {

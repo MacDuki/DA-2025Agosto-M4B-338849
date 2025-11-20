@@ -3,7 +3,7 @@ package PedroWattimo.Obligatorio.dtos;
 import java.util.ArrayList;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.models.Tarifa;
+import PedroWattimo.Obligatorio.models.entidades.Tarifa;
 
 public class TarifaDto {
     private String categoria;

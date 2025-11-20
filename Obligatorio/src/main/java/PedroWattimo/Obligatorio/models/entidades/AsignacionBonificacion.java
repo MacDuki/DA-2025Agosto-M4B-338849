@@ -1,0 +1,50 @@
+package PedroWattimo.Obligatorio.models.entidades;
+
+import java.time.LocalDateTime;
+
+public class AsignacionBonificacion {
+
+    private LocalDateTime fechaHora;
+    private Propietario propietario;
+    private Puesto puesto;
+    private Bonificacion bonificacion;
+
+    public AsignacionBonificacion() {
+    }
+
+    public AsignacionBonificacion(LocalDateTime fechaHora, Propietario propietario, Puesto puesto,
+            Bonificacion bonificacion) {
+        this.fechaHora = fechaHora;
+        this.propietario = propietario;
+        this.puesto = puesto;
+        this.bonificacion = bonificacion;
+    }
+
+    public AsignacionBonificacion(Propietario propietario, Puesto puesto, Bonificacion bonificacion) {
+        this.fechaHora = LocalDateTime.now();
+        this.propietario = propietario;
+        this.puesto = puesto;
+        this.bonificacion = bonificacion;
+    }
+
+    boolean activaPara(Puesto puesto, Propietario propietario) {
+        return this.puesto.equals(puesto) && this.propietario.equals(propietario);
+    }
+
+    public LocalDateTime getFechaHora() {
+        return fechaHora;
+    }
+
+    public Propietario getPropietario() {
+        return propietario;
+    }
+
+    public Puesto getPuesto() {
+        return puesto;
+    }
+
+    public Bonificacion getBonificacion() {
+        return bonificacion;
+    }
+
+}

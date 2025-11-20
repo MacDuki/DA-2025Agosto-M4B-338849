@@ -1,6 +1,6 @@
 package PedroWattimo.Obligatorio.dtos;
 
-import PedroWattimo.Obligatorio.models.Propietario;
+import PedroWattimo.Obligatorio.models.entidades.Propietario;
 
 public class PropietarioResumenDto {
     private String nombreCompleto;

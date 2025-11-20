@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.models.AsignacionBonificacion;
+import PedroWattimo.Obligatorio.models.entidades.AsignacionBonificacion;
 
 public class BonificacionAsignadaDto {
     private String nombre;

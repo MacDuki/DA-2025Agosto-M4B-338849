@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import PedroWattimo.Obligatorio.models.ConexionNavegador;
+import PedroWattimo.Obligatorio.models.entidades.ConexionNavegador;
 import jakarta.servlet.http.HttpSession;
 
 @RestController

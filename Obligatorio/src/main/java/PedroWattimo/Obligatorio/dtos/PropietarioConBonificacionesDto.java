@@ -2,7 +2,7 @@ package PedroWattimo.Obligatorio.dtos;
 
 import java.util.List;
 
-import PedroWattimo.Obligatorio.models.Propietario;
+import PedroWattimo.Obligatorio.models.entidades.Propietario;
 
 public class PropietarioConBonificacionesDto {
     private String nombreCompleto;

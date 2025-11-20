@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.models.Notificacion;
+import PedroWattimo.Obligatorio.models.entidades.Notificacion;
 
 public class NotificacionDto {
     private LocalDateTime fechaHora;

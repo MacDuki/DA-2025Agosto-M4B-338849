@@ -3,7 +3,7 @@ package PedroWattimo.Obligatorio.dtos;
 import java.util.ArrayList;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.models.Estado;
+import PedroWattimo.Obligatorio.models.entidades.Estado;
 
 public class EstadoDto {
     private String nombre;
