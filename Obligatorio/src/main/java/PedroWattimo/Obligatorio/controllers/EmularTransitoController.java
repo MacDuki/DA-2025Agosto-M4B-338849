@@ -20,6 +20,7 @@ import PedroWattimo.Obligatorio.dtos.PuestoDto;
 import PedroWattimo.Obligatorio.dtos.TarifaDto;
 import PedroWattimo.Obligatorio.models.ConexionNavegador;
 import PedroWattimo.Obligatorio.models.Fachada;
+import PedroWattimo.Obligatorio.models.Propietario;
 import PedroWattimo.Obligatorio.models.Puesto;
 import PedroWattimo.Obligatorio.models.Tarifa;
 import PedroWattimo.Obligatorio.models.Transito;
@@ -85,7 +86,8 @@ public class EmularTransitoController implements Observador {
                 request.getMatricula(),
                 fechaHora);
 
-        EmularTransitoResultado resultado = new EmularTransitoResultado(transito);
+        Propietario propietario = transito.vehiculo().getPropietario();
+        EmularTransitoResultado resultado = new EmularTransitoResultado(transito, propietario);
         return new Respuesta("ok", resultado);
     }
 }

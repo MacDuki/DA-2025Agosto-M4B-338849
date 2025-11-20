@@ -233,14 +233,6 @@ public class Propietario extends Usuario {
                 .orElse(null);
     }
 
-    public List<AsignacionBonificacion> bonificacionesAsignadas() {
-        return this.asignaciones == null ? List.of() : List.copyOf(this.asignaciones);
-    }
-
-    public List<Vehiculo> vehiculos() {
-        return this.vehiculos == null ? List.of() : List.copyOf(this.vehiculos);
-    }
-
     public List<Notificacion> notificacionesOrdenadasDesc() {
         List<Notificacion> out = new ArrayList<>(this.notificaciones);
         out.sort((a, b) -> b.getFechaHora().compareTo(a.getFechaHora()));
@@ -260,14 +252,6 @@ public class Propietario extends Usuario {
         if (this.notificaciones != null)
             this.notificaciones.clear();
         return cant;
-    }
-
-    public int saldoActual() {
-        return this.saldoActual;
-    }
-
-    public String estadoActual() {
-        return this.estadoActual != null ? this.estadoActual.nombre() : FabricaEstados.crearHabilitado().nombre();
     }
 
     public double totalGastadoPor(Vehiculo v) {

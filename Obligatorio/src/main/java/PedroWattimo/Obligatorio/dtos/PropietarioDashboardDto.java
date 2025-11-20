@@ -18,8 +18,8 @@ public class PropietarioDashboardDto {
 
     public PropietarioDashboardDto(Propietario p) {
         this.propietario = new PropietarioResumenDto(p);
-        this.bonificaciones = BonificacionAsignadaDto.desdeLista(p.bonificacionesAsignadas());
-        this.vehiculos = VehiculoResumenDto.desdeLista(p.vehiculos(), p);
+        this.bonificaciones = BonificacionAsignadaDto.desdeLista(p.getAsignaciones());
+        this.vehiculos = VehiculoResumenDto.desdeLista(p.getVehiculos(), p);
         this.transitos = TransitoDto.desdeLista(p.transitosOrdenadosDesc());
         this.notificaciones = NotificacionDto.desdeLista(p.notificacionesOrdenadasDesc());
     }

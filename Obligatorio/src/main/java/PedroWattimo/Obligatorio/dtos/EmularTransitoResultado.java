@@ -1,5 +1,6 @@
 package PedroWattimo.Obligatorio.dtos;
 
+import PedroWattimo.Obligatorio.models.Propietario;
 import PedroWattimo.Obligatorio.models.Transito;
 
 public class EmularTransitoResultado {
@@ -29,22 +30,15 @@ public class EmularTransitoResultado {
         this.saldoPost = saldoPost;
     }
 
-    public EmularTransitoResultado(Transito t) {
-        this.nombrePropietario = t.vehiculo() != null && t.vehiculo().getPropietario() != null
-                ? t.vehiculo().getPropietario().getNombreCompleto()
-                : null;
-        this.estadoPropietario = t.vehiculo() != null && t.vehiculo().getPropietario() != null
-                && t.vehiculo().getPropietario().getEstadoActual() != null
-                        ? t.vehiculo().getPropietario().getEstadoActual().nombre()
-                        : "HABILITADO";
+    public EmularTransitoResultado(Transito t, Propietario p) {
+        this.nombrePropietario = p.getNombreCompleto();
+        this.estadoPropietario = p.getEstadoActual() != null ? p.getEstadoActual().nombre() : "HABILITADO";
         this.categoriaVehiculo = t.categoriaVehiculo();
         this.bonificacionNombre = t.nombreBonificacion();
         this.costoTransito = t.costoConTarifa();
         this.montoBonificacion = t.montoBonificacion();
         this.montoPagado = t.totalPagado();
-        this.saldoPost = t.vehiculo() != null && t.vehiculo().getPropietario() != null
-                ? t.vehiculo().getPropietario().getSaldoActual()
-                : 0;
+        this.saldoPost = p.getSaldoActual();
     }
 
     public String getNombrePropietario() {

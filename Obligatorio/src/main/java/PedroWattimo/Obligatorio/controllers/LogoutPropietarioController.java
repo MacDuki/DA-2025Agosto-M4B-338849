@@ -12,10 +12,6 @@ import PedroWattimo.Obligatorio.models.Fachada;
 import PedroWattimo.Obligatorio.models.SesionPropietario;
 import jakarta.servlet.http.HttpSession;
 
-/**
- * Controlador para el caso de uso: Logout de Propietario.
- * 
- */
 @RestController
 @RequestMapping("/propietarios/logout")
 public class LogoutPropietarioController {

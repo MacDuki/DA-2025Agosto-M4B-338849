@@ -14,10 +14,6 @@ import PedroWattimo.Obligatorio.models.SesionPropietario;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import jakarta.servlet.http.HttpSession;
 
-/**
- * Controlador para el caso de uso: Login de Propietario.
- * Patrón MVC: orquesta la autenticación delegando en Fachada.
- */
 @RestController
 @RequestMapping("/propietarios/login")
 public class LoginPropietarioController {
