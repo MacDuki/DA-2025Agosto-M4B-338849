@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import PedroWattimo.Obligatorio.models.exceptions.OblException;
+
 public class Propietario extends Usuario {
     private int saldoActual;
     private int saldoMinimoAlerta;
@@ -15,7 +17,7 @@ public class Propietario extends Usuario {
     private List<Notificacion> notificaciones;
 
     public static void validarDatosCreacion(int cedula, String nombreCompleto, String password)
-            throws PedroWattimo.Obligatorio.models.exceptions.OblException {
+            throws OblException {
         Usuario.validarDatosCreacionBase(cedula, nombreCompleto, password);
     }
 
@@ -74,18 +76,22 @@ public class Propietario extends Usuario {
         return this;
     }
 
-    public Propietario acreditarSaldo(int monto) {
-        if (monto > 0)
-            this.saldoActual += monto;
+    public Propietario acreditarSaldo(double monto) {
+        if (monto > 0) {
+            this.saldoActual += (int) Math.round(monto);
+        }
         return this;
     }
 
-    public boolean debitarSaldo(int monto) {
+    public boolean debitarSaldo(double monto) {
         if (monto <= 0)
             return false;
-        if (this.saldoActual - monto < 0)
+        int montoRedondeado = (int) Math.round(monto);
+        if (this.saldoActual - montoRedondeado < 0)
             return false;
-        this.saldoActual -= monto;
+        this.saldoActual -= montoRedondeado;
+        if (this.saldoActual < 0)
+            this.saldoActual = 0;
         return true;
     }
 
@@ -124,20 +130,6 @@ public class Propietario extends Usuario {
 
     public boolean saldoInsuficientePara(double monto) {
         return this.saldoActual < monto;
-    }
-
-    public void debitar(double monto) {
-        if (monto <= 0)
-            return;
-        this.saldoActual -= (int) Math.round(monto);
-        if (this.saldoActual < 0)
-            this.saldoActual = 0;
-    }
-
-    public void acreditar(double monto) {
-        if (monto > 0) {
-            this.saldoActual += (int) Math.round(monto);
-        }
     }
 
     public Optional<AsignacionBonificacion> bonificacionAsignadaPara(Puesto p) {
@@ -184,39 +176,32 @@ public class Propietario extends Usuario {
     }
 
     public void validarAsignacionBonificacion(Bonificacion bonificacion, Puesto puesto)
-            throws PedroWattimo.Obligatorio.models.exceptions.OblException {
+            throws OblException {
         if (bonificacion == null) {
-            throw new PedroWattimo.Obligatorio.models.exceptions.OblException("Debe especificar una bonificación");
+            throw new OblException("Debe especificar una bonificación");
         }
         if (puesto == null) {
-            throw new PedroWattimo.Obligatorio.models.exceptions.OblException("Debe especificar un puesto");
+            throw new OblException("Debe especificar un puesto");
         }
         if (this.estadoActual != null && !this.estadoActual.permiteIngresar()) {
-            throw new PedroWattimo.Obligatorio.models.exceptions.OblException(
+            throw new OblException(
                     "El propietario esta deshabilitado. No se pueden asignar bonificaciones");
         }
         if (this.tieneBonificacionPara(puesto)) {
-            throw new PedroWattimo.Obligatorio.models.exceptions.OblException(
+            throw new OblException(
                     "Ya tiene una bonificación asignada para ese puesto");
         }
     }
 
-    public void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) {
-        if (bonificacion == null || puesto == null)
-            return;
-        if (this.estadoActual != null && !this.estadoActual.permiteIngresar()) {
-            throw new IllegalStateException("El propietario esta deshabilitado. No se pueden asignar bonificaciones");
-        }
-        if (this.asignaciones == null)
-            this.asignaciones = new ArrayList<>();
-        AsignacionBonificacion ab = new AsignacionBonificacion(this, puesto, bonificacion);
-        this.asignaciones.add(ab);
+    public AsignacionBonificacion asignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws OblException {
+        return asignarBonificacion(bonificacion, puesto, LocalDateTime.now());
     }
 
     public AsignacionBonificacion asignarBonificacion(Bonificacion bonificacion, Puesto puesto,
-            LocalDateTime fechaHora) {
-        if (bonificacion == null || puesto == null || fechaHora == null)
-            return null;
+            LocalDateTime fechaHora) throws OblException {
+        if (bonificacion == null || puesto == null || fechaHora == null) {
+            throw new OblException("Bonificación, puesto y fecha no pueden ser nulos");
+        }
         if (this.asignaciones == null)
             this.asignaciones = new ArrayList<>();
         AsignacionBonificacion ab = new AsignacionBonificacion(fechaHora, this, puesto, bonificacion);

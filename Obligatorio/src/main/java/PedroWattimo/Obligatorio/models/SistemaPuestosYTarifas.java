@@ -43,11 +43,8 @@ public class SistemaPuestosYTarifas {
     public Puesto agregarPuesto(String nombre, String direccion) throws OblException {
         Puesto.validarDatosCreacion(nombre, direccion);
 
-        try {
-            buscarPorNombre(nombre);
+        if (puestos.stream().anyMatch(p -> nombre.equalsIgnoreCase(p.getNombre()))) {
             throw new OblException("Ya existe un puesto con el nombre: " + nombre);
-        } catch (OblException e) {
-
         }
 
         Puesto nuevoPuesto = new Puesto(nombre, direccion);

@@ -82,7 +82,7 @@ public class SistemaTransitos {
         if (prop.saldoInsuficientePara(montoAPagar)) {
             throw new OblException(String.format("Saldo insuficiente: $%d", prop.getSaldoActual()));
         }
-        prop.debitar(montoAPagar);
+        prop.debitarSaldo(montoAPagar);
 
         Transito transito = registrarTransito(puesto, veh, tarifa, montoBonif, montoAPagar, fechaHora, bonifAplicada);
 
