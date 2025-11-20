@@ -3,9 +3,11 @@ package PedroWattimo.Obligatorio.models.subsistemas;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import PedroWattimo.Obligatorio.models.entidades.*;
-import PedroWattimo.Obligatorio.models.sesiones.*;
+import PedroWattimo.Obligatorio.models.entidades.Administrador;
+import PedroWattimo.Obligatorio.models.entidades.Propietario;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
+import PedroWattimo.Obligatorio.models.sesiones.SesionAdmin;
+import PedroWattimo.Obligatorio.models.sesiones.SesionPropietario;
 
 public class SistemaAcceso {
 

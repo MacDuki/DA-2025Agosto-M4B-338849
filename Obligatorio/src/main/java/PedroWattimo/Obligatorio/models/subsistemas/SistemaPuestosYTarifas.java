@@ -3,7 +3,9 @@ package PedroWattimo.Obligatorio.models.subsistemas;
 import java.util.ArrayList;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.models.entidades.*;
+import PedroWattimo.Obligatorio.models.entidades.Categoria;
+import PedroWattimo.Obligatorio.models.entidades.Puesto;
+import PedroWattimo.Obligatorio.models.entidades.Tarifa;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 public class SistemaPuestosYTarifas {

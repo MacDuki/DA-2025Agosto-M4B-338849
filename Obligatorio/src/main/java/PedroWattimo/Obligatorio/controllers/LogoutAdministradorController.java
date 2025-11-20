@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import PedroWattimo.Obligatorio.Respuesta;
 import PedroWattimo.Obligatorio.dtos.LogoutResultadoDto;
-import PedroWattimo.Obligatorio.models.subsistemas.Fachada;
 import PedroWattimo.Obligatorio.models.sesiones.SesionAdmin;
+import PedroWattimo.Obligatorio.models.subsistemas.Fachada;
 import jakarta.servlet.http.HttpSession;
 
 @RestController
@@ -35,6 +35,6 @@ public class LogoutAdministradorController {
 
         LogoutResultadoDto resultado = new LogoutResultadoDto("Sesión cerrada exitosamente");
         Respuesta respuesta = new Respuesta("logoutExitoso", resultado);
-        return List.of(respuesta);
+        return Respuesta.lista(respuesta);
     }
 }

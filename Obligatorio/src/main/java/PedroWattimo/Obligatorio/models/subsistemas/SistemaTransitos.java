@@ -7,7 +7,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import PedroWattimo.Obligatorio.models.entidades.*;
+import PedroWattimo.Obligatorio.models.entidades.Bonificacion;
+import PedroWattimo.Obligatorio.models.entidades.Categoria;
+import PedroWattimo.Obligatorio.models.entidades.Estado;
+import PedroWattimo.Obligatorio.models.entidades.Propietario;
+import PedroWattimo.Obligatorio.models.entidades.Puesto;
+import PedroWattimo.Obligatorio.models.entidades.Tarifa;
+import PedroWattimo.Obligatorio.models.entidades.Transito;
+import PedroWattimo.Obligatorio.models.entidades.Vehiculo;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
 

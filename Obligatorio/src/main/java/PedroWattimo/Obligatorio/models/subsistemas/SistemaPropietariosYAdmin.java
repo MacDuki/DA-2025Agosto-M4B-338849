@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import PedroWattimo.Obligatorio.models.entidades.*;
+import PedroWattimo.Obligatorio.models.entidades.Administrador;
+import PedroWattimo.Obligatorio.models.entidades.Estado;
+import PedroWattimo.Obligatorio.models.entidades.Propietario;
+import PedroWattimo.Obligatorio.models.entidades.Vehiculo;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 public class SistemaPropietariosYAdmin {

@@ -13,9 +13,9 @@ import PedroWattimo.Obligatorio.dtos.NotificacionesBorradasDto;
 import PedroWattimo.Obligatorio.dtos.PropietarioAutenticadoDTO;
 import PedroWattimo.Obligatorio.dtos.PropietarioDashboardDto;
 import PedroWattimo.Obligatorio.models.entidades.ConexionNavegador;
-import PedroWattimo.Obligatorio.models.subsistemas.Fachada;
 import PedroWattimo.Obligatorio.models.entidades.Propietario;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
+import PedroWattimo.Obligatorio.models.subsistemas.Fachada;
 import jakarta.servlet.http.HttpSession;
 import observador.Observable;
 import observador.Observador;
@@ -49,7 +49,7 @@ public class DashboardPropietarioController implements Observador {
                 "Hay cambios en tu dashboard");
 
         Respuesta respuesta = new Respuesta("dashboard_actualizado", notificacion);
-        conexionNavegador.enviarJSON(List.of(respuesta));
+        conexionNavegador.enviarJSON(Respuesta.lista(respuesta));
     }
 
     @PostMapping
@@ -69,7 +69,7 @@ public class DashboardPropietarioController implements Observador {
         dto.setVersion(fachada.versionDashboardDePropietario(propietario.getCedula()));
 
         Respuesta respuesta = new Respuesta("dashboard", dto);
-        return List.of(respuesta);
+        return Respuesta.lista(respuesta);
     }
 
     @PostMapping("/notificaciones/borrar")
@@ -94,8 +94,8 @@ public class DashboardPropietarioController implements Observador {
                 "notificaciones_borradas",
                 "Notificaciones borradas");
         Respuesta notifSSE = new Respuesta("dashboard_actualizado", notificacion);
-        conexionNavegador.enviarJSON(List.of(notifSSE));
+        conexionNavegador.enviarJSON(Respuesta.lista(notifSSE));
 
-        return List.of(respuesta);
+        return Respuesta.lista(respuesta);
     }
 }

@@ -3,9 +3,9 @@ package PedroWattimo.Obligatorio.models.subsistemas;
 import java.util.ArrayList;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.models.entidades.*;
-import PedroWattimo.Obligatorio.models.fabricas.*;
+import PedroWattimo.Obligatorio.models.entidades.Estado;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
+import PedroWattimo.Obligatorio.models.fabricas.FabricaEstados;
 
 public class SistemaEstados {
     private final List<Estado> estados;

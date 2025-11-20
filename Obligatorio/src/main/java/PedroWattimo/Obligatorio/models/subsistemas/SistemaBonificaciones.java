@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import PedroWattimo.Obligatorio.models.entidades.*;
-import PedroWattimo.Obligatorio.models.fabricas.*;
+import PedroWattimo.Obligatorio.models.entidades.AsignacionBonificacion;
+import PedroWattimo.Obligatorio.models.entidades.Bonificacion;
+import PedroWattimo.Obligatorio.models.entidades.Propietario;
+import PedroWattimo.Obligatorio.models.entidades.Puesto;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
+import PedroWattimo.Obligatorio.models.fabricas.FabricaBonificaciones;
 
 public class SistemaBonificaciones {
 

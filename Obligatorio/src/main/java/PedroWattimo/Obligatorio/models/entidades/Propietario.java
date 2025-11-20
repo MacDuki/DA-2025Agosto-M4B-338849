@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import PedroWattimo.Obligatorio.models.fabricas.FabricaEstados;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
+import PedroWattimo.Obligatorio.models.fabricas.FabricaEstados;
 
 public class Propietario extends Usuario {
     private int saldoActual;

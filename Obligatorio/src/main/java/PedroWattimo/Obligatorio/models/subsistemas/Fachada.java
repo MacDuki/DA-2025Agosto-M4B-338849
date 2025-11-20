@@ -3,11 +3,18 @@ package PedroWattimo.Obligatorio.models.subsistemas;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import PedroWattimo.Obligatorio.models.entidades.*;
-import PedroWattimo.Obligatorio.models.fabricas.*;
-import PedroWattimo.Obligatorio.models.sesiones.*;
+import PedroWattimo.Obligatorio.models.entidades.Administrador;
+import PedroWattimo.Obligatorio.models.entidades.Bonificacion;
+import PedroWattimo.Obligatorio.models.entidades.Categoria;
+import PedroWattimo.Obligatorio.models.entidades.Estado;
+import PedroWattimo.Obligatorio.models.entidades.Propietario;
+import PedroWattimo.Obligatorio.models.entidades.Puesto;
+import PedroWattimo.Obligatorio.models.entidades.Transito;
+import PedroWattimo.Obligatorio.models.entidades.Vehiculo;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 import PedroWattimo.Obligatorio.models.exceptions.TarifaNoDefinidaException;
+import PedroWattimo.Obligatorio.models.sesiones.SesionAdmin;
+import PedroWattimo.Obligatorio.models.sesiones.SesionPropietario;
 import observador.Observable;
 
 public class Fachada extends Observable {

@@ -2,7 +2,7 @@ package PedroWattimo.Obligatorio.models.sesiones;
 
 import java.time.LocalDateTime;
 
-import PedroWattimo.Obligatorio.models.entidades.*;
+import PedroWattimo.Obligatorio.models.entidades.Administrador;
 
 public class SesionAdmin {
     private LocalDateTime fechaLogin;

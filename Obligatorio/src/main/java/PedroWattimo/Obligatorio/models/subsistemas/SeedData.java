@@ -1,8 +1,9 @@
 package PedroWattimo.Obligatorio.models.subsistemas;
 
-import PedroWattimo.Obligatorio.models.entidades.*;
-import PedroWattimo.Obligatorio.models.fabricas.*;
+import PedroWattimo.Obligatorio.models.entidades.Propietario;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
+import PedroWattimo.Obligatorio.models.fabricas.FabricaBonificaciones;
+import PedroWattimo.Obligatorio.models.fabricas.FabricaEstados;
 
 public class SeedData {
 

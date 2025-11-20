@@ -1,6 +1,9 @@
 package PedroWattimo.Obligatorio.models.fabricas;
 
-import PedroWattimo.Obligatorio.models.entidades.*;
+import PedroWattimo.Obligatorio.models.entidades.Bonificacion;
+import PedroWattimo.Obligatorio.models.entidades.BonificacionExonerados;
+import PedroWattimo.Obligatorio.models.entidades.BonificacionFrecuentes;
+import PedroWattimo.Obligatorio.models.entidades.BonificacionTrabajadores;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 /**

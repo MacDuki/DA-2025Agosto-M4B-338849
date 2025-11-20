@@ -1,6 +1,10 @@
 package PedroWattimo.Obligatorio.models.fabricas;
 
-import PedroWattimo.Obligatorio.models.entidades.*;
+import PedroWattimo.Obligatorio.models.entidades.Estado;
+import PedroWattimo.Obligatorio.models.entidades.EstadoDeshabilitado;
+import PedroWattimo.Obligatorio.models.entidades.EstadoHabilitado;
+import PedroWattimo.Obligatorio.models.entidades.EstadoPenalizado;
+import PedroWattimo.Obligatorio.models.entidades.EstadoSuspendido;
 import PedroWattimo.Obligatorio.models.exceptions.OblException;
 
 /**
